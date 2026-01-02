@@ -23,18 +23,12 @@ FROM oven/bun:1-slim AS runner
 
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 sveltekit
-
 # Copy built app
-COPY --from=builder --chown=sveltekit:nodejs /app/build ./build
-COPY --from=builder --chown=sveltekit:nodejs /app/package.json ./
+COPY --from=builder /app/build ./build
+COPY --from=builder /app/package.json ./
 
 # Install only production dependencies
 RUN bun install --production --frozen-lockfile
-
-USER sveltekit
 
 # Expose port
 EXPOSE 3000
