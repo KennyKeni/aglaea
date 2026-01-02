@@ -8,5 +8,11 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit(),
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
-	]
+	],
+	ssr: {
+		noExternal: ['bits-ui', 'svelte-toolbelt', 'runed']
+	},
+	optimizeDeps: {
+		include: ['bits-ui', 'svelte-toolbelt', 'runed']
+	}
 });
