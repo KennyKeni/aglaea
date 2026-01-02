@@ -24,24 +24,16 @@
 
 	let { data, children }: { data: LayoutData; children: any } = $props();
 
-	const pokemonData = usePokemonData(data.pokemon, data.totalCount);
+	// Destructure to avoid "state_referenced_locally" warning - layout data is stable
+	const { pokemon: initialPokemon, totalCount } = data;
+	const pokemonData = usePokemonData(initialPokemon, totalCount);
 	setPokemonDataContext(pokemonData);
 	const panel = usePanelState(() => pokemonData.items);
 
 	let sentinelEl: HTMLDivElement;
 
 	onMount(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (entries[0].isIntersecting && pokemonData.hasMore && !pokemonData.isLoading) {
-					pokemonData.loadMore();
-				}
-			},
-			{ rootMargin: '200px' }
-		);
-
-		observer.observe(sentinelEl);
-		return () => observer.disconnect();
+		return pokemonData.setupInfiniteScroll(sentinelEl);
 	});
 
 	function handleSearch(query: string) {
@@ -66,7 +58,23 @@
 
 			{#if pokemonData.isLoading}
 				{#each Array(8) as _, i (i)}
-					<Skeleton class="h-48 w-full rounded-2xl" />
+					<div class="bg-card rounded-2xl border p-4">
+						<div class="flex items-start justify-between gap-3 pb-2">
+							<div class="space-y-2">
+								<Skeleton class="h-3 w-12" />
+								<Skeleton class="h-5 w-24" />
+							</div>
+							<Skeleton class="h-14 w-14 rounded-xl" />
+						</div>
+						<div class="space-y-3 pt-2">
+							<div class="flex gap-2">
+								<Skeleton class="h-5 w-16 rounded-full" />
+								<Skeleton class="h-5 w-14 rounded-full" />
+							</div>
+							<Skeleton class="h-10 w-full" />
+							<Skeleton class="h-6 w-28 rounded-full" />
+						</div>
+					</div>
 				{/each}
 			{/if}
 		</div>
@@ -75,7 +83,7 @@
 
 		{#if pokemonData.hasMore && !pokemonData.isLoading}
 			<div class="text-muted-foreground py-4 text-center text-sm">
-				Scroll for more ({pokemonData.totalLoaded} of {data.totalCount} loaded)
+				Scroll for more ({pokemonData.totalLoaded} of {totalCount} loaded)
 			</div>
 		{/if}
 	</div>

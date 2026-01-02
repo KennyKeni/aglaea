@@ -75,10 +75,21 @@ export function usePanelState(getPokemonList: () => Pokemon[]): PanelState {
 	const showOverlay = $derived(mode === 'peek' && !isNavigatingToDetail);
 	const isLoading = $derived(isNavigatingToDetail);
 
+	// Detail page loads pokemon via its own server function - use that when list doesn't have it
+	const detailPagePokemon = $derived.by(() => {
+		if (!isDetailRoute) return null;
+		const data = page.data?.pokemon;
+		// Ensure it's a single pokemon object (has id), not the array from layout
+		if (data && !Array.isArray(data) && typeof data === 'object' && 'id' in data) {
+			return data as Pokemon;
+		}
+		return null;
+	});
+
 	const currentPokemon = $derived(
 		navigatingToPokemon ??
 			(isDetailRoute
-				? getPokemonList().find((p) => String(p.id) === page.params.id)
+				? (getPokemonList().find((p) => String(p.id) === page.params.id) ?? detailPagePokemon)
 				: focusedPokemon)
 	);
 
@@ -91,18 +102,20 @@ export function usePanelState(getPokemonList: () => Pokemon[]): PanelState {
 	});
 
 	function openPeek(mon: Pokemon) {
+		cachedPokemon = mon; // Cache immediately in case it gets filtered out later
 		goto(`/pokemon3?focus=${mon.id}`, { noScroll: true });
 		preloadData(`/pokemon3/${mon.id}`);
 	}
 
 	function expand() {
-		if (!focusId) return;
-		goto(`/pokemon3/${focusId}`, { noScroll: true });
+		const id = focusId ?? cachedPokemon?.id;
+		if (!id) return;
+		goto(`/pokemon3/${id}`, { noScroll: true });
 	}
 
 	function collapse() {
-		if (!isDetailRoute) return;
-		const currentId = page.params.id;
+		const currentId = page.params.id ?? cachedPokemon?.id;
+		if (!currentId) return;
 		goto(`/pokemon3?focus=${currentId}`, { noScroll: true });
 	}
 

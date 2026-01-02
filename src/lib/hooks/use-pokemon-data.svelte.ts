@@ -2,35 +2,34 @@ import type { Pokemon } from '$lib/types/pokemon';
 
 const PAGE_SIZE = 50;
 
-export interface PokemonDataState {
-	readonly items: Pokemon[];
-	readonly isLoading: boolean;
-	readonly hasMore: boolean;
-	readonly isSearching: boolean;
-	readonly searchQuery: string;
-	readonly totalLoaded: number;
-	loadMore(): Promise<void>;
-	search(query: string): void;
-	clearSearch(): void;
-}
+export class PokemonDataState {
+	items = $state<Pokemon[]>([]);
+	isLoading = $state(false);
+	isSearching = $state(false);
+	searchQuery = $state('');
+	totalLoaded = $state(0);
+	hasMore = $state(true);
 
-export function usePokemonData(
-	initialPokemon: Pokemon[],
-	totalCount: number
-): PokemonDataState {
-	let allLoaded = $state<Pokemon[]>(initialPokemon);
-	let searchResults = $state<Pokemon[] | null>(null);
-	let isLoading = $state(false);
-	let isSearching = $state(false);
-	let searchQuery = $state('');
-	let offset = $state(initialPokemon.length);
-	let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+	#allLoaded: Pokemon[] = [];
+	#searchResults: Pokemon[] | null = null;
+	#offset = 0;
+	#totalCount: number;
+	#searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
-	const hasMore = $derived(offset < totalCount && !searchQuery);
-	const items = $derived(searchResults ?? filterLocal(allLoaded, searchQuery));
-	const totalLoaded = $derived(allLoaded.length);
+	constructor(initialPokemon: Pokemon[], totalCount: number) {
+		this.#allLoaded = initialPokemon;
+		this.#offset = initialPokemon.length;
+		this.#totalCount = totalCount;
+		this.#updateState();
+	}
 
-	function filterLocal(pokemon: Pokemon[], query: string): Pokemon[] {
+	#updateState() {
+		this.hasMore = this.#offset < this.#totalCount && !this.searchQuery;
+		this.items = this.#searchResults ?? this.#filterLocal(this.#allLoaded, this.searchQuery);
+		this.totalLoaded = this.#allLoaded.length;
+	}
+
+	#filterLocal(pokemon: Pokemon[], query: string): Pokemon[] {
 		if (!query.trim()) return pokemon;
 		const q = query.trim().toLowerCase();
 		return pokemon.filter(
@@ -38,91 +37,91 @@ export function usePokemonData(
 		);
 	}
 
-	async function loadMore() {
-		if (isLoading || !hasMore) return;
+	async loadMore() {
+		if (this.isLoading || !this.hasMore) return;
 
-		isLoading = true;
+		this.isLoading = true;
 		try {
 			const res = await fetch(
-				`/api/pokemon/search?limit=${PAGE_SIZE}&offset=${offset}&includeTypes=true&includeAbilities=true`
+				`/api/pokemon/search?limit=${PAGE_SIZE}&offset=${this.#offset}&includeTypes=true&includeAbilities=true`
 			);
 			if (res.ok) {
 				const newPokemon: Pokemon[] = await res.json();
-				allLoaded = [...allLoaded, ...newPokemon];
-				offset += newPokemon.length;
+				this.#allLoaded = [...this.#allLoaded, ...newPokemon];
+				this.#offset += newPokemon.length;
+				this.#updateState();
 			}
 		} finally {
-			isLoading = false;
+			this.isLoading = false;
 		}
 	}
 
-	function search(query: string) {
-		searchQuery = query;
+	search(query: string) {
+		this.searchQuery = query;
 
-		if (searchTimeout) {
-			clearTimeout(searchTimeout);
+		if (this.#searchTimeout) {
+			clearTimeout(this.#searchTimeout);
 		}
 
 		if (!query.trim()) {
-			searchResults = null;
-			isSearching = false;
+			this.#searchResults = null;
+			this.isSearching = false;
+			this.#updateState();
 			return;
 		}
 
-		// If query matches loaded data well, use local filter
-		const localResults = filterLocal(allLoaded, query);
-		if (localResults.length >= 10 || allLoaded.length >= totalCount) {
-			searchResults = null; // Use local filter via derived
-			isSearching = false;
+		const localResults = this.#filterLocal(this.#allLoaded, query);
+		if (localResults.length >= 10 || this.#allLoaded.length >= this.#totalCount) {
+			this.#searchResults = null;
+			this.isSearching = false;
+			this.#updateState();
 			return;
 		}
 
-		// Otherwise, search API after debounce
-		isSearching = true;
-		searchTimeout = setTimeout(async () => {
+		this.isSearching = true;
+		this.#searchTimeout = setTimeout(async () => {
 			try {
 				const res = await fetch(
 					`/api/pokemon/search?search=${encodeURIComponent(query)}&limit=100&includeTypes=true&includeAbilities=true`
 				);
 				if (res.ok) {
-					searchResults = await res.json();
+					this.#searchResults = await res.json();
+					this.#updateState();
 				}
 			} finally {
-				isSearching = false;
+				this.isSearching = false;
 			}
 		}, 300);
 	}
 
-	function clearSearch() {
-		searchQuery = '';
-		searchResults = null;
-		isSearching = false;
-		if (searchTimeout) {
-			clearTimeout(searchTimeout);
+	clearSearch() {
+		this.searchQuery = '';
+		this.#searchResults = null;
+		this.isSearching = false;
+		if (this.#searchTimeout) {
+			clearTimeout(this.#searchTimeout);
 		}
+		this.#updateState();
 	}
 
-	return {
-		get items() {
-			return items;
-		},
-		get isLoading() {
-			return isLoading;
-		},
-		get hasMore() {
-			return hasMore;
-		},
-		get isSearching() {
-			return isSearching;
-		},
-		get searchQuery() {
-			return searchQuery;
-		},
-		get totalLoaded() {
-			return totalLoaded;
-		},
-		loadMore,
-		search,
-		clearSearch
-	};
+	setupInfiniteScroll(sentinel: HTMLElement): () => void {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && this.hasMore && !this.isLoading) {
+					this.loadMore();
+				}
+			},
+			{ rootMargin: '200px' }
+		);
+
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	}
+}
+
+export function usePokemonData(
+	initialPokemon: Pokemon[],
+	totalCount: number
+): PokemonDataState {
+	return new PokemonDataState(initialPokemon, totalCount);
 }
