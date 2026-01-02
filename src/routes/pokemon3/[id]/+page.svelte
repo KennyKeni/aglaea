@@ -59,7 +59,7 @@
 		</Tabs.Content>
 
 		<Tabs.Content value="details" class="mt-4">
-			<PokemonDetailsTab form={activeForm} />
+			<PokemonDetailsTab form={activeForm} pokemon={data.pokemon} />
 		</Tabs.Content>
 	</Tabs.Root>
 

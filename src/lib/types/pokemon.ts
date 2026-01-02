@@ -26,6 +26,46 @@ export interface Move {
 	level: number | null;
 }
 
+export interface SpawnCondition {
+	id: number;
+	type: string;
+	biomes: { id: number; name: string }[];
+	biomeTags: { id: number; name: string }[];
+	timeRanges: { id: number; name: string }[];
+	moonPhases: { id: number; name: string }[];
+	weather: { id: number; name: string } | null;
+	sky: { canSeeSky: boolean | null; minSkyLight: number | null; maxSkyLight: number | null } | null;
+}
+
+export interface Spawn {
+	id: number;
+	bucket: { id: number; name: string };
+	positionType: { id: number; name: string };
+	weight: number;
+	levelMin: number;
+	levelMax: number;
+	conditions: SpawnCondition[];
+}
+
+export interface Drop {
+	item: { id: number; name: string };
+	percentage?: number;
+	quantityMin?: number;
+	quantityMax?: number;
+}
+
+export interface Drops {
+	amount: number;
+	percentages: Drop[];
+	ranges: Drop[];
+}
+
+export interface Label {
+	id: number;
+	name: string;
+	slug: string;
+}
+
 export interface Form {
 	id: number;
 	name: string;
@@ -47,9 +87,31 @@ export interface Form {
 	baseSpecialDefence: number;
 	baseSpeed: number;
 	baseExperienceYield: number | null;
+	evHp: number;
+	evAttack: number;
+	evDefence: number;
+	evSpecialAttack: number;
+	evSpecialDefence: number;
+	evSpeed: number;
 	types: FormType[];
 	abilities: FormAbility[];
 	moves: Move[];
+	spawns?: Spawn[];
+	drops?: Drops;
+	labels?: Label[];
+}
+
+export interface EggGroup {
+	id: number;
+	name: string;
+	slug: string;
+}
+
+export interface ExperienceGroup {
+	id: number;
+	name: string;
+	slug: string;
+	formula: string;
 }
 
 export interface Pokemon {
@@ -59,6 +121,8 @@ export interface Pokemon {
 	description: string | null;
 	generation: number;
 	forms: Form[];
+	eggGroups?: EggGroup[];
+	experienceGroup?: ExperienceGroup;
 }
 
 export const TYPE_COLORS: Record<string, string> = {

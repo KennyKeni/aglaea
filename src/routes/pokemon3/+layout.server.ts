@@ -5,7 +5,7 @@ const PAGE_SIZE = 50;
 
 export const load: LayoutServerLoad = async ({ fetch }) => {
 	const res = await fetch(
-		`${env.BACKEND_URL}/pokemon/search?includeTypes=true&includeAbilities=true&limit=${PAGE_SIZE}&offset=0`
+		`${env.BACKEND_URL}/pokemon?includeTypes=true&includeAbilities=true&limit=${PAGE_SIZE}&offset=0`
 	);
 
 	if (!res.ok) {
