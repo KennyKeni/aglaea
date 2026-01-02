@@ -12,17 +12,13 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Maximize2 } from '@lucide/svelte';
 	import { cn } from '$lib/utils';
-	import type { Pokemon } from './types';
+	import { getPokemonDataContext } from '$lib/context/pokemon';
 
-	interface PageData {
-		pokemon: Pokemon[];
-	}
-
-	let { data }: { data: PageData } = $props();
+	const pokemonData = getPokemonDataContext();
 
 	let focusId = $derived(page.url.searchParams.get('focus'));
 	let focusedPokemon = $derived(
-		focusId ? data.pokemon.find((p) => String(p.id) === focusId) : null
+		focusId ? pokemonData.items.find((p) => String(p.id) === focusId) : null
 	);
 
 	let formIndex = $state(0);

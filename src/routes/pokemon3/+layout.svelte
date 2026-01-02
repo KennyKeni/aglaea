@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import {
 		SearchHeader,
 		PokemonCard,
@@ -8,37 +9,75 @@
 		PokemonDetailsTab
 	} from '$lib/components/pokemon';
 	import * as Tabs from '$lib/components/ui/tabs';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { cn } from '$lib/utils';
 	import { usePanelState } from '$lib/hooks/use-panel-state.svelte';
+	import { usePokemonData } from '$lib/hooks/use-pokemon-data.svelte';
+	import { setPokemonDataContext } from '$lib/context/pokemon';
 	import type { Pokemon } from './types';
 
 	interface LayoutData {
 		pokemon: Pokemon[];
+		totalCount: number;
+		pageSize: number;
 	}
 
 	let { data, children }: { data: LayoutData; children: any } = $props();
 
-	let query = $state('');
-	let filtered = $derived.by(() => {
-		const s = query.trim().toLowerCase();
-		if (!s) return data.pokemon;
-		return data.pokemon.filter(
-			(m) => m.name.toLowerCase().includes(s) || String(m.id).includes(s)
+	const pokemonData = usePokemonData(data.pokemon, data.totalCount);
+	setPokemonDataContext(pokemonData);
+	const panel = usePanelState(() => pokemonData.items);
+
+	let sentinelEl: HTMLDivElement;
+
+	onMount(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && pokemonData.hasMore && !pokemonData.isLoading) {
+					pokemonData.loadMore();
+				}
+			},
+			{ rootMargin: '200px' }
 		);
+
+		observer.observe(sentinelEl);
+		return () => observer.disconnect();
 	});
 
-	const panel = usePanelState(data.pokemon);
+	function handleSearch(query: string) {
+		pokemonData.search(query);
+	}
 </script>
 
 <div class="bg-muted/30 min-h-screen">
-	<SearchHeader bind:query count={filtered.length} />
+	<SearchHeader
+		query={pokemonData.searchQuery}
+		onQueryChange={handleSearch}
+		count={pokemonData.items.length}
+		totalLoaded={pokemonData.totalLoaded}
+		isSearching={pokemonData.isSearching}
+	/>
 
 	<div class="mx-auto max-w-6xl px-4 py-6">
 		<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-			{#each filtered as mon (mon.id)}
+			{#each pokemonData.items as mon (mon.id)}
 				<PokemonCard pokemon={mon} onclick={() => panel.openPeek(mon)} />
 			{/each}
+
+			{#if pokemonData.isLoading}
+				{#each Array(8) as _, i (i)}
+					<Skeleton class="h-48 w-full rounded-2xl" />
+				{/each}
+			{/if}
 		</div>
+
+		<div bind:this={sentinelEl} class="h-4"></div>
+
+		{#if pokemonData.hasMore && !pokemonData.isLoading}
+			<div class="text-muted-foreground py-4 text-center text-sm">
+				Scroll for more ({pokemonData.totalLoaded} of {data.totalCount} loaded)
+			</div>
+		{/if}
 	</div>
 
 	<PokemonPanel {panel}>

@@ -18,7 +18,7 @@ export interface PanelState {
 	close(): void;
 }
 
-export function usePanelState(pokemonList: Pokemon[]): PanelState {
+export function usePanelState(getPokemonList: () => Pokemon[]): PanelState {
 	let isMd = $state(false);
 
 	onMount(() => {
@@ -53,13 +53,13 @@ export function usePanelState(pokemonList: Pokemon[]): PanelState {
 	const focusId = $derived(page.url.searchParams.get('focus'));
 	const isDetailRoute = $derived(page.route.id?.includes('[id]') ?? false);
 	const focusedPokemon = $derived(
-		focusId ? pokemonList.find((p) => String(p.id) === focusId) : null
+		focusId ? getPokemonList().find((p) => String(p.id) === focusId) : null
 	);
 
 	const isNavigatingToDetail = $derived(navigating?.to?.route.id?.includes('[id]') ?? false);
 	const navigatingToId = $derived(isNavigatingToDetail ? navigating?.to?.params?.id : null);
 	const navigatingToPokemon = $derived(
-		navigatingToId ? pokemonList.find((p) => String(p.id) === navigatingToId) : null
+		navigatingToId ? getPokemonList().find((p) => String(p.id) === navigatingToId) : null
 	);
 
 	const mode = $derived<'closed' | 'peek' | 'full'>(
@@ -78,7 +78,7 @@ export function usePanelState(pokemonList: Pokemon[]): PanelState {
 	const currentPokemon = $derived(
 		navigatingToPokemon ??
 			(isDetailRoute
-				? pokemonList.find((p) => String(p.id) === page.params.id)
+				? getPokemonList().find((p) => String(p.id) === page.params.id)
 				: focusedPokemon)
 	);
 
