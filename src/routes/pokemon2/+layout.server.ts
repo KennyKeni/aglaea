@@ -1,9 +1,9 @@
 import type { LayoutServerLoad } from './$types';
-import { BACKEND_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const load: LayoutServerLoad = async ({ fetch }) => {
 	const res = await fetch(
-		`${BACKEND_URL}/pokemon/search?includeTypes=true&includeAbilities=true&limit=50`
+		`${env.BACKEND_URL}/pokemon/search?includeTypes=true&includeAbilities=true&limit=50`
 	);
 
 	if (!res.ok) {
