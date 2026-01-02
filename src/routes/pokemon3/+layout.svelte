@@ -24,8 +24,8 @@
 
 	let { data, children }: { data: LayoutData; children: any } = $props();
 
-	// Destructure to avoid "state_referenced_locally" warning - layout data is stable
-	const { pokemon: initialPokemon, totalCount } = data;
+	const initialPokemon = $derived(data.pokemon);
+	const totalCount = $derived(data.totalCount);
 	const pokemonData = usePokemonData(initialPokemon, totalCount);
 	setPokemonDataContext(pokemonData);
 	const panel = usePanelState(() => pokemonData.items);

@@ -43,7 +43,7 @@ export class PokemonDataState {
 		this.isLoading = true;
 		try {
 			const res = await fetch(
-				`/api/pokemon/search?limit=${PAGE_SIZE}&offset=${this.#offset}&includeTypes=true&includeAbilities=true`
+				`/api/pokemon?limit=${PAGE_SIZE}&offset=${this.#offset}&includeTypes=true&includeAbilities=true`
 			);
 			if (res.ok) {
 				const newPokemon: Pokemon[] = await res.json();
@@ -82,7 +82,7 @@ export class PokemonDataState {
 		this.#searchTimeout = setTimeout(async () => {
 			try {
 				const res = await fetch(
-					`/api/pokemon/search?search=${encodeURIComponent(query)}&limit=100&includeTypes=true&includeAbilities=true`
+					`/api/pokemon?search=${encodeURIComponent(query)}&limit=100&includeTypes=true&includeAbilities=true`
 				);
 				if (res.ok) {
 					this.#searchResults = await res.json();
