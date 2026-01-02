@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import {
 		SearchHeader,
 		PokemonCard,
@@ -24,9 +24,7 @@
 
 	let { data, children }: { data: LayoutData; children: any } = $props();
 
-	const initialPokemon = $derived(data.pokemon);
-	const totalCount = $derived(data.totalCount);
-	const pokemonData = usePokemonData(initialPokemon, totalCount);
+	const pokemonData = untrack(() => usePokemonData(data.pokemon, data.totalCount));
 	setPokemonDataContext(pokemonData);
 	const panel = usePanelState(() => pokemonData.items);
 
@@ -83,7 +81,7 @@
 
 		{#if pokemonData.hasMore && !pokemonData.isLoading}
 			<div class="text-muted-foreground py-4 text-center text-sm">
-				Scroll for more ({pokemonData.totalLoaded} of {totalCount} loaded)
+				Scroll for more ({pokemonData.totalLoaded} of {data.totalCount} loaded)
 			</div>
 		{/if}
 	</div>

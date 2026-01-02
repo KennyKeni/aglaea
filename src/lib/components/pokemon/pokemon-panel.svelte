@@ -4,6 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { X, Maximize2, Minimize2 } from '@lucide/svelte';
+	import { browser } from '$app/environment';
 	import type { Action } from 'svelte/action';
 	import type { Snippet } from 'svelte';
 	import type { PanelState } from '$lib/hooks/use-panel-state.svelte';
@@ -17,7 +18,13 @@
 		children: Snippet;
 	} = $props();
 
+	let hasHydrated = $state(false);
+	$effect(() => {
+		if (browser) hasHydrated = true;
+	});
+
 	const slideIn: Action<HTMLElement> = (node) => {
+		if (!hasHydrated) return;
 		node.style.transform = 'translateX(100%)';
 		requestAnimationFrame(() => {
 			animate(node, { transform: 'translateX(0%)' }, { duration: 0.35, ease: [0.22, 1, 0.36, 1] });

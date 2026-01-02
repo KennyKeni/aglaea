@@ -1,7 +1,7 @@
 import type { LayoutServerLoad } from './$types';
 import { env } from '$env/dynamic/private';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 48;
 
 export const load: LayoutServerLoad = async ({ fetch }) => {
 	const res = await fetch(

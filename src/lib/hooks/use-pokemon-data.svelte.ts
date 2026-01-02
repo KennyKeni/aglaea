@@ -1,6 +1,6 @@
 import type { Pokemon } from '$lib/types/pokemon';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 48;
 
 export class PokemonDataState {
 	items = $state<Pokemon[]>([]);
