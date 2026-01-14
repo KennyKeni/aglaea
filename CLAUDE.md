@@ -35,6 +35,7 @@ SvelteKit acts as a BFF (Backend-for-Frontend) proxy. All browser requests go th
 ## API: herta.kennykeni.com
 
 ## SCHEMA: API.json
+
 - This is a large OPENAPI format'd file
 
 ## File Structure & Responsibilities
