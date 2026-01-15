@@ -28,3 +28,6 @@ project.inlang/cache/
 
 *storybook.log
 storybook-static
+
+# LLM
+.claude
