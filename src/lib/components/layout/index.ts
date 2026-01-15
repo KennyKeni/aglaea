@@ -1,1 +1,2 @@
-export { default as Navbar } from './navbar.svelte';
+export { default as AppSidebar } from './app-sidebar.svelte';
+export { default as AppHeader } from './app-header.svelte';

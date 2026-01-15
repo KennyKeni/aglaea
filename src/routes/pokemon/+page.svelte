@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { SearchHeader, PokemonGrid } from '$lib/components/pokemon';
+	import { PokemonGrid } from '$lib/components/pokemon';
 	import Pagination from '$lib/components/ui/pagination.svelte';
 	import { getPokemonDataContext, getPanelContext } from '$lib/context/pokemon';
 	import type { Pokemon } from '$lib/types/pokemon';
@@ -25,22 +25,10 @@
 		}
 	});
 
-	let query = $state(page.url.searchParams.get('search') || '');
-
-	function handleSearch(nextQuery: string) {
-		query = nextQuery;
-		pokemonData.search(nextQuery);
-
-		const params = new URLSearchParams(page.url.searchParams);
-		if (nextQuery.trim()) {
-			params.set('search', nextQuery);
-			params.delete('page');
-		} else {
-			params.delete('search');
-		}
-		const queryString = params.toString();
-		history.replaceState({}, '', queryString ? `/pokemon?${queryString}` : '/pokemon');
-	}
+	$effect(() => {
+		const query = page.url.searchParams.get('search') || '';
+		pokemonData.search(query);
+	});
 
 	function handlePageChange(newPage: number) {
 		const params = new URLSearchParams(page.url.searchParams);
@@ -48,14 +36,6 @@
 		goto(`/pokemon?${params.toString()}`, { keepFocus: true });
 	}
 </script>
-
-<SearchHeader
-	{query}
-	onQueryChange={handleSearch}
-	count={pokemonData.items.length}
-	totalLoaded={data.pokemon.length}
-	isSearching={pokemonData.isSearching}
-/>
 
 <PokemonGrid
 	pokemon={pokemonData.items}

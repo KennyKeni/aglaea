@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
-	import { Navbar } from '$lib/components/layout';
+	import { AppSidebar, AppHeader } from '$lib/components/layout';
+	import * as Sidebar from '$lib/components/ui/sidebar';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 
@@ -14,12 +15,21 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
-{#if !isAuthPage}
-	<Navbar />
+{#if isAuthPage}
+	{@render children()}
+{:else}
+	<Sidebar.Provider>
+		<AppSidebar />
+		<Sidebar.Inset class="flex flex-col">
+			<AppHeader />
+			<main class="relative flex-1 overflow-hidden">
+				{@render children()}
+			</main>
+		</Sidebar.Inset>
+	</Sidebar.Provider>
 {/if}
-{@render children()}
 <div style="display:none">
-	{#each locales as locale}
+	{#each locales as locale (locale)}
 		<a href={localizeHref(page.url.pathname, { locale })}>
 			{locale}
 		</a>

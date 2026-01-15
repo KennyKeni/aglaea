@@ -15,7 +15,7 @@
         "@eslint/js": "^9.39.1",
         "@inlang/paraglide-js": "^2.6.0",
         "@internationalized/date": "^3.10.0",
-        "@lucide/svelte": "^0.562.0",
+        "@lucide/svelte": "^0.561.0",
         "@storybook/addon-a11y": "^10.1.11",
         "@storybook/addon-docs": "^10.1.11",
         "@storybook/addon-svelte-csf": "^5.0.10",
@@ -191,7 +191,7 @@
 
     "@lix-js/server-protocol-schema": ["@lix-js/server-protocol-schema@0.1.1", "", {}, "sha512-jBeALB6prAbtr5q4vTuxnRZZv1M2rKe8iNqRQhFJ4Tv7150unEa0vKyz0hs8Gl3fUGsWaNJBh3J8++fpbrpRBQ=="],
 
-    "@lucide/svelte": ["@lucide/svelte@0.562.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-wDMULwtTFN2Sc/TFBm6gfuVCNb4Y5P9LDrwxNnUbV52+IEU7NXZmvxwXoz+vrrpad6Xupq+Hw5eUlqIHEGhouw=="],
+    "@lucide/svelte": ["@lucide/svelte@0.561.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-vofKV2UFVrKE6I4ewKJ3dfCXSV6iP6nWVmiM83MLjsU91EeJcEg7LoWUABLp/aOTxj1HQNbJD1f3g3L0JQgH9A=="],
 
     "@mdx-js/react": ["@mdx-js/react@3.1.1", "", { "dependencies": { "@types/mdx": "^2.0.0" }, "peerDependencies": { "@types/react": ">=16", "react": ">=16" } }, "sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw=="],
 

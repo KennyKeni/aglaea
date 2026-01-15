@@ -48,7 +48,7 @@
 	{#key itemKey}
 		<button
 			aria-label="Close panel"
-			class="fixed inset-0 z-30 bg-black/40 transition-opacity duration-200"
+			class="absolute inset-0 z-30 bg-black/40 transition-opacity duration-200"
 			style="opacity: {animation.showOverlay ? 1 : 0}; pointer-events: {animation.showOverlay
 				? 'auto'
 				: 'none'}"
@@ -57,7 +57,7 @@
 
 		<aside
 			use:slideIn
-			class="bg-background fixed top-0 right-0 z-40 h-dvh shadow-2xl transition-[width,border-radius,border-left] duration-300 ease-out"
+			class="bg-background absolute inset-y-0 right-0 z-40 shadow-2xl transition-[width,border-radius,border-left] duration-300 ease-out"
 			style="width: {animation.panelWidth}; border-top-left-radius: {animation.borderRadius}; border-left: {animation.borderLeft}"
 		>
 			<div class="bg-background/80 sticky top-0 z-10 border-b backdrop-blur">
@@ -94,7 +94,7 @@
 				</div>
 			</div>
 
-			<ScrollArea class="h-[calc(100dvh-56px)]">
+			<ScrollArea class="h-[calc(100%-56px)]">
 				<div class="px-4 py-4 md:px-6 md:py-6">
 					{@render children()}
 				</div>

@@ -49,7 +49,7 @@
 	const panelSubtitle = $derived(panelMode.activeItem ? formatId(panelMode.activeItem.id) : '');
 </script>
 
-<div class="bg-muted/30 min-h-screen">
+<div class="bg-muted/30 flex min-h-full flex-col">
 	<div class:hidden={panelMode.isDetailRoute}>
 		{@render children()}
 	</div>

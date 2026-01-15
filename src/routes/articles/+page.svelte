@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { SearchHeader, ArticleGrid } from '$lib/components/articles';
+	import { ArticleGrid } from '$lib/components/articles';
 	import Pagination from '$lib/components/ui/pagination.svelte';
 	import { getArticleDataContext, getArticlePanelContext } from '$lib/context/articles';
 	import type { Article } from '$lib/types/article';
@@ -25,22 +25,10 @@
 		}
 	});
 
-	let query = $state(page.url.searchParams.get('search') || '');
-
-	function handleSearch(nextQuery: string) {
-		query = nextQuery;
-		articleData.search(nextQuery);
-
-		const params = new URLSearchParams(page.url.searchParams);
-		if (nextQuery.trim()) {
-			params.set('search', nextQuery);
-			params.delete('page');
-		} else {
-			params.delete('search');
-		}
-		const queryString = params.toString();
-		history.replaceState({}, '', queryString ? `/articles?${queryString}` : '/articles');
-	}
+	$effect(() => {
+		const query = page.url.searchParams.get('search') || '';
+		articleData.search(query);
+	});
 
 	function handlePageChange(newPage: number) {
 		const params = new URLSearchParams(page.url.searchParams);
@@ -48,14 +36,6 @@
 		goto(`/articles?${params.toString()}`, { keepFocus: true });
 	}
 </script>
-
-<SearchHeader
-	{query}
-	onQueryChange={handleSearch}
-	count={articleData.items.length}
-	totalLoaded={data.articles.length}
-	isSearching={articleData.isSearching}
-/>
 
 <ArticleGrid
 	articles={articleData.items}
