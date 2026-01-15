@@ -1,5 +1,5 @@
 import type { Article } from '$lib/types/article';
-import { createGridDataState, type GridDataState } from './grid-data-state.svelte';
+import { createGridDataState, type GridDataState } from './grid-data.svelte';
 
 export function createArticleState(
 	initialArticles: Article[],

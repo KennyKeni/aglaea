@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte';
-import type { GridDataState } from '$lib/states/grid-data-state.svelte';
-import type { PanelModeState } from '$lib/hooks/use-panel-mode.svelte';
-import type { PanelAnimationState } from '$lib/hooks/use-panel-animation.svelte';
+import type { GridDataState } from '$lib/state/grid-data.svelte';
+import type { PanelModeState } from '$lib/state/panel-mode.svelte';
+import type { PanelAnimationState } from '$lib/state/panel-animation.svelte';
 import type { Article } from '$lib/types/article';
 
 const ARTICLE_DATA_KEY = Symbol('article-data');

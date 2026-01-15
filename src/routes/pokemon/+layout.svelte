@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Panel, PokemonContent } from '$lib/components/pokemon';
-	import { createPokemonSpeciesState } from '$lib/states/pokemon-species-state.svelte';
-	import { usePanelMode } from '$lib/hooks/use-panel-mode.svelte';
-	import { usePanelAnimation } from '$lib/hooks/use-panel-animation.svelte';
+	import { createPokemonSpeciesState } from '$lib/state/pokemon-data.svelte';
+	import { createPanelMode } from '$lib/state/panel-mode.svelte';
+	import { createPanelAnimation } from '$lib/state/panel-animation.svelte';
 	import { setPokemonDataContext, setPanelContext } from '$lib/context/pokemon';
 	import { formatId } from '$lib/utils/pokemon';
 	import type { Pokemon } from '$lib/types/pokemon';
@@ -20,7 +20,7 @@
 
 	let isMobileState = $state(false);
 
-	const panelMode = usePanelMode<Pokemon>({
+	const panelMode = createPanelMode<Pokemon>({
 		items: () => pokemonData.items,
 		basePath: '/pokemon',
 		getId: (item) => item.id,
@@ -34,7 +34,7 @@
 		isMobile: () => isMobileState
 	});
 
-	const panelAnimation = usePanelAnimation(
+	const panelAnimation = createPanelAnimation(
 		() => panelMode.mode,
 		() => panelMode.isNavigating
 	);
@@ -49,7 +49,7 @@
 	const panelSubtitle = $derived(panelMode.activeItem ? formatId(panelMode.activeItem.id) : '');
 </script>
 
-<div class="bg-muted/30 flex min-h-full flex-col">
+<div class="bg-muted/30 min-h-screen">
 	<div class:hidden={panelMode.isDetailRoute}>
 		{@render children()}
 	</div>

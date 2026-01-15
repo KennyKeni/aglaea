@@ -91,8 +91,9 @@ export class GridDataStateImpl<T> implements GridDataState<T> {
 				const res = await fetch(`${this.#config.apiEndpoint}?${qs}`);
 				if (res.ok) {
 					const json = await res.json();
-					this.#searchResults = json.data ?? json;
-					this.items = this.#searchResults;
+					const results: T[] = json.data ?? json;
+					this.#searchResults = results;
+					this.items = results;
 				}
 			} finally {
 				this.isSearching = false;

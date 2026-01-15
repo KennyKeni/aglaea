@@ -26,7 +26,7 @@ export interface PanelModeOptions<T> {
 	isMobile?: () => boolean;
 }
 
-export function usePanelMode<T>({
+export function createPanelMode<T>({
 	items,
 	basePath,
 	focusParam = 'focus',

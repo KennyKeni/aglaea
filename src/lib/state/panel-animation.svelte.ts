@@ -1,5 +1,5 @@
 import { onMount } from 'svelte';
-import type { PanelMode } from './use-panel-mode.svelte';
+import type { PanelMode } from './panel-mode.svelte';
 
 export interface PanelAnimationState {
 	readonly showPanel: boolean;
@@ -10,7 +10,7 @@ export interface PanelAnimationState {
 	readonly isMobile: boolean;
 }
 
-export function usePanelAnimation(
+export function createPanelAnimation(
 	getMode: () => PanelMode,
 	getIsNavigating: () => boolean
 ): PanelAnimationState {

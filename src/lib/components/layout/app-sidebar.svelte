@@ -41,7 +41,7 @@
 						{#if item.children && item.children.length > 0}
 							<Collapsible.Root open={isGroupActive(item.children)} class="group/collapsible">
 								<Sidebar.MenuItem>
-									<Collapsible.Trigger asChild>
+									<Collapsible.Trigger>
 										{#snippet child({ props })}
 											<Sidebar.MenuButton {...props} tooltipContent={item.label}>
 												{#if item.icon}

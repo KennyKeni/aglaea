@@ -1,5 +1,5 @@
 import type { Pokemon } from '$lib/types/pokemon';
-import { createGridDataState, type GridDataState } from './grid-data-state.svelte';
+import { createGridDataState, type GridDataState } from './grid-data.svelte';
 
 export function createPokemonSpeciesState(
 	initialPokemon: Pokemon[],

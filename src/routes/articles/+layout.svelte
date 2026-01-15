@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Panel, ArticleContent } from '$lib/components/articles';
-	import { createArticleState } from '$lib/states/article-state.svelte';
-	import { usePanelMode } from '$lib/hooks/use-panel-mode.svelte';
-	import { usePanelAnimation } from '$lib/hooks/use-panel-animation.svelte';
+	import { createArticleState } from '$lib/state/article-data.svelte';
+	import { createPanelMode } from '$lib/state/panel-mode.svelte';
+	import { createPanelAnimation } from '$lib/state/panel-animation.svelte';
 	import { setArticleDataContext, setArticlePanelContext } from '$lib/context/articles';
 	import type { Article } from '$lib/types/article';
 
@@ -19,7 +19,7 @@
 
 	let isMobileState = $state(false);
 
-	const panelMode = usePanelMode<Article>({
+	const panelMode = createPanelMode<Article>({
 		items: () => articleData.items,
 		basePath: '/articles',
 		getId: (item) => item.id,
@@ -33,7 +33,7 @@
 		isMobile: () => isMobileState
 	});
 
-	const panelAnimation = usePanelAnimation(
+	const panelAnimation = createPanelAnimation(
 		() => panelMode.mode,
 		() => panelMode.isNavigating
 	);
@@ -48,7 +48,7 @@
 	const panelSubtitle = $derived(panelMode.activeItem?.author ? `By ${panelMode.activeItem.author}` : '');
 </script>
 
-<div class="bg-muted/30 flex min-h-full flex-col">
+<div class="bg-muted/30 min-h-screen">
 	<div class:hidden={panelMode.isDetailRoute}>
 		{@render children()}
 	</div>

@@ -20,9 +20,9 @@
 {:else}
 	<Sidebar.Provider>
 		<AppSidebar />
-		<Sidebar.Inset class="flex flex-col">
+		<Sidebar.Inset>
 			<AppHeader />
-			<main class="relative flex-1 overflow-hidden">
+			<main class="flex-1">
 				{@render children()}
 			</main>
 		</Sidebar.Inset>
