@@ -6,11 +6,10 @@
 		EdraToolBar,
 		EdraDragHandleExtended
 	} from '$lib/components/edra/shadcn';
-	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
-	import { Loader2, X } from '@lucide/svelte';
+	import { Loader2 } from '@lucide/svelte';
 	import type { Article } from '$lib/types/article';
 	import initEditor from '$lib/components/edra/editor';
 
@@ -116,64 +115,11 @@
 </script>
 
 <form onsubmit={handleSubmit}>
-	<Card.Root class="rounded-2xl">
-		<Card.Header>
-			<div class="flex items-center justify-between">
-				<Card.Title>{isCreateMode ? 'New Article' : 'Edit Article'}</Card.Title>
-				<Button variant="ghost" size="icon" onclick={onCancel} type="button">
-					<X class="h-4 w-4" />
-				</Button>
-			</div>
-		</Card.Header>
-		<Card.Content class="space-y-6">
-			{#if error}
-				<div class="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-					{error}
-				</div>
-			{/if}
-
-			<div class="space-y-2">
-				<Label for="title">Title</Label>
-				<Input id="title" bind:value={title} required disabled={isSaving} />
-			</div>
-
-			<div class="space-y-2">
-				<Label for="subtitle">Subtitle</Label>
-				<Input id="subtitle" bind:value={subtitle} disabled={isSaving} />
-			</div>
-
-			<div class="space-y-2">
-				<Label for="description">Description</Label>
-				<Input id="description" bind:value={description} disabled={isSaving} />
-			</div>
-
-			<div class="space-y-2">
-				<Label for="author">Author</Label>
-				<Input id="author" bind:value={author} disabled={isSaving} />
-			</div>
-
-			<div class="space-y-2">
-				<Label>Body</Label>
-				<div class="rounded-md border">
-					{#if editor && !editor.isDestroyed}
-						<EdraToolBar
-							class="bg-secondary/50 flex w-full items-center overflow-x-auto border-b p-1"
-							{editor}
-						/>
-						<EdraDragHandleExtended {editor} />
-					{/if}
-					<div class="min-h-[300px] p-4">
-						<EdraEditor
-							bind:editor
-							content={initialContent}
-							editable={!isSaving}
-							onUpdate={() => {}}
-						/>
-					</div>
-				</div>
-			</div>
-		</Card.Content>
-		<Card.Footer class="flex justify-end gap-2">
+	<div class="flex items-center justify-between mb-8">
+		<h1 class="text-3xl font-bold tracking-tight">
+			{isCreateMode ? 'New Article' : 'Edit Article'}
+		</h1>
+		<div class="flex items-center gap-2">
 			<Button variant="outline" onclick={onCancel} type="button" disabled={isSaving}>
 				Cancel
 			</Button>
@@ -185,6 +131,79 @@
 					{isCreateMode ? 'Create Article' : 'Save Changes'}
 				{/if}
 			</Button>
-		</Card.Footer>
-	</Card.Root>
+		</div>
+	</div>
+
+	{#if error}
+		<div class="bg-destructive/10 text-destructive rounded-md p-3 text-sm mb-6">
+			{error}
+		</div>
+	{/if}
+
+	<div class="space-y-6 mb-8">
+		<div class="space-y-2">
+			<Label for="title">Title</Label>
+			<Input
+				id="title"
+				bind:value={title}
+				required
+				disabled={isSaving}
+				class="text-lg"
+				placeholder="Article title"
+			/>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div class="space-y-2">
+				<Label for="subtitle">Subtitle</Label>
+				<Input
+					id="subtitle"
+					bind:value={subtitle}
+					disabled={isSaving}
+					placeholder="Optional subtitle"
+				/>
+			</div>
+
+			<div class="space-y-2">
+				<Label for="author">Author</Label>
+				<Input
+					id="author"
+					bind:value={author}
+					disabled={isSaving}
+					placeholder="Author name"
+				/>
+			</div>
+		</div>
+
+		<div class="space-y-2">
+			<Label for="description">Description</Label>
+			<Input
+				id="description"
+				bind:value={description}
+				disabled={isSaving}
+				placeholder="Brief description for previews"
+			/>
+		</div>
+	</div>
+
+	<div class="space-y-2">
+		<Label>Body</Label>
+		<div class="rounded-lg border bg-background">
+			{#if editor && !editor.isDestroyed}
+				<EdraToolBar
+					class="bg-muted/50 flex w-full items-center overflow-x-auto border-b p-1 sticky top-0 z-10"
+					{editor}
+				/>
+				<EdraDragHandleExtended {editor} />
+			{/if}
+			<div class="min-h-[400px] p-6">
+				<EdraEditor
+					bind:editor
+					content={initialContent}
+					editable={!isSaving}
+					onUpdate={() => {}}
+				/>
+			</div>
+		</div>
+	</div>
 </form>
