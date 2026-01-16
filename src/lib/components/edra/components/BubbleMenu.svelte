@@ -47,9 +47,9 @@
 			editor,
 			element,
 			shouldShow,
-			updateDelay,
-			resizeDelay,
-			options
+			...(updateDelay !== undefined && { updateDelay }),
+			...(resizeDelay !== undefined && { resizeDelay }),
+			...(options && { options })
 		});
 
 		editor.registerPlugin(plugin);

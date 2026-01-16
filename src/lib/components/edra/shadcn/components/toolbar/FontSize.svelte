@@ -40,7 +40,7 @@
 			</Button>
 		</EdraToolTip>
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content class="h-fit w-fit" portalProps={{ disabled: true, to: undefined }}>
+	<DropdownMenu.Content class="h-fit w-fit" portalProps={{ disabled: true }}>
 		{#each FONT_SIZE as fontSize (fontSize)}
 			<DropdownMenu.Item
 				onclick={() => {

@@ -23,9 +23,6 @@ import List from '@lucide/svelte/icons/list';
 import ListOrdered from '@lucide/svelte/icons/list-ordered';
 import ListChecks from '@lucide/svelte/icons/list-checks';
 import Image from '@lucide/svelte/icons/image';
-import Video from '@lucide/svelte/icons/video';
-import Audio from '@lucide/svelte/icons/audio-lines';
-import IFrame from '@lucide/svelte/icons/code-xml';
 import Table from '@lucide/svelte/icons/table';
 import Radical from '@lucide/svelte/icons/radical';
 import SquareRadical from '@lucide/svelte/icons/square-radical';
@@ -423,33 +420,6 @@ const commands: Record<string, EdraToolBarCommands[]> = {
 				editor.chain().focus().insertImagePlaceholder().run();
 			},
 			isActive: (editor) => editor.isActive('image-placeholder')
-		},
-		{
-			icon: Video,
-			name: 'video-placeholder',
-			tooltip: 'Video Placeholder',
-			onClick: (editor) => {
-				editor.chain().focus().insertVideoPlaceholder().run();
-			},
-			isActive: (editor) => editor.isActive('video-placeholder')
-		},
-		{
-			icon: Audio,
-			name: 'audio-placeholder',
-			tooltip: 'Audio Placeholder',
-			onClick: (editor) => {
-				editor.chain().focus().insertAudioPlaceholder().run();
-			},
-			isActive: (editor) => editor.isActive('audio-placeholder')
-		},
-		{
-			icon: IFrame,
-			name: 'iframe-placeholder',
-			tooltip: 'IFrame Placeholder',
-			onClick: (editor) => {
-				editor.chain().focus().insertIFramePlaceholder().run();
-			},
-			isActive: (editor) => editor.isActive('iframe-placeholder')
 		}
 	],
 	table: [

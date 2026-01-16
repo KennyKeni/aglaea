@@ -19,7 +19,7 @@
 
 	interface MediaExtendedProps extends NodeViewProps {
 		children: Snippet<[]>;
-		mediaRef?: HTMLElement;
+		mediaRef?: HTMLElement | undefined;
 	}
 
 	const {
@@ -81,10 +81,12 @@
 	}
 
 	function handleTouchStart(e: TouchEvent, position: 'left' | 'right') {
+		const touch = e.touches[0];
+		if (!touch) return;
 		e.preventDefault();
 		resizing = true;
 		resizingPosition = position;
-		resizingInitialMouseX = e.touches[0].clientX;
+		resizingInitialMouseX = touch.clientX;
 		if (mediaRef && nodeRef?.parentElement) {
 			const currentWidth = mediaRef.offsetWidth;
 			const parentWidth = nodeRef.parentElement.offsetWidth;
@@ -93,10 +95,11 @@
 	}
 
 	function handleTouchMove(e: TouchEvent) {
-		if (!resizing || !nodeRef?.parentElement) return;
-		let dx = e.touches[0].clientX - resizingInitialMouseX;
+		const touch = e.touches[0];
+		if (!touch || !resizing || !nodeRef?.parentElement) return;
+		let dx = touch.clientX - resizingInitialMouseX;
 		if (resizingPosition === 'left') {
-			dx = resizingInitialMouseX - e.touches[0].clientX;
+			dx = resizingInitialMouseX - touch.clientX;
 		}
 		const parentWidth = nodeRef.parentElement.offsetWidth;
 		const deltaPercent = (dx / parentWidth) * 100;

@@ -98,10 +98,10 @@
 					if (currentNodeIsEmptyParagraph) {
 						tr.insertText('/', currentNodePos, currentNodePos + 1);
 					} else {
-						tr.insert(
-							insertPos,
-							state.schema.nodes.paragraph.create(null, [state.schema.text('/')])
-						);
+						const paragraphNode = state.schema.nodes.paragraph;
+						if (paragraphNode) {
+							tr.insert(insertPos, paragraphNode.create(null, [state.schema.text('/')]));
+						}
 					}
 
 					return dispatch(tr);

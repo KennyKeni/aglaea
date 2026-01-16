@@ -125,7 +125,9 @@ export const Video = Node.create<VideoOptions>({
 								const reader = new FileReader();
 
 								reader.onload = (readerEvent) => {
-									const node = schema.nodes.video.create({ src: readerEvent.target?.result });
+									const videoNode = schema.nodes.video;
+									if (!videoNode) return;
+									const node = videoNode.create({ src: readerEvent.target?.result });
 
 									if (coordinates && typeof coordinates.pos === 'number') {
 										const transaction = tr.insert(coordinates?.pos, node);

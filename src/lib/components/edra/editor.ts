@@ -26,8 +26,8 @@ export default (
 	options?: Partial<EditorOptions>
 ) => {
 	const editor = new Editor({
-		element,
-		content,
+		...(element && { element }),
+		...(content && { content }),
 		extensions: [
 			StarterKit.configure({
 				orderedList: {

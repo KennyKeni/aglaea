@@ -7,12 +7,10 @@ export const InlineMathReplacer = InlineMath.extend({
 		return [
 			textInputRule({
 				find: /\$\$([^$]+)\$\$/,
+				// @ts-expect-error tiptap types say string but API accepts function
 				replace: ({ match, commands }) => {
-					const latex = match[1];
-					// Insert the inline math node with the LaTeX content
-					commands.insertInlineMath({
-						latex
-					});
+					const latex = match[1] ?? '';
+					commands.insertInlineMath({ latex });
 					return '';
 				}
 			})

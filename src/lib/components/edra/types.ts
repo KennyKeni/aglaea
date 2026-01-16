@@ -6,7 +6,7 @@ import type { Snippet } from 'svelte';
 export interface EdraEditorProps {
 	content?: Content;
 	editable?: boolean;
-	editor?: Editor;
+	editor?: Editor | undefined;
 	autofocus?: boolean;
 	onUpdate?: () => void;
 	class?: string;

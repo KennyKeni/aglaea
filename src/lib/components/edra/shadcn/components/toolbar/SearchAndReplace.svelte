@@ -15,6 +15,15 @@
 	import { slide } from 'svelte/transition';
 	import EdraToolTip from '../EdraToolTip.svelte';
 
+	interface SearchStorage {
+		resultIndex: number;
+		results: { from: number; to: number }[];
+	}
+
+	function getSearchStorage(editor: Editor): SearchStorage {
+		return (editor.storage as unknown as { searchAndReplace: SearchStorage }).searchAndReplace;
+	}
+
 	interface Props {
 		editor: Editor;
 	}
@@ -28,8 +37,8 @@
 	let replaceText = $state('');
 	let caseSensitive = $state(false);
 
-	let searchIndex = $derived(editor.storage?.searchAndReplace?.resultIndex);
-	let searchCount = $derived(editor.storage?.searchAndReplace?.results.length);
+	let searchIndex = $derived(getSearchStorage(editor)?.resultIndex ?? 0);
+	let searchCount = $derived(getSearchStorage(editor)?.results?.length ?? 0);
 
 	function updateSearchTerm(clearIndex: boolean = false) {
 		if (clearIndex) editor.commands.resetIndex();
@@ -40,8 +49,8 @@
 	}
 
 	function goToSelection() {
-		const { results, resultIndex } = editor.storage.searchAndReplace;
-		const position = results[resultIndex];
+		const storage = getSearchStorage(editor);
+		const position = storage?.results?.[storage?.resultIndex];
 		if (!position) return;
 		editor.commands.setTextSelection(position);
 		const { node } = editor.view.domAtPos(editor.state.selection.anchor);
@@ -92,7 +101,7 @@
 	</Popover.Trigger>
 	<Popover.Content
 		class="flex w-fit items-center gap-1 p-2"
-		portalProps={{ disabled: true, to: undefined }}
+		portalProps={{ disabled: true }}
 	>
 		<Button
 			variant="ghost"

@@ -10,6 +10,14 @@ import type { Component } from 'svelte';
 
 const extensionName = 'slashCommand';
 
+interface SlashCommandStorage {
+	rect: DOMRect | null;
+}
+
+function getSlashStorage(editor: Editor): SlashCommandStorage {
+	return (editor.storage as unknown as Record<string, SlashCommandStorage>)[extensionName] ?? { rect: null };
+}
+
 interface PopupState {
 	element: HTMLElement | null;
 	cleanup: (() => void) | null;
@@ -190,7 +198,7 @@ export default (menuList: Component<any, any, ''>): Extension =>
 											}
 										});
 
-										props.editor.storage[extensionName].rect = rect;
+										getSlashStorage(props.editor).rect = rect;
 									}
 								}
 							},

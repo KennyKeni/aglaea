@@ -13,7 +13,7 @@
 	}
 	const { editor }: Props = $props();
 
-	const alignments = commands['alignment'];
+	const alignments = commands['alignment'] ?? [];
 
 	const isActive = $derived.by(() => {
 		return alignments.find((alignment) => alignment.isActive?.(editor)) !== undefined;
@@ -42,7 +42,7 @@
 			</div>
 		</EdraToolTip>
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content portalProps={{ disabled: true, to: undefined }}>
+	<DropdownMenu.Content portalProps={{ disabled: true }}>
 		{#each alignments as alignment (alignment)}
 			{@const Icon = alignment.icon}
 			<DropdownMenu.Item onclick={() => alignment.onClick?.(editor)}>

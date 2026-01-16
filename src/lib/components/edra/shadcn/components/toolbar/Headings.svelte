@@ -15,7 +15,7 @@
 
 	const { editor }: Props = $props();
 
-	const headings = commands['headings'];
+	const headings = commands['headings'] ?? [];
 
 	const isActive = $derived.by(() => {
 		return headings.find((h) => h.isActive?.(editor)) !== undefined;
@@ -43,7 +43,7 @@
 			</div>
 		</EdraToolTip>
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content portalProps={{ to: undefined, disabled: true }}>
+	<DropdownMenu.Content portalProps={{ disabled: true }}>
 		<DropdownMenu.Item onclick={() => editor.chain().focus().setParagraph().run()}>
 			<Paragraph />
 			<span>Paragraph</span>
