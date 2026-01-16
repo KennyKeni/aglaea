@@ -10,42 +10,69 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
 	import { Loader2 } from '@lucide/svelte';
-	import type { Article } from '$lib/types/article';
+	import type { Article, ArticleCategory, ArticleImage } from '$lib/types/article';
 	import initEditor from '$lib/components/edra/editor';
 
+	interface EditMeta {
+		id: string;
+		createdAt: string;
+		categories: ArticleCategory[];
+		images: ArticleImage[];
+	}
+
 	let {
-		article = null,
+		initialTitle = '',
+		initialSubtitle = '',
+		initialDescription = '',
+		initialAuthor = '',
+		initialBody = '',
+		editMeta = null,
 		onSave,
 		onCancel
 	}: {
-		article?: Article | null;
+		initialTitle?: string;
+		initialSubtitle?: string;
+		initialDescription?: string;
+		initialAuthor?: string;
+		initialBody?: string;
+		editMeta?: EditMeta | null;
 		onSave: (saved: Article) => void;
 		onCancel: () => void;
 	} = $props();
 
-	const isCreateMode = $derived(!article);
+	const isCreateMode = $derived(!editMeta);
 
-	let title = $state(article?.title ?? '');
-	let subtitle = $state(article?.subtitle ?? '');
-	let description = $state(article?.description ?? '');
-	let author = $state(article?.author ?? '');
+	let title = $state('');
+	let subtitle = $state('');
+	let description = $state('');
+	let author = $state('');
+	let initialized = $state(false);
+
+	$effect(() => {
+		if (initialized) return;
+		title = initialTitle;
+		subtitle = initialSubtitle;
+		description = initialDescription;
+		author = initialAuthor;
+		initialized = true;
+	});
 
 	let editor: Editor | undefined = $state();
 	let isSaving = $state(false);
 	let error = $state('');
 
 	const initialContent: Content = $derived.by(() => {
-		if (!article?.body) {
+		if (!initialBody) {
 			return { type: 'doc', content: [{ type: 'paragraph', content: [] }] };
 		}
 		try {
-			const parsed = JSON.parse(article.body);
+			const parsed = JSON.parse(initialBody);
 			if (parsed && typeof parsed === 'object' && parsed.type === 'doc') {
 				return parsed;
 			}
-			return article.body;
+			return initialBody;
 		} catch {
-			return article.body;
+			return initialBody;
 		}
 	});
 
@@ -64,7 +91,7 @@
 		error = '';
 
 		const body = JSON.stringify(editor.getJSON());
-		const url = isCreateMode ? '/api/articles' : `/api/articles/${article!.id}`;
+		const url = isCreateMode ? '/api/articles' : `/api/articles/${editMeta!.id}`;
 		const method = isCreateMode ? 'POST' : 'PATCH';
 
 		try {
@@ -101,10 +128,10 @@
 				author: author || null,
 				body,
 				bodyHtml,
-				createdAt: article?.createdAt ?? new Date().toISOString(),
+				createdAt: editMeta?.createdAt ?? new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
-				categories: article?.categories ?? [],
-				images: article?.images ?? []
+				categories: editMeta?.categories ?? [],
+				images: editMeta?.images ?? []
 			});
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'An unexpected error occurred';

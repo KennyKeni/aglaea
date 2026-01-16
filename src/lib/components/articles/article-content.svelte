@@ -4,17 +4,20 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Maximize2 } from '@lucide/svelte';
 	import type { Article } from '$lib/types/article';
+	import type { TocItem } from '$lib/utils/toc';
 
 	export type ContentMode = 'peek' | 'full' | 'loading';
 
 	let {
 		article,
 		fullArticle = null,
+		toc = [],
 		mode = 'full',
 		onExpand
 	}: {
 		article: Article;
 		fullArticle?: Article | null;
+		toc?: TocItem[];
 		mode?: ContentMode;
 		onExpand?: () => void;
 	} = $props();
@@ -76,6 +79,43 @@
 				<span>{formattedDate}</span>
 			{/if}
 		</div>
+
+		{#if toc.length > 0}
+			<nav class="mb-8 p-4 bg-muted/50 rounded-lg">
+				<h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+					Contents
+				</h2>
+				<ul class="space-y-1">
+					{#each toc as item (item.id)}
+						<li style:padding-left="{(item.level - 1) * 1}rem">
+							<a
+								href="#{item.id}"
+								class="text-sm text-muted-foreground hover:text-foreground transition-colors"
+								onclick={(e) => {
+									e.preventDefault();
+									const target = document.getElementById(item.id);
+									if (!target) return;
+
+									const viewport = target.closest('[data-slot="scroll-area-viewport"]');
+									if (viewport) {
+										const targetRect = target.getBoundingClientRect();
+										const viewportRect = viewport.getBoundingClientRect();
+										viewport.scrollTo({
+											top: viewport.scrollTop + targetRect.top - viewportRect.top - 20,
+											behavior: 'smooth'
+										});
+									} else {
+										target.scrollIntoView({ behavior: 'smooth' });
+									}
+								}}
+							>
+								{item.text}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</nav>
+		{/if}
 
 		{#if dataSource.bodyHtml}
 			<div class="prose prose-neutral dark:prose-invert prose-lg max-w-none">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { Panel, PokemonContent } from '$lib/components/pokemon';
+	import { PokemonContent } from '$lib/components/pokemon';
+	import EntityPanelLayout from '$lib/components/ui/entity-panel-layout.svelte';
 	import { createPokemonSpeciesState } from '$lib/state/pokemon-data.svelte';
 	import { createPanelMode } from '$lib/state/panel-mode.svelte';
 	import { createPanelAnimation } from '$lib/state/panel-animation.svelte';
@@ -49,35 +50,24 @@
 	const panelSubtitle = $derived(panelMode.activeItem ? formatId(panelMode.activeItem.id) : '');
 </script>
 
-<div class="bg-muted/30 min-h-screen">
-	<div class:hidden={panelMode.isDetailRoute}>
+<EntityPanelLayout
+	{panelMode}
+	{panelAnimation}
+	title={panelTitle}
+	subtitle={panelSubtitle}
+	footer="Pokemon data from PokeAPI."
+>
+	{#snippet children()}
 		{@render children()}
-	</div>
+	{/snippet}
 
-	<Panel
-		itemKey={panelMode.activeId}
-		title={panelTitle}
-		subtitle={panelSubtitle}
-		animation={panelAnimation}
-		onClose={panelMode.close}
-		onExpand={panelMode.expand}
-		onCollapse={panelMode.collapse}
-		mode={panelMode.mode}
-	>
-		{#if panelMode.isDetailRoute}
-			{@render children()}
-		{:else if panelMode.activeItem}
+	{#snippet peekContent()}
+		{#if panelMode.activeItem}
 			<PokemonContent
 				pokemon={panelMode.activeItem}
 				mode={panelMode.isNavigating ? 'loading' : 'peek'}
 				onExpand={panelMode.expand}
 			/>
 		{/if}
-	</Panel>
-
-	<div class="bg-background border-t">
-		<div class="text-muted-foreground mx-auto max-w-6xl px-4 py-6 text-xs">
-			Peek panel - expand into full-width detail.
-		</div>
-	</div>
-</div>
+	{/snippet}
+</EntityPanelLayout>

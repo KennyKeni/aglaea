@@ -22,17 +22,27 @@
 
 	let isDragging = $state(false);
 
-	editor.view.dom.addEventListener('dragstart', () => {
-		isDragging = true;
-	});
+	$effect(() => {
+		const dom = editor.view.dom;
 
-	editor.view.dom.addEventListener('drop', () => {
-		isDragging = true;
+		const handleDragStart = () => {
+			isDragging = true;
+		};
 
-		// Allow some time for the drop action to complete before re-enabling
-		setTimeout(() => {
-			isDragging = false;
-		}, 100); // Adjust delay if needed
+		const handleDrop = () => {
+			isDragging = true;
+			setTimeout(() => {
+				isDragging = false;
+			}, 100);
+		};
+
+		dom.addEventListener('dragstart', handleDragStart);
+		dom.addEventListener('drop', handleDrop);
+
+		return () => {
+			dom.removeEventListener('dragstart', handleDragStart);
+			dom.removeEventListener('drop', handleDrop);
+		};
 	});
 
 	function shouldShow(props: ShouldShowProps) {

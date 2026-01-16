@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { Panel, ArticleContent } from '$lib/components/articles';
+	import { ArticleContent } from '$lib/components/articles';
+	import EntityPanelLayout from '$lib/components/ui/entity-panel-layout.svelte';
 	import { createArticleState } from '$lib/state/article-data.svelte';
 	import { createPanelMode } from '$lib/state/panel-mode.svelte';
 	import { createPanelAnimation } from '$lib/state/panel-animation.svelte';
@@ -48,35 +49,24 @@
 	const panelSubtitle = $derived(panelMode.activeItem?.author ? `By ${panelMode.activeItem.author}` : '');
 </script>
 
-<div class="bg-muted/30 min-h-screen">
-	<div class:hidden={panelMode.isDetailRoute}>
+<EntityPanelLayout
+	{panelMode}
+	{panelAnimation}
+	title={panelTitle}
+	subtitle={panelSubtitle}
+	footer="Articles from the community."
+>
+	{#snippet children()}
 		{@render children()}
-	</div>
+	{/snippet}
 
-	<Panel
-		itemKey={panelMode.activeId}
-		title={panelTitle}
-		subtitle={panelSubtitle}
-		animation={panelAnimation}
-		onClose={panelMode.close}
-		onExpand={panelMode.expand}
-		onCollapse={panelMode.collapse}
-		mode={panelMode.mode}
-	>
-		{#if panelMode.isDetailRoute}
-			{@render children()}
-		{:else if panelMode.activeItem}
+	{#snippet peekContent()}
+		{#if panelMode.activeItem}
 			<ArticleContent
 				article={panelMode.activeItem}
 				mode={panelMode.isNavigating ? 'loading' : 'peek'}
 				onExpand={panelMode.expand}
 			/>
 		{/if}
-	</Panel>
-
-	<div class="bg-background border-t">
-		<div class="text-muted-foreground mx-auto max-w-6xl px-4 py-6 text-xs">
-			Articles from the community.
-		</div>
-	</div>
-</div>
+	{/snippet}
+</EntityPanelLayout>

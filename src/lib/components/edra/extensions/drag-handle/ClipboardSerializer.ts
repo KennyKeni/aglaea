@@ -18,9 +18,11 @@ export function serializeForClipboard(view: EditorView, slice: Slice) {
 	}
 
 	// Older version fallback
-	const proseMirrorView = getPmView();
+	const proseMirrorView = getPmView() as {
+		__serializeForClipboard?: (view: EditorView, slice: Slice) => unknown;
+	} | null;
 
-	if (proseMirrorView && typeof proseMirrorView?.__serializeForClipboard === 'function') {
+	if (proseMirrorView && typeof proseMirrorView.__serializeForClipboard === 'function') {
 		return proseMirrorView.__serializeForClipboard(view, slice);
 	}
 

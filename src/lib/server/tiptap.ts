@@ -1,5 +1,6 @@
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
+import Heading from '@tiptap/extension-heading';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import Typography from '@tiptap/extension-typography';
@@ -10,15 +11,34 @@ import { TaskItem, TaskList } from '@tiptap/extension-list';
 import { Table, TableCell, TableRow, TableHeader } from '@tiptap/extension-table';
 import { Markdown } from '@tiptap/markdown';
 import Mathematics from '@tiptap/extension-mathematics';
+import { slugify } from '$lib/utils/slugify';
+
+function createHeadingWithIds() {
+	const slugCounts = new Map<string, number>();
+
+	return Heading.extend({
+		renderHTML({ node, HTMLAttributes }) {
+			const text = node.textContent;
+			const baseSlug = slugify(text);
+			const count = slugCounts.get(baseSlug) ?? 0;
+			const id = count > 0 ? `${baseSlug}-${count}` : baseSlug;
+			slugCounts.set(baseSlug, count + 1);
+
+			const level = node.attrs.level;
+			return [`h${level}`, { ...HTMLAttributes, id }, 0];
+		}
+	}).configure({ levels: [1, 2, 3, 4] });
+}
 
 function getServerExtensions() {
 	return [
 		StarterKit.configure({
 			orderedList: { HTMLAttributes: { class: 'list-decimal' } },
 			bulletList: { HTMLAttributes: { class: 'list-disc' } },
-			heading: { levels: [1, 2, 3, 4] },
+			heading: false,
 			codeBlock: false
 		}),
+		createHeadingWithIds(),
 		Highlight.configure({ multicolor: true }),
 		Color,
 		Subscript,

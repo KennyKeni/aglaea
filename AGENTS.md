@@ -134,3 +134,73 @@ Containers communicate via service names. SvelteKit uses `BACKEND_URL=http://bac
 2. **Streaming**: Return unawaited promises for slow data
 3. **Error handling**: Use `error()` helper, handle in `handleError` hook
 4. **Protected routes**: Check `locals.user` in `+layout.server.ts`, redirect if missing
+
+## Svelte 5 State Initialization (avoiding `state_referenced_locally` warning)
+
+When copying props into local state, Svelte warns that prop changes won't update the local copy. Choose the pattern based on intent:
+
+### Pattern 1: Initialize once, never sync (forms/editors)
+
+Use when component mounts fresh each time (e.g., editor opens/closes):
+
+```svelte
+let { initialTitle, initialBody } = $props();
+
+let title = $state('');
+let body = $state('');
+let initialized = $state(false);
+
+$effect(() => {
+  if (initialized) return;
+  title = initialTitle;
+  body = initialBody;
+  initialized = true;
+});
+```
+
+### Pattern 2: Always sync on prop changes (navigation)
+
+Use when props change during component lifetime (e.g., route params):
+
+```svelte
+let { data } = $props();
+
+let article: Article = $state(null!);
+let isEditing = $state(false);
+
+$effect(() => {
+  article = data.article;
+  isEditing = false;
+});
+```
+
+**Important**: Add a guard in the template since `$effect` runs after initial render:
+
+```svelte
+{#if !article}
+  <!-- Loading state -->
+{:else}
+  <Content {article} />
+{/if}
+```
+
+### Pattern 3: Sync until user edits (dirty tracking)
+
+Use when you want prop sync but not during active editing:
+
+```svelte
+let { initialValue } = $props();
+
+let draft = $state('');
+let dirty = $state(false);
+
+$effect(() => {
+  if (!dirty) draft = initialValue;
+});
+```
+
+### When to use each
+
+- **Form/Editor components**: Pattern 1 (snapshot on mount)
+- **Pages with route params**: Pattern 2 (sync on navigation)
+- **Editable fields that should reset**: Pattern 3 (dirty tracking)
