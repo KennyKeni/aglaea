@@ -22,7 +22,7 @@
 		"@eslint/js": "^9.39.1",
 		"@inlang/paraglide-js": "^2.6.0",
 		"@internationalized/date": "^3.10.0",
-		"@lucide/svelte": "^0.561.0",
+		"@lucide/svelte": "^0.562.0",
 		"@storybook/addon-a11y": "^10.1.11",
 		"@storybook/addon-docs": "^10.1.11",
 		"@storybook/addon-svelte-csf": "^5.0.10",
@@ -62,8 +62,32 @@
 		"vitest": "^4.0.16"
 	},
 	"dependencies": {
+		"@floating-ui/dom": "^1.7.4",
 		"@tanstack/svelte-virtual": "^3.13.18",
+		"@tiptap/core": "^3.15.3",
+		"@tiptap/extension-bubble-menu": "^3.15.3",
+		"@tiptap/extension-code-block-lowlight": "^3.15.3",
+		"@tiptap/extension-highlight": "^3.15.3",
+		"@tiptap/extension-image": "^3.15.3",
+		"@tiptap/extension-list": "^3.15.3",
+		"@tiptap/extension-mathematics": "^3.15.3",
+		"@tiptap/extension-subscript": "^3.15.3",
+		"@tiptap/extension-superscript": "^3.15.3",
+		"@tiptap/extension-table": "^3.15.3",
+		"@tiptap/extension-text-align": "^3.15.3",
+		"@tiptap/extension-text-style": "^3.15.3",
+		"@tiptap/extension-typography": "^3.15.3",
+		"@tiptap/extensions": "^3.15.3",
+		"@tiptap/html": "^3.15.3",
+		"@tiptap/markdown": "^3.15.3",
+		"@tiptap/pm": "^3.15.3",
+		"@tiptap/starter-kit": "^3.15.3",
+		"@tiptap/suggestion": "^3.15.3",
 		"better-auth": "^1.4.12",
-		"motion": "^12.26.1"
+		"katex": "^0.16.27",
+		"lowlight": "^3.3.0",
+		"motion": "^12.26.1",
+		"svelte-tiptap": "^3.0.1",
+		"tiptap-extension-auto-joiner": "^0.1.3"
 	}
 }

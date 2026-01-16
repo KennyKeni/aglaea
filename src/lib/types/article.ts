@@ -15,6 +15,7 @@ export interface Article {
 	subtitle: string | null;
 	description: string | null;
 	body: string;
+	bodyHtml?: string;
 	author: string | null;
 	createdAt: string;
 	updatedAt: string;

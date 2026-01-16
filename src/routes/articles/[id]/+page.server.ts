@@ -2,11 +2,12 @@ import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import type { Article } from '$lib/types/article';
+import { jsonToHtml } from '$lib/server/tiptap';
 
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	try {
 		const res = await fetch(
-			`${env.BACKEND_URL}/articles/${params.id}?includeCategories=true&includeImages=true`
+			`${env.BACKEND_URL}/articles/${params.id}?includeCategories=true&includeImages=true&includeBody=true`
 		);
 
 		if (!res.ok) {
@@ -18,8 +19,9 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 		});
 
 		const article: Article = await res.json();
+		const bodyHtml = jsonToHtml(article.body);
 
-		return { article };
+		return { article: { ...article, bodyHtml } };
 	} catch (e) {
 		if (e && typeof e === 'object' && 'status' in e) {
 			throw e;

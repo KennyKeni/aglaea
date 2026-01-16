@@ -100,12 +100,12 @@
 	</div>
 {/if}
 
-{#if isFull && dataSource.body}
+{#if isFull && dataSource.bodyHtml}
 	<div class="mt-4">
 		<Card.Root class="rounded-2xl">
 			<Card.Content class="p-4 md:p-6">
 				<div class="prose prose-neutral dark:prose-invert max-w-none">
-					{@html dataSource.body}
+					{@html dataSource.bodyHtml}
 				</div>
 			</Card.Content>
 		</Card.Root>
