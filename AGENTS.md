@@ -242,3 +242,75 @@ $effect(() => {
 - **Form/Editor components**: Pattern 1 (snapshot on mount)
 - **Pages with route params**: Pattern 2 (sync on navigation)
 - **Editable fields that should reset**: Pattern 3 (dirty tracking)
+
+## Component Cleanup (onDestroy)
+
+Always clean up resources to prevent memory leaks. Common cases:
+
+### TipTap Editor instances
+
+Components that create or bind to a TipTap Editor must destroy it:
+
+```svelte
+import { onDestroy } from 'svelte';
+
+let editor: Editor | undefined = $state();
+
+onDestroy(() => {
+  if (editor) {
+    editor.destroy();
+    editor = undefined;
+  }
+});
+```
+
+### Event listeners added in $effect
+
+Return a cleanup function from `$effect`:
+
+```svelte
+$effect(() => {
+  const handler = () => { /* ... */ };
+  window.addEventListener('resize', handler);
+  return () => window.removeEventListener('resize', handler);
+});
+```
+
+### Event listeners added in onMount
+
+Return cleanup from `onMount`:
+
+```svelte
+onMount(() => {
+  const handler = () => { /* ... */ };
+  window.addEventListener('scroll', handler);
+  return () => window.removeEventListener('scroll', handler);
+});
+```
+
+### TipTap extensions with DOM elements
+
+Extensions that create DOM elements must remove them in `onDestroy`:
+
+```typescript
+Extension.create({
+  onCreate() {
+    this.element = document.createElement('div');
+    document.body.appendChild(this.element);
+  },
+  onDestroy() {
+    this.element?.remove();
+  }
+});
+```
+
+### Checklist for cleanup
+
+Resources that need cleanup:
+- TipTap/ProseMirror editors and plugins
+- DOM elements created with `document.createElement`
+- Event listeners on `window`, `document`, or external elements
+- IntersectionObserver, ResizeObserver, MutationObserver
+- setInterval (setTimeout usually fine unless component unmounts mid-delay)
+- WebSocket connections
+- Third-party library instances

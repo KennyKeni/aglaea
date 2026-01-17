@@ -49,6 +49,18 @@ export default (menuList: Component<any, any, ''>): Extension =>
 			document.body.appendChild(popup.element);
 		},
 
+		onDestroy() {
+			if (popup.cleanup) {
+				popup.cleanup();
+				popup.cleanup = null;
+			}
+			if (popup.element) {
+				popup.element.remove();
+				popup.element = null;
+			}
+			popup.isVisible = false;
+		},
+
 		addProseMirrorPlugins() {
 			return [
 				Suggestion({

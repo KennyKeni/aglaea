@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import type { Content, Editor } from '@tiptap/core';
 	import { generateHTML } from '@tiptap/html';
 	import {
@@ -12,6 +13,13 @@
 	import { Loader2 } from '@lucide/svelte';
 	import type { Article, ArticleCategory, ArticleImage } from '$lib/types/article';
 	import initEditor from '$lib/components/edra/editor';
+
+	onDestroy(() => {
+		if (editor) {
+			editor.destroy();
+			editor = undefined;
+		}
+	});
 
 	interface EditMeta {
 		id: string;
