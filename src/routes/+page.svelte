@@ -4,43 +4,37 @@
 
 	const categories = [
 		{
-			title: 'Pokemon Database',
+			title: 'Species Database',
 			icon: Database,
 			href: '/pokemon',
-			desc: 'Complete species registry, stats, and evolution chains.',
+			desc: 'Browse Cobblemon species, stats, abilities, and evolution chains.',
 			meta: '151 Species',
 		},
 		{
 			title: 'Articles & Guides',
 			icon: FileText,
 			href: '/articles',
-			desc: 'In-depth tutorials, architectural patterns, and best practices.',
+			desc: 'Guides, tutorials, and tips for Cobblemon players.',
 			meta: '12 Articles',
 		},
 		{
 			title: 'Component Library',
 			icon: Zap,
 			href: '/demo',
-			desc: 'Interactive UI components, blocks, and layout primitives.',
+			desc: 'Reusable UI components and design system showcase.',
 			meta: '24 Components',
 		},
 		{
-			title: 'Security & Auth',
+			title: 'Account',
 			icon: Shield,
 			href: '/login',
-			desc: 'User sessions, security protocols, and permission scopes.',
-			meta: 'v2.0 Spec',
+			desc: 'Sign in to save favorites and track your collection.',
+			meta: 'Sign In',
 		},
 	];
 
-	const updates = [
-		{ label: 'Data', title: 'Added Generation IX species stats', date: '2h ago' },
-		{ label: 'Docs', title: 'Updated server-side caching guide', date: '1d ago' },
-		{ label: 'UI', title: 'New "Glass" variant for cards', date: '3d ago' },
-		{ label: 'Fix', title: 'Resolved hydration mismatch in nav', date: '5d ago' },
-	];
+	const updates: { label: string; title: string; date: string }[] = [];
 
-	const quickLinks = ['CLI Reference', 'Theming', 'Deployment', 'Shortcuts'];
 </script>
 
 <div class="min-h-screen w-full pt-12 pb-20 text-foreground md:pt-20">
@@ -64,7 +58,9 @@
 				Aglaea <span class="text-muted-foreground">Index</span>
 			</h1>
 
-			<p class="max-w-2xl text-lg text-muted-foreground sm:text-xl">Cobblemon Index.</p>
+			<p class="max-w-2xl text-lg text-muted-foreground sm:text-xl">
+				Species database and reference for the Cobblemon mod.
+			</p>
 		</header>
 
 		<div class="grid gap-10 lg:grid-cols-[1fr_300px] lg:gap-12">
@@ -120,58 +116,40 @@
 					</div>
 				</section>
 
-				<section>
-					<h3 class="mb-4 text-xs font-bold tracking-widest text-muted-foreground uppercase">
-						Quick Access
-					</h3>
-					<div class="flex flex-wrap gap-2">
-						{#each quickLinks as link (link)}
-							<button
-								class="rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/30 hover:text-foreground"
-							>
-								{link}
-							</button>
-						{/each}
-					</div>
-				</section>
 			</main>
 
 			<aside class="space-y-8">
 				<div class="rounded-2xl border border-border bg-card p-6 shadow-sm">
-					<div class="mb-6 flex items-center justify-between">
-						<h3 class="flex items-center gap-2 font-semibold tracking-tight">
-							<Clock class="size-4 text-muted-foreground" />
-							Updates
-						</h3>
-						<span class="relative flex h-2 w-2">
-							<span
-								class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"
-							></span>
-							<span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-						</span>
-					</div>
+					<h3 class="mb-6 flex items-center gap-2 font-semibold tracking-tight">
+						<Clock class="size-4 text-muted-foreground" />
+						Updates
+					</h3>
 
 					<div class="space-y-6">
-						{#each updates as update (update.title)}
-							<div class="group relative pl-4">
-								<div
-									class="absolute top-1.5 bottom-1.5 left-0 w-[2px] rounded-full bg-border transition-colors group-hover:bg-primary/50"
-								></div>
+						{#if updates.length === 0}
+							<p class="text-sm text-muted-foreground">No recent updates.</p>
+						{:else}
+							{#each updates as update (update.title)}
+								<div class="group relative pl-4">
+									<div
+										class="absolute top-1.5 bottom-1.5 left-0 w-0.5 rounded-full bg-border transition-colors group-hover:bg-primary/50"
+									></div>
 
-								<div class="mb-1 flex items-center gap-2">
-									<span class="text-[10px] font-bold tracking-wider text-primary uppercase">
-										{update.label}
-									</span>
-									<span class="text-[10px] text-muted-foreground">{update.date}</span>
+									<div class="mb-1 flex items-center gap-2">
+										<span class="text-[10px] font-bold tracking-wider text-primary uppercase">
+											{update.label}
+										</span>
+										<span class="text-[10px] text-muted-foreground">{update.date}</span>
+									</div>
+									<button
+										type="button"
+										class="block text-left text-sm leading-snug font-medium text-foreground/80 transition-colors hover:text-primary hover:underline"
+									>
+										{update.title}
+									</button>
 								</div>
-								<button
-									type="button"
-									class="block text-left text-sm leading-snug font-medium text-foreground/80 transition-colors hover:text-primary hover:underline"
-								>
-									{update.title}
-								</button>
-							</div>
-						{/each}
+							{/each}
+						{/if}
 					</div>
 
 					<div class="mt-6 border-t border-border pt-6">

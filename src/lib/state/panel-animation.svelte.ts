@@ -8,6 +8,7 @@ export interface PanelAnimationState {
 	readonly borderRadius: string;
 	readonly borderLeft: string;
 	readonly isMobile: boolean;
+	readonly skipAnimation: boolean;
 }
 
 export function createPanelAnimation(
@@ -15,12 +16,18 @@ export function createPanelAnimation(
 	getIsNavigating: () => boolean
 ): PanelAnimationState {
 	let isMd = $state(false);
+	let isInitialRender = $state(true);
 
 	onMount(() => {
 		const mq = window.matchMedia('(min-width: 768px)');
 		isMd = mq.matches;
 		const handler = (e: MediaQueryListEvent) => (isMd = e.matches);
 		mq.addEventListener('change', handler);
+
+		requestAnimationFrame(() => {
+			isInitialRender = false;
+		});
+
 		return () => mq.removeEventListener('change', handler);
 	});
 
@@ -52,6 +59,9 @@ export function createPanelAnimation(
 		},
 		get isMobile() {
 			return !isMd;
+		},
+		get skipAnimation() {
+			return isInitialRender;
 		}
 	};
 }

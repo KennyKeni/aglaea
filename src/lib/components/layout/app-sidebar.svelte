@@ -1,3 +1,7 @@
+<script lang="ts" module>
+	const expandedGroups = new Set<string>();
+</script>
+
 <script lang="ts">
 	import { page } from '$app/state';
 	import * as Sidebar from '$lib/components/ui/sidebar';
@@ -11,6 +15,23 @@
 
 	function isGroupActive(children: typeof navigation[0]['children']): boolean {
 		return children?.some((child) => child.href && isActive(child.href)) ?? false;
+	}
+
+	function isExpanded(label: string, children: typeof navigation[0]['children']): boolean {
+		if (expandedGroups.has(label)) return true;
+		if (isGroupActive(children)) {
+			expandedGroups.add(label);
+			return true;
+		}
+		return false;
+	}
+
+	function toggleExpanded(label: string, open: boolean) {
+		if (open) {
+			expandedGroups.add(label);
+		} else {
+			expandedGroups.delete(label);
+		}
 	}
 </script>
 
@@ -39,7 +60,7 @@
 				<Sidebar.Menu>
 					{#each navigation as item (item.label)}
 						{#if item.children && item.children.length > 0}
-							<Collapsible.Root open={isGroupActive(item.children)} class="group/collapsible">
+							<Collapsible.Root open={isExpanded(item.label, item.children)} onOpenChange={(open) => toggleExpanded(item.label, open)} class="group/collapsible">
 								<Sidebar.MenuItem>
 									<Collapsible.Trigger>
 										{#snippet child({ props })}

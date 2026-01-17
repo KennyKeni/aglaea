@@ -3,6 +3,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import LoadingSpinner from '$lib/components/ui/loading-spinner.svelte';
 	import { Pencil } from '@lucide/svelte';
+	import { can } from '$lib/state/permissions.svelte';
+	import { Resource, Action } from '$lib/types/auth';
 	import type { Article } from '$lib/types/article';
 	import type { TocItem } from '$lib/utils/toc';
 
@@ -26,12 +28,14 @@
 		<div class="mx-auto max-w-3xl xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[1fr_48rem_16rem] xl:gap-8">
 			<div class="hidden xl:block"></div>
 			<div>
-				<div class="mb-6 flex justify-end">
-					<Button variant="ghost" size="sm" href="/articles/{article.id}/edit">
-						<Pencil class="mr-2 h-4 w-4" />
-						Edit
-					</Button>
-				</div>
+				{#if can(Resource.Article, Action.Update)}
+					<div class="mb-6 flex justify-end">
+						<Button variant="ghost" size="sm" href="/articles/{article.id}/edit">
+							<Pencil class="mr-2 h-4 w-4" />
+							Edit
+						</Button>
+					</div>
+				{/if}
 				<ArticleContent {article} mode="full" />
 			</div>
 			{#if hasToc}

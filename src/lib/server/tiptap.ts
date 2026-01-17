@@ -12,6 +12,7 @@ import { Table, TableCell, TableRow, TableHeader } from '@tiptap/extension-table
 import { Markdown } from '@tiptap/markdown';
 import Mathematics from '@tiptap/extension-mathematics';
 import { slugify } from '$lib/utils/slugify';
+import DOMPurify from 'isomorphic-dompurify';
 
 function createHeadingWithIds() {
 	const slugCounts = new Map<string, number>();
@@ -61,9 +62,10 @@ function getServerExtensions() {
 export function jsonToHtml(body: string): string {
 	try {
 		const parsed = JSON.parse(body);
-		return generateHTML(parsed, getServerExtensions());
+		const html = generateHTML(parsed, getServerExtensions());
+		return DOMPurify.sanitize(html);
 	} catch (e) {
 		console.error('jsonToHtml error:', e);
-		return body;
+		return '';
 	}
 }

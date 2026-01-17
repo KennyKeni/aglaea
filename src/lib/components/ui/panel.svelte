@@ -37,7 +37,7 @@
 	const showPanel = $derived(hasItem || mode === 'full');
 
 	function slideIn(node: HTMLElement) {
-		if (!browser) return;
+		if (!browser || animation.skipAnimation) return;
 		node.style.transform = 'translateX(100%)';
 		requestAnimationFrame(() => {
 			animate(node, { transform: 'translateX(0%)' }, { duration: 0.35, ease: [0.22, 1, 0.36, 1] });

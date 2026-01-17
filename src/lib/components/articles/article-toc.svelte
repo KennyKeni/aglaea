@@ -65,7 +65,7 @@
 		<h4 class="mb-3 text-sm font-medium text-foreground/90">On this page</h4>
 		<ul class="flex flex-col gap-1.5 text-sm">
 			{#each toc as item (item.id)}
-				{@const indent = Math.max(item.level, 0) * 0.75}
+				{@const indent = Math.max(item.level, 0) * 0.5}
 				{@const isActive = activeId === item.id}
 				<li
 					style:padding-left={`${indent}rem`}
