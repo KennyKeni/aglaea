@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { PageServerLoad } from './$types';
 import { PokemonSchema } from '$lib/types/api';
+import { parseResponse } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
 	const res = await fetch(
@@ -16,11 +17,7 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
 		'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400'
 	});
 
-	const json = await res.json();
-	const parsed = PokemonSchema.safeParse(json);
-	if (!parsed.success) {
-		throw error(500, 'Invalid API response');
-	}
+	const pokemon = await parseResponse(res, PokemonSchema);
 
-	return { pokemon: parsed.data };
+	return { pokemon };
 };

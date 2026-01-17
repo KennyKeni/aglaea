@@ -1,7 +1,8 @@
 import { env } from '$env/dynamic/private';
-import { error, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { ArticleSchema, PaginatedSchema } from '$lib/types/api';
+import { parseResponse } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 	const { totalCount, pageSize } = await parent();
@@ -27,14 +28,10 @@ export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 			return { articles: [], currentPage: validPage, pageSize };
 		}
 
-		const json = await res.json();
-		const parsed = PaginatedSchema(ArticleSchema).safeParse(json);
-		if (!parsed.success) {
-			throw error(500, 'Invalid API response');
-		}
+		const data = await parseResponse(res, PaginatedSchema(ArticleSchema));
 
 		return {
-			articles: parsed.data.data ?? [],
+			articles: data.data ?? [],
 			currentPage: validPage,
 			pageSize
 		};

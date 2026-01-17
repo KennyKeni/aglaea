@@ -1,7 +1,8 @@
 import { env } from '$env/dynamic/private';
-import { error, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { PaginatedSchema, PokemonSchema } from '$lib/types/api';
+import { parseResponse } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 	const { totalCount, pageSize } = await parent();
@@ -27,14 +28,10 @@ export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 			return { pokemon: [], currentPage: validPage, pageSize };
 		}
 
-		const json = await res.json();
-		const parsed = PaginatedSchema(PokemonSchema).safeParse(json);
-		if (!parsed.success) {
-			throw error(500, 'Invalid API response');
-		}
+		const data = await parseResponse(res, PaginatedSchema(PokemonSchema));
 
 		return {
-			pokemon: parsed.data.data ?? [],
+			pokemon: data.data ?? [],
 			currentPage: validPage,
 			pageSize
 		};

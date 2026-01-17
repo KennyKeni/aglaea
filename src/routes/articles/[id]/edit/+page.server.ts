@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { ArticleSchema } from '$lib/types/api';
+import { parseResponse } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ fetch, params }) => {
 	const res = await fetch(
@@ -12,10 +13,6 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
 		throw error(404, 'Article not found');
 	}
 
-	const json = await res.json();
-	const parsed = ArticleSchema.safeParse(json);
-	if (!parsed.success) {
-		throw error(500, 'Invalid API response');
-	}
-	return { article: parsed.data, panel: true };
+	const article = await parseResponse(res, ArticleSchema);
+	return { article, panel: true };
 };

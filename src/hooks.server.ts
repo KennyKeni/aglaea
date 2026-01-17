@@ -30,7 +30,8 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 					event.locals.permissions = parsed.data;
 				}
 			}
-		} catch {
+		} catch (e) {
+			console.error('Failed to fetch permissions:', e);
 			event.locals.permissions = null;
 		}
 	}

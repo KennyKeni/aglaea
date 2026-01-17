@@ -34,7 +34,8 @@ export async function fetchPermissions(fetch: typeof globalThis.fetch): Promise<
 		}
 		data = parsed.data;
 		return parsed.data;
-	} catch {
+	} catch (e) {
+		console.error('Failed to fetch permissions:', e);
 		return null;
 	}
 }

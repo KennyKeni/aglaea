@@ -8,7 +8,7 @@
 
 	let { data }: { data: { article: Article; toc: TocItem[] } } = $props();
 
-	let article: Article = $state(null!);
+	let article: Article | null = $state(null);
 	let toc: TocItem[] = $state([]);
 
 	$effect(() => {

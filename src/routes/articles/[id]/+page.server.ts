@@ -4,6 +4,7 @@ import type { PageServerLoad } from './$types';
 import { ArticleSchema } from '$lib/types/api';
 import { jsonToHtml } from '$lib/server/tiptap';
 import { extractToc } from '$lib/utils/toc';
+import { parseResponse } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 	try {
@@ -19,12 +20,7 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 			'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400'
 		});
 
-		const json = await res.json();
-		const parsed = ArticleSchema.safeParse(json);
-		if (!parsed.success) {
-			throw error(500, 'Invalid API response');
-		}
-		const article = parsed.data;
+		const article = await parseResponse(res, ArticleSchema);
 		const doc = JSON.parse(article.body);
 		const bodyToc = extractToc(doc);
 		const toc = [{ id: 'article-title', text: article.title, level: 0 }, ...bodyToc];

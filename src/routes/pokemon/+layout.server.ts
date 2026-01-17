@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
-import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { PaginatedSchema, PokemonSchema } from '$lib/types/api';
+import { parseResponse } from '$lib/utils';
 
 const PAGE_SIZE = 24;
 
@@ -13,14 +13,10 @@ export const load: LayoutServerLoad = async ({ fetch }) => {
 			return { totalCount: 0, pageSize: PAGE_SIZE };
 		}
 
-		const json = await res.json();
-		const parsed = PaginatedSchema(PokemonSchema).safeParse(json);
-		if (!parsed.success) {
-			throw error(500, 'Invalid API response');
-		}
+		const data = await parseResponse(res, PaginatedSchema(PokemonSchema));
 
 		return {
-			totalCount: parsed.data.total ?? 0,
+			totalCount: data.total ?? 0,
 			pageSize: PAGE_SIZE
 		};
 	} catch {
