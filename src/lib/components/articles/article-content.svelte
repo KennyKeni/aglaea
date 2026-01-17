@@ -57,7 +57,7 @@
 
     <div class="mb-8 flex items-center gap-3 border-b pb-8 text-sm text-muted-foreground">
       {#if dataSource.author}
-        <span>By {dataSource.author}</span>
+        <span>By {dataSource.author.name}</span>
       {/if}
       {#if dataSource.author && formattedDate}
         <span>·</span>
@@ -71,9 +71,9 @@
       <div class="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
         <p class="text-destructive">Failed to load article content.</p>
       </div>
-    {:else if dataSource.bodyHtml}
+    {:else if dataSource.contentHtml}
       <div class="prose prose-lg max-w-none prose-neutral dark:prose-invert">
-        {@html dataSource.bodyHtml}
+        {@html dataSource.contentHtml}
       </div>
     {/if}
   </article>
@@ -103,7 +103,7 @@
 
     <div class="mb-6 flex items-center gap-3 border-b pb-6 text-sm text-muted-foreground">
       {#if dataSource.author}
-        <span>By {dataSource.author}</span>
+        <span>By {dataSource.author.name}</span>
       {/if}
       {#if dataSource.author && formattedDate}
         <span>·</span>

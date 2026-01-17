@@ -7,7 +7,7 @@
   import { Label } from '$lib/components/ui/label';
   import { Button } from '$lib/components/ui/button';
   import { Loader2 } from '@lucide/svelte';
-  import type { Article, ArticleCategory, ArticleImage } from '$lib/types/article';
+  import type { Article, ArticleCategory, ArticleImage, TiptapDoc, ArticleAuthor } from '$lib/types/article';
   import initEditor from '$lib/components/edra/editor';
 
   onDestroy(() => {
@@ -20,6 +20,8 @@
   interface EditMeta {
     id: string;
     createdAt: string;
+    ownerId: string | null;
+    author: ArticleAuthor | null;
     categories: ArticleCategory[];
     images: ArticleImage[];
   }
@@ -28,8 +30,7 @@
     initialTitle = '',
     initialSubtitle = '',
     initialDescription = '',
-    initialAuthor = '',
-    initialBody = '',
+    initialContent = null,
     editMeta = null,
     onSave,
     onCancel,
@@ -37,8 +38,7 @@
     initialTitle?: string;
     initialSubtitle?: string;
     initialDescription?: string;
-    initialAuthor?: string;
-    initialBody?: string;
+    initialContent?: TiptapDoc | null;
     editMeta?: EditMeta | null;
     onSave: (saved: Article) => void;
     onCancel: () => void;
@@ -49,7 +49,6 @@
   let title = $state('');
   let subtitle = $state('');
   let description = $state('');
-  let author = $state('');
   let initialized = $state(false);
 
   $effect(() => {
@@ -57,7 +56,6 @@
     title = initialTitle;
     subtitle = initialSubtitle;
     description = initialDescription;
-    author = initialAuthor;
     initialized = true;
   });
 
@@ -65,19 +63,11 @@
   let isSaving = $state(false);
   let error = $state('');
 
-  const initialContent: Content = $derived.by(() => {
-    if (!initialBody) {
+  const editorContent: Content = $derived.by(() => {
+    if (!initialContent) {
       return { type: 'doc', content: [{ type: 'paragraph', content: [] }] };
     }
-    try {
-      const parsed = JSON.parse(initialBody);
-      if (parsed && typeof parsed === 'object' && parsed.type === 'doc') {
-        return parsed;
-      }
-      return initialBody;
-    } catch {
-      return initialBody;
-    }
+    return initialContent;
   });
 
   function getEditorExtensions() {
@@ -87,6 +77,14 @@
     return extensions;
   }
 
+  function getEditorContent(): TiptapDoc {
+    const json = editor!.getJSON();
+    return {
+      type: 'doc',
+      content: json.content,
+    };
+  }
+
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     if (!editor) return;
@@ -94,7 +92,7 @@
     isSaving = true;
     error = '';
 
-    const body = JSON.stringify(editor.getJSON());
+    const content = getEditorContent();
     const url = isCreateMode ? '/api/articles' : `/api/articles/${editMeta!.id}`;
     const method = isCreateMode ? 'POST' : 'PATCH';
 
@@ -106,8 +104,7 @@
           title,
           subtitle: subtitle || null,
           description: description || null,
-          author: author || null,
-          body,
+          content,
         }),
       });
 
@@ -121,7 +118,7 @@
       }
 
       const response = await res.json();
-      const bodyHtml = generateHTML(editor.getJSON(), getEditorExtensions());
+      const contentHtml = generateHTML(content, getEditorExtensions());
 
       onSave({
         id: response.id,
@@ -129,9 +126,10 @@
         title,
         subtitle: subtitle || null,
         description: description || null,
-        author: author || null,
-        body,
-        bodyHtml,
+        content,
+        contentHtml,
+        ownerId: editMeta?.ownerId ?? null,
+        author: editMeta?.author ?? null,
         createdAt: editMeta?.createdAt ?? new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         categories: editMeta?.categories ?? [],
@@ -182,21 +180,14 @@
       />
     </div>
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <div class="space-y-2">
-        <Label for="subtitle">Subtitle</Label>
-        <Input
-          id="subtitle"
-          bind:value={subtitle}
-          disabled={isSaving}
-          placeholder="Optional subtitle"
-        />
-      </div>
-
-      <div class="space-y-2">
-        <Label for="author">Author</Label>
-        <Input id="author" bind:value={author} disabled={isSaving} placeholder="Author name" />
-      </div>
+    <div class="space-y-2">
+      <Label for="subtitle">Subtitle</Label>
+      <Input
+        id="subtitle"
+        bind:value={subtitle}
+        disabled={isSaving}
+        placeholder="Optional subtitle"
+      />
     </div>
 
     <div class="space-y-2">
@@ -211,7 +202,7 @@
   </div>
 
   <div class="space-y-2">
-    <Label>Body</Label>
+    <Label>Content</Label>
     <div class="rounded-lg border bg-background">
       {#if editor && !editor.isDestroyed}
         <EdraToolBar
@@ -221,7 +212,7 @@
         <EdraDragHandleExtended {editor} />
       {/if}
       <div class="min-h-[400px] p-6">
-        <EdraEditor bind:editor content={initialContent} editable={!isSaving} onUpdate={() => {}} />
+        <EdraEditor bind:editor content={editorContent} editable={!isSaving} onUpdate={() => {}} />
       </div>
     </div>
   </div>

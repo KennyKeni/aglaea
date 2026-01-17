@@ -24,11 +24,12 @@
       initialTitle={data.article.title}
       initialSubtitle={data.article.subtitle ?? ''}
       initialDescription={data.article.description ?? ''}
-      initialAuthor={data.article.author ?? ''}
-      initialBody={data.article.body}
+      initialContent={data.article.content}
       editMeta={{
         id: String(data.article.id),
         createdAt: data.article.createdAt,
+        ownerId: data.article.ownerId,
+        author: data.article.author,
         categories: data.article.categories ?? [],
         images: data.article.images ?? [],
       }}

@@ -3,9 +3,22 @@ import type { NamedRef } from './base';
 export interface ArticleCategory extends NamedRef {}
 
 export interface ArticleImage {
-  id: number;
+  imageId: string;
   url: string;
+  mimeType: string | null;
   isCover: boolean;
+  sortOrder: number;
+}
+
+export interface ArticleAuthor {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+export interface TiptapDoc {
+  type: 'doc';
+  content?: Record<string, unknown>[];
 }
 
 export interface Article {
@@ -14,10 +27,11 @@ export interface Article {
   title: string;
   subtitle: string | null;
   description: string | null;
-  body: string;
-  bodyHtml?: string;
+  content: TiptapDoc | null;
+  contentHtml?: string;
   renderError?: boolean;
-  author: string | null;
+  ownerId: string | null;
+  author: ArticleAuthor | null;
   createdAt: string;
   updatedAt: string;
   categories: ArticleCategory[];

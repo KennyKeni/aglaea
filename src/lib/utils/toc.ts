@@ -1,16 +1,10 @@
 import { slugify } from './slugify';
+import type { TiptapNode } from '$lib/types/api/article';
 
 export interface TocItem {
   id: string;
   text: string;
   level: number;
-}
-
-interface TiptapNode {
-  type: string;
-  content?: TiptapNode[];
-  text?: string;
-  attrs?: { level?: number };
 }
 
 export function extractToc(doc: TiptapNode): TocItem[] {

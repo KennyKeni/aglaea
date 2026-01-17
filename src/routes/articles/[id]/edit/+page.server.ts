@@ -6,7 +6,7 @@ import { parseResponse } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ fetch, params }) => {
   const res = await fetch(
-    `${env.BACKEND_URL}/articles/${params.id}?includeCategories=true&includeImages=true&includeBody=true`,
+    `${env.BACKEND_URL}/articles/${params.id}?includeCategories=true&includeImages=true&includeContent=true&includeAuthor=true`,
   );
 
   if (!res.ok) {

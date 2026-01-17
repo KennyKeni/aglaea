@@ -9,7 +9,7 @@ import { parseResponse } from '$lib/utils';
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
   try {
     const res = await fetch(
-      `${env.BACKEND_URL}/articles/${params.id}?includeCategories=true&includeImages=true&includeBody=true`,
+      `${env.BACKEND_URL}/articles/${params.id}?includeCategories=true&includeImages=true&includeContent=true&includeAuthor=true`,
     );
 
     if (!res.ok) {
@@ -21,23 +21,24 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
     });
 
     const article = await parseResponse(res, ArticleSchema);
-    const doc = JSON.parse(article.body);
-    const bodyToc = extractToc(doc);
-    const toc = [{ id: 'article-title', text: article.title, level: 0 }, ...bodyToc];
+    const contentToc = article.content ? extractToc(article.content) : [];
+    const toc = [{ id: 'article-title', text: article.title, level: 0 }, ...contentToc];
 
-    let bodyHtml: string | undefined;
+    let contentHtml: string | undefined;
     let renderError = false;
-    try {
-      bodyHtml = jsonToHtml(article.body);
-    } catch (e) {
-      if (e instanceof RenderError) {
-        renderError = true;
-      } else {
-        throw e;
+    if (article.content) {
+      try {
+        contentHtml = jsonToHtml(article.content);
+      } catch (e) {
+        if (e instanceof RenderError) {
+          renderError = true;
+        } else {
+          throw e;
+        }
       }
     }
 
-    return { article: { ...article, bodyHtml, renderError }, toc, panel: true };
+    return { article: { ...article, contentHtml, renderError }, toc, panel: true };
   } catch (e) {
     if (e && typeof e === 'object' && 'status' in e) {
       throw e;

@@ -19,5 +19,5 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
 
   const pokemon = await parseResponse(res, PokemonSchema);
 
-  return { pokemon };
+  return { pokemon, panel: true };
 };
