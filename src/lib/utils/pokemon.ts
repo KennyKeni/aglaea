@@ -18,7 +18,7 @@ export const TYPE_COLORS: Record<string, string> = {
   dragon: 'bg-indigo-700 text-white',
   dark: 'bg-zinc-800 text-white',
   steel: 'bg-slate-500 text-white',
-  fairy: 'bg-fuchsia-400 text-zinc-900'
+  fairy: 'bg-fuchsia-400 text-zinc-900',
 };
 
 export function formatId(n: number): string {

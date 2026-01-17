@@ -20,111 +20,111 @@ import 'katex/dist/katex.min.css';
 import { InlineMathReplacer } from './extensions/InlineMathReplacer.js';
 
 export default (
-	element?: HTMLElement,
-	content?: Content,
-	extensions?: Extensions,
-	options?: Partial<EditorOptions>
+  element?: HTMLElement,
+  content?: Content,
+  extensions?: Extensions,
+  options?: Partial<EditorOptions>,
 ) => {
-	const editor = new Editor({
-		...(element && { element }),
-		...(content && { content }),
-		extensions: [
-			StarterKit.configure({
-				orderedList: {
-					HTMLAttributes: {
-						class: 'list-decimal'
-					}
-				},
-				bulletList: {
-					HTMLAttributes: {
-						class: 'list-disc'
-					}
-				},
-				heading: {
-					levels: [1, 2, 3, 4]
-				},
-				link: {
-					openOnClick: false,
-					autolink: true,
-					linkOnPaste: true
-				},
-				codeBlock: false
-			}),
-			Highlight.configure({
-				multicolor: true
-			}),
-			Placeholder.configure({
-				emptyEditorClass: 'is-empty',
-				// Use a placeholder:
-				// Use different placeholders depending on the node type:
-				placeholder: ({ node }) => {
-					if (node.type.name === 'heading') {
-						return 'What’s the title?';
-					} else if (node.type.name === 'paragraph') {
-						return 'Press / or write something ...';
-					}
-					return '';
-				}
-			}),
-			Color,
-			Subscript,
-			Superscript,
-			Typography,
-			ColorHighlighter,
-			TextStyle,
-			FontSize,
-			TextAlign.configure({
-				types: ['heading', 'paragraph']
-			}),
-			TaskList,
-			TaskItem.configure({
-				nested: true
-			}),
-			SearchAndReplace,
-			InlineMathReplacer,
-			MathMatics.configure({
-				blockOptions: {
-					onClick: (node, pos) => {
-						const newCalculation = prompt('Enter new calculation:', node.attrs.latex);
-						if (newCalculation) {
-							editor
-								.chain()
-								.setNodeSelection(pos)
-								.updateBlockMath({ latex: newCalculation })
-								.focus()
-								.run();
-						}
-					}
-				},
-				inlineOptions: {
-					onClick: (node, pos) => {
-						const newCalculation = prompt('Enter new calculation:', node.attrs.latex);
-						if (newCalculation) {
-							editor
-								.chain()
-								.setNodeSelection(pos)
-								.updateInlineMath({ latex: newCalculation })
-								.focus()
-								.run();
-						}
-					}
-				}
-			}),
-			AutoJoiner,
-			Table,
-			TableHeader,
-			TableRow,
-			TableCell,
-			Markdown,
-			...(extensions ?? [])
-		],
-		...options
-	});
+  const editor = new Editor({
+    ...(element && { element }),
+    ...(content && { content }),
+    extensions: [
+      StarterKit.configure({
+        orderedList: {
+          HTMLAttributes: {
+            class: 'list-decimal',
+          },
+        },
+        bulletList: {
+          HTMLAttributes: {
+            class: 'list-disc',
+          },
+        },
+        heading: {
+          levels: [1, 2, 3, 4],
+        },
+        link: {
+          openOnClick: false,
+          autolink: true,
+          linkOnPaste: true,
+        },
+        codeBlock: false,
+      }),
+      Highlight.configure({
+        multicolor: true,
+      }),
+      Placeholder.configure({
+        emptyEditorClass: 'is-empty',
+        // Use a placeholder:
+        // Use different placeholders depending on the node type:
+        placeholder: ({ node }) => {
+          if (node.type.name === 'heading') {
+            return 'What’s the title?';
+          } else if (node.type.name === 'paragraph') {
+            return 'Press / or write something ...';
+          }
+          return '';
+        },
+      }),
+      Color,
+      Subscript,
+      Superscript,
+      Typography,
+      ColorHighlighter,
+      TextStyle,
+      FontSize,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+      SearchAndReplace,
+      InlineMathReplacer,
+      MathMatics.configure({
+        blockOptions: {
+          onClick: (node, pos) => {
+            const newCalculation = prompt('Enter new calculation:', node.attrs.latex);
+            if (newCalculation) {
+              editor
+                .chain()
+                .setNodeSelection(pos)
+                .updateBlockMath({ latex: newCalculation })
+                .focus()
+                .run();
+            }
+          },
+        },
+        inlineOptions: {
+          onClick: (node, pos) => {
+            const newCalculation = prompt('Enter new calculation:', node.attrs.latex);
+            if (newCalculation) {
+              editor
+                .chain()
+                .setNodeSelection(pos)
+                .updateInlineMath({ latex: newCalculation })
+                .focus()
+                .run();
+            }
+          },
+        },
+      }),
+      AutoJoiner,
+      Table,
+      TableHeader,
+      TableRow,
+      TableCell,
+      Markdown,
+      ...(extensions ?? []),
+    ],
+    ...options,
+  });
 
-	editor.setOptions({
-		editorProps: {
-			handlePaste: getHandlePaste(editor)
-		}
-	});
-	return editor;
+  editor.setOptions({
+    editorProps: {
+      handlePaste: getHandlePaste(editor),
+    },
+  });
+  return editor;
 };

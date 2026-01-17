@@ -1,3 +1,3 @@
 export const load = () => {
-	return { panel: true };
+  return { panel: true };
 };

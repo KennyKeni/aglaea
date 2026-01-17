@@ -26,367 +26,367 @@ import { Plugin, PluginKey, type EditorState, type Transaction } from '@tiptap/p
 import { Node as PMNode } from '@tiptap/pm/model';
 
 declare module '@tiptap/core' {
-	interface Commands<ReturnType> {
-		search: {
-			/**
-			 * @description Set search term in extension.
-			 */
-			setSearchTerm: (searchTerm: string) => ReturnType;
-			/**
-			 * @description Set replace term in extension.
-			 */
-			setReplaceTerm: (replaceTerm: string) => ReturnType;
-			/**
-			 * @description Set case sensitivity in extension.
-			 */
-			setCaseSensitive: (caseSensitive: boolean) => ReturnType;
-			/**
-			 * @description Reset current search result to first instance.
-			 */
-			resetIndex: () => ReturnType;
-			/**
-			 * @description Find next instance of search result.
-			 */
-			nextSearchResult: () => ReturnType;
-			/**
-			 * @description Find previous instance of search result.
-			 */
-			previousSearchResult: () => ReturnType;
-			/**
-			 * @description Replace first instance of search result with given replace term.
-			 */
-			replace: () => ReturnType;
-			/**
-			 * @description Replace all instances of search result with given replace term.
-			 */
-			replaceAll: () => ReturnType;
-		};
-	}
+  interface Commands<ReturnType> {
+    search: {
+      /**
+       * @description Set search term in extension.
+       */
+      setSearchTerm: (searchTerm: string) => ReturnType;
+      /**
+       * @description Set replace term in extension.
+       */
+      setReplaceTerm: (replaceTerm: string) => ReturnType;
+      /**
+       * @description Set case sensitivity in extension.
+       */
+      setCaseSensitive: (caseSensitive: boolean) => ReturnType;
+      /**
+       * @description Reset current search result to first instance.
+       */
+      resetIndex: () => ReturnType;
+      /**
+       * @description Find next instance of search result.
+       */
+      nextSearchResult: () => ReturnType;
+      /**
+       * @description Find previous instance of search result.
+       */
+      previousSearchResult: () => ReturnType;
+      /**
+       * @description Replace first instance of search result with given replace term.
+       */
+      replace: () => ReturnType;
+      /**
+       * @description Replace all instances of search result with given replace term.
+       */
+      replaceAll: () => ReturnType;
+    };
+  }
 }
 
 interface TextNodesWithPosition {
-	text: string;
-	pos: number;
+  text: string;
+  pos: number;
 }
 
 const getRegex = (s: string, disableRegex: boolean, caseSensitive: boolean): RegExp => {
-	return RegExp(
-		disableRegex ? s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : s,
-		caseSensitive ? 'gu' : 'gui'
-	);
+  return RegExp(
+    disableRegex ? s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : s,
+    caseSensitive ? 'gu' : 'gui',
+  );
 };
 
 interface ProcessedSearches {
-	decorationsToReturn: DecorationSet;
-	results: Range[];
+  decorationsToReturn: DecorationSet;
+  results: Range[];
 }
 
 function processSearches(
-	doc: PMNode,
-	searchTerm: RegExp,
-	searchResultClass: string,
-	resultIndex: number
+  doc: PMNode,
+  searchTerm: RegExp,
+  searchResultClass: string,
+  resultIndex: number,
 ): ProcessedSearches {
-	const decorations: Decoration[] = [];
-	const results: Range[] = [];
+  const decorations: Decoration[] = [];
+  const results: Range[] = [];
 
-	let textNodesWithPosition: TextNodesWithPosition[] = [];
-	let index = 0;
+  let textNodesWithPosition: TextNodesWithPosition[] = [];
+  let index = 0;
 
-	if (!searchTerm) {
-		return {
-			decorationsToReturn: DecorationSet.empty,
-			results: []
-		};
-	}
+  if (!searchTerm) {
+    return {
+      decorationsToReturn: DecorationSet.empty,
+      results: [],
+    };
+  }
 
-	doc?.descendants((node, pos) => {
-		if (node.isText) {
-			const existing = textNodesWithPosition[index];
-			if (existing) {
-				textNodesWithPosition[index] = {
-					text: existing.text + node.text,
-					pos: existing.pos
-				};
-			} else {
-				textNodesWithPosition[index] = {
-					text: `${node.text}`,
-					pos
-				};
-			}
-		} else {
-			index += 1;
-		}
-	});
+  doc?.descendants((node, pos) => {
+    if (node.isText) {
+      const existing = textNodesWithPosition[index];
+      if (existing) {
+        textNodesWithPosition[index] = {
+          text: existing.text + node.text,
+          pos: existing.pos,
+        };
+      } else {
+        textNodesWithPosition[index] = {
+          text: `${node.text}`,
+          pos,
+        };
+      }
+    } else {
+      index += 1;
+    }
+  });
 
-	textNodesWithPosition = textNodesWithPosition.filter(Boolean);
+  textNodesWithPosition = textNodesWithPosition.filter(Boolean);
 
-	for (const element of textNodesWithPosition) {
-		const { text, pos } = element;
-		const matches = Array.from(text.matchAll(searchTerm)).filter(([matchText]) => matchText.trim());
+  for (const element of textNodesWithPosition) {
+    const { text, pos } = element;
+    const matches = Array.from(text.matchAll(searchTerm)).filter(([matchText]) => matchText.trim());
 
-		for (const m of matches) {
-			if (m[0] === '') break;
+    for (const m of matches) {
+      if (m[0] === '') break;
 
-			if (m.index !== undefined) {
-				results.push({
-					from: pos + m.index,
-					to: pos + m.index + m[0].length
-				});
-			}
-		}
-	}
+      if (m.index !== undefined) {
+        results.push({
+          from: pos + m.index,
+          to: pos + m.index + m[0].length,
+        });
+      }
+    }
+  }
 
-	for (let i = 0; i < results.length; i += 1) {
-		const r = results[i];
-		if (r) {
-			const className =
-				i === resultIndex ? `${searchResultClass} ${searchResultClass}-current` : searchResultClass;
-			const decoration: Decoration = Decoration.inline(r.from, r.to, {
-				class: className
-			});
-			decorations.push(decoration);
-		}
-	}
+  for (let i = 0; i < results.length; i += 1) {
+    const r = results[i];
+    if (r) {
+      const className =
+        i === resultIndex ? `${searchResultClass} ${searchResultClass}-current` : searchResultClass;
+      const decoration: Decoration = Decoration.inline(r.from, r.to, {
+        class: className,
+      });
+      decorations.push(decoration);
+    }
+  }
 
-	return {
-		decorationsToReturn: DecorationSet.create(doc, decorations),
-		results
-	};
+  return {
+    decorationsToReturn: DecorationSet.create(doc, decorations),
+    results,
+  };
 }
 
 const replace = (
-	replaceTerm: string,
-	results: Range[],
-	{ state, dispatch }: { state: EditorState; dispatch: Dispatch }
+  replaceTerm: string,
+  results: Range[],
+  { state, dispatch }: { state: EditorState; dispatch: Dispatch },
 ) => {
-	const firstResult = results[0];
-	if (!firstResult) return;
+  const firstResult = results[0];
+  if (!firstResult) return;
 
-	if (dispatch) dispatch(state.tr.insertText(replaceTerm, firstResult.from, firstResult.to));
+  if (dispatch) dispatch(state.tr.insertText(replaceTerm, firstResult.from, firstResult.to));
 };
 
 const rebaseNextResult = (
-	replaceTerm: string,
-	index: number,
-	lastOffset: number,
-	results: Range[]
+  replaceTerm: string,
+  index: number,
+  lastOffset: number,
+  results: Range[],
 ): [number, Range[]] | null => {
-	const nextIndex = index + 1;
-	const current = results[index];
-	const next = results[nextIndex];
+  const nextIndex = index + 1;
+  const current = results[index];
+  const next = results[nextIndex];
 
-	if (!current || !next) return null;
+  if (!current || !next) return null;
 
-	const offset = current.to - current.from - replaceTerm.length + lastOffset;
+  const offset = current.to - current.from - replaceTerm.length + lastOffset;
 
-	results[nextIndex] = {
-		to: next.to - offset,
-		from: next.from - offset
-	};
+  results[nextIndex] = {
+    to: next.to - offset,
+    from: next.from - offset,
+  };
 
-	return [offset, results];
+  return [offset, results];
 };
 
 const replaceAll = (
-	replaceTerm: string,
-	results: Range[],
-	{ tr, dispatch }: { tr: Transaction; dispatch: Dispatch }
+  replaceTerm: string,
+  results: Range[],
+  { tr, dispatch }: { tr: Transaction; dispatch: Dispatch },
 ) => {
-	let offset = 0;
+  let offset = 0;
 
-	let resultsCopy = results.slice();
+  let resultsCopy = results.slice();
 
-	if (!resultsCopy.length) return;
+  if (!resultsCopy.length) return;
 
-	for (let i = 0; i < resultsCopy.length; i += 1) {
-		const result = resultsCopy[i];
-		if (!result) continue;
+  for (let i = 0; i < resultsCopy.length; i += 1) {
+    const result = resultsCopy[i];
+    if (!result) continue;
 
-		tr.insertText(replaceTerm, result.from, result.to);
+    tr.insertText(replaceTerm, result.from, result.to);
 
-		const rebaseNextResultResponse = rebaseNextResult(replaceTerm, i, offset, resultsCopy);
+    const rebaseNextResultResponse = rebaseNextResult(replaceTerm, i, offset, resultsCopy);
 
-		if (!rebaseNextResultResponse) continue;
+    if (!rebaseNextResultResponse) continue;
 
-		offset = rebaseNextResultResponse[0];
-		resultsCopy = rebaseNextResultResponse[1];
-	}
+    offset = rebaseNextResultResponse[0];
+    resultsCopy = rebaseNextResultResponse[1];
+  }
 
-	if (dispatch) {
-		dispatch(tr);
-	}
+  if (dispatch) {
+    dispatch(tr);
+  }
 };
 
 export const searchAndReplacePluginKey = new PluginKey('searchAndReplacePlugin');
 
 export interface SearchAndReplaceOptions {
-	searchResultClass: string;
-	disableRegex: boolean;
+  searchResultClass: string;
+  disableRegex: boolean;
 }
 
 export interface SearchAndReplaceStorage {
-	searchTerm: string;
-	replaceTerm: string;
-	results: Range[];
-	lastSearchTerm: string;
-	caseSensitive: boolean;
-	lastCaseSensitive: boolean;
-	resultIndex: number;
-	lastResultIndex: number;
+  searchTerm: string;
+  replaceTerm: string;
+  results: Range[];
+  lastSearchTerm: string;
+  caseSensitive: boolean;
+  lastCaseSensitive: boolean;
+  resultIndex: number;
+  lastResultIndex: number;
 }
 
 type EditorWithSearchStorage = {
-	storage: { searchAndReplace: SearchAndReplaceStorage };
+  storage: { searchAndReplace: SearchAndReplaceStorage };
 };
 
 function getSearchStorage(editor: unknown): SearchAndReplaceStorage {
-	return (editor as EditorWithSearchStorage).storage.searchAndReplace;
+  return (editor as EditorWithSearchStorage).storage.searchAndReplace;
 }
 
 export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, SearchAndReplaceStorage>({
-	name: 'searchAndReplace',
+  name: 'searchAndReplace',
 
-	addOptions() {
-		return {
-			searchResultClass: 'search-result',
-			disableRegex: true
-		};
-	},
+  addOptions() {
+    return {
+      searchResultClass: 'search-result',
+      disableRegex: true,
+    };
+  },
 
-	addStorage() {
-		return {
-			searchTerm: '',
-			replaceTerm: '',
-			results: [],
-			lastSearchTerm: '',
-			caseSensitive: false,
-			lastCaseSensitive: false,
-			resultIndex: 0,
-			lastResultIndex: 0
-		};
-	},
+  addStorage() {
+    return {
+      searchTerm: '',
+      replaceTerm: '',
+      results: [],
+      lastSearchTerm: '',
+      caseSensitive: false,
+      lastCaseSensitive: false,
+      resultIndex: 0,
+      lastResultIndex: 0,
+    };
+  },
 
-	addCommands() {
-		return {
-			setSearchTerm:
-				(searchTerm: string) =>
-				({ editor }) => {
-					getSearchStorage(editor).searchTerm = searchTerm;
-					return false;
-				},
-			setReplaceTerm:
-				(replaceTerm: string) =>
-				({ editor }) => {
-					getSearchStorage(editor).replaceTerm = replaceTerm;
-					return false;
-				},
-			setCaseSensitive:
-				(caseSensitive: boolean) =>
-				({ editor }) => {
-					getSearchStorage(editor).caseSensitive = caseSensitive;
-					return false;
-				},
-			resetIndex:
-				() =>
-				({ editor }) => {
-					getSearchStorage(editor).resultIndex = 0;
-					return false;
-				},
-			nextSearchResult:
-				() =>
-				({ editor }) => {
-					const storage = getSearchStorage(editor);
-					const nextIndex = storage.resultIndex + 1;
-					storage.resultIndex = storage.results[nextIndex] ? nextIndex : 0;
-					return false;
-				},
-			previousSearchResult:
-				() =>
-				({ editor }) => {
-					const storage = getSearchStorage(editor);
-					const prevIndex = storage.resultIndex - 1;
-					storage.resultIndex = storage.results[prevIndex] ? prevIndex : storage.results.length - 1;
-					return false;
-				},
-			replace:
-				() =>
-				({ editor, state, dispatch }) => {
-					const { replaceTerm, results } = getSearchStorage(editor);
-					replace(replaceTerm, results, { state, dispatch });
-					return false;
-				},
-			replaceAll:
-				() =>
-				({ editor, tr, dispatch }) => {
-					const { replaceTerm, results } = getSearchStorage(editor);
-					replaceAll(replaceTerm, results, { tr, dispatch });
-					return false;
-				}
-		};
-	},
+  addCommands() {
+    return {
+      setSearchTerm:
+        (searchTerm: string) =>
+        ({ editor }) => {
+          getSearchStorage(editor).searchTerm = searchTerm;
+          return false;
+        },
+      setReplaceTerm:
+        (replaceTerm: string) =>
+        ({ editor }) => {
+          getSearchStorage(editor).replaceTerm = replaceTerm;
+          return false;
+        },
+      setCaseSensitive:
+        (caseSensitive: boolean) =>
+        ({ editor }) => {
+          getSearchStorage(editor).caseSensitive = caseSensitive;
+          return false;
+        },
+      resetIndex:
+        () =>
+        ({ editor }) => {
+          getSearchStorage(editor).resultIndex = 0;
+          return false;
+        },
+      nextSearchResult:
+        () =>
+        ({ editor }) => {
+          const storage = getSearchStorage(editor);
+          const nextIndex = storage.resultIndex + 1;
+          storage.resultIndex = storage.results[nextIndex] ? nextIndex : 0;
+          return false;
+        },
+      previousSearchResult:
+        () =>
+        ({ editor }) => {
+          const storage = getSearchStorage(editor);
+          const prevIndex = storage.resultIndex - 1;
+          storage.resultIndex = storage.results[prevIndex] ? prevIndex : storage.results.length - 1;
+          return false;
+        },
+      replace:
+        () =>
+        ({ editor, state, dispatch }) => {
+          const { replaceTerm, results } = getSearchStorage(editor);
+          replace(replaceTerm, results, { state, dispatch });
+          return false;
+        },
+      replaceAll:
+        () =>
+        ({ editor, tr, dispatch }) => {
+          const { replaceTerm, results } = getSearchStorage(editor);
+          replaceAll(replaceTerm, results, { tr, dispatch });
+          return false;
+        },
+    };
+  },
 
-	addProseMirrorPlugins() {
-		const editor = this.editor;
-		const { searchResultClass, disableRegex } = this.options;
-		const storage = getSearchStorage(editor);
+  addProseMirrorPlugins() {
+    const editor = this.editor;
+    const { searchResultClass, disableRegex } = this.options;
+    const storage = getSearchStorage(editor);
 
-		const setLastSearchTerm = (t: string) => (storage.lastSearchTerm = t);
-		const setLastCaseSensitive = (t: boolean) => (storage.lastCaseSensitive = t);
-		const setLastResultIndex = (t: number) => (storage.lastResultIndex = t);
+    const setLastSearchTerm = (t: string) => (storage.lastSearchTerm = t);
+    const setLastCaseSensitive = (t: boolean) => (storage.lastCaseSensitive = t);
+    const setLastResultIndex = (t: number) => (storage.lastResultIndex = t);
 
-		return [
-			new Plugin({
-				key: searchAndReplacePluginKey,
-				state: {
-					init: () => DecorationSet.empty,
-					apply({ doc, docChanged }, oldState) {
-						const {
-							searchTerm,
-							lastSearchTerm,
-							caseSensitive,
-							lastCaseSensitive,
-							resultIndex,
-							lastResultIndex
-						} = storage;
+    return [
+      new Plugin({
+        key: searchAndReplacePluginKey,
+        state: {
+          init: () => DecorationSet.empty,
+          apply({ doc, docChanged }, oldState) {
+            const {
+              searchTerm,
+              lastSearchTerm,
+              caseSensitive,
+              lastCaseSensitive,
+              resultIndex,
+              lastResultIndex,
+            } = storage;
 
-						if (
-							!docChanged &&
-							lastSearchTerm === searchTerm &&
-							lastCaseSensitive === caseSensitive &&
-							lastResultIndex === resultIndex
-						)
-							return oldState;
+            if (
+              !docChanged &&
+              lastSearchTerm === searchTerm &&
+              lastCaseSensitive === caseSensitive &&
+              lastResultIndex === resultIndex
+            )
+              return oldState;
 
-						setLastSearchTerm(searchTerm);
-						setLastCaseSensitive(caseSensitive);
-						setLastResultIndex(resultIndex);
+            setLastSearchTerm(searchTerm);
+            setLastCaseSensitive(caseSensitive);
+            setLastResultIndex(resultIndex);
 
-						if (!searchTerm) {
-							storage.results = [];
-							return DecorationSet.empty;
-						}
+            if (!searchTerm) {
+              storage.results = [];
+              return DecorationSet.empty;
+            }
 
-						const { decorationsToReturn, results } = processSearches(
-							doc,
-							getRegex(searchTerm, disableRegex, caseSensitive),
-							searchResultClass,
-							resultIndex
-						);
+            const { decorationsToReturn, results } = processSearches(
+              doc,
+              getRegex(searchTerm, disableRegex, caseSensitive),
+              searchResultClass,
+              resultIndex,
+            );
 
-						storage.results = results;
+            storage.results = results;
 
-						return decorationsToReturn;
-					}
-				},
-				props: {
-					decorations(state) {
-						return this.getState(state);
-					}
-				}
-			})
-		];
-	}
+            return decorationsToReturn;
+          },
+        },
+        props: {
+          decorations(state) {
+            return this.getState(state);
+          },
+        },
+      }),
+    ];
+  },
 });
 
 export default SearchAndReplace;
