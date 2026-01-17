@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { ArticleSchema } from '$lib/types/api';
-import { jsonToHtml } from '$lib/server/tiptap';
+import { jsonToHtml, RenderError } from '$lib/server/tiptap';
 import { extractToc } from '$lib/utils/toc';
 import { parseResponse } from '$lib/utils';
 
@@ -24,9 +24,20 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 		const doc = JSON.parse(article.body);
 		const bodyToc = extractToc(doc);
 		const toc = [{ id: 'article-title', text: article.title, level: 0 }, ...bodyToc];
-		const bodyHtml = jsonToHtml(article.body);
 
-		return { article: { ...article, bodyHtml }, toc, panel: true };
+		let bodyHtml: string | undefined;
+		let renderError = false;
+		try {
+			bodyHtml = jsonToHtml(article.body);
+		} catch (e) {
+			if (e instanceof RenderError) {
+				renderError = true;
+			} else {
+				throw e;
+			}
+		}
+
+		return { article: { ...article, bodyHtml, renderError }, toc, panel: true };
 	} catch (e) {
 		if (e && typeof e === 'object' && 'status' in e) {
 			throw e;

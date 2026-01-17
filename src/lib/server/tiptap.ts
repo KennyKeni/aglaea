@@ -9,7 +9,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Highlight from '@tiptap/extension-highlight';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
 import { Table, TableCell, TableRow, TableHeader } from '@tiptap/extension-table';
-import { Markdown } from '@tiptap/markdown';
+import { Markdown, MarkdownManager } from '@tiptap/markdown';
 import Mathematics from '@tiptap/extension-mathematics';
 import { slugify } from '$lib/utils/slugify';
 import DOMPurify from 'isomorphic-dompurify';
@@ -59,13 +59,38 @@ function getServerExtensions() {
 	];
 }
 
+export class RenderError extends Error {
+	constructor(message: string, public readonly cause?: unknown) {
+		super(message);
+		this.name = 'RenderError';
+	}
+}
+
 export function jsonToHtml(body: string): string {
+	let parsed;
 	try {
-		const parsed = JSON.parse(body);
+		parsed = JSON.parse(body);
+	} catch {
+		return markdownToHtml(body);
+	}
+
+	try {
 		const html = generateHTML(parsed, getServerExtensions());
 		return DOMPurify.sanitize(html);
 	} catch (e) {
-		console.error('jsonToHtml error:', e);
-		return '';
+		console.error('Failed to render JSON:', e);
+		throw new RenderError('Failed to render article content', e);
+	}
+}
+
+function markdownToHtml(markdown: string): string {
+	try {
+		const manager = new MarkdownManager({ extensions: getServerExtensions() });
+		const json = manager.parse(markdown);
+		const html = generateHTML(json, getServerExtensions());
+		return DOMPurify.sanitize(html);
+	} catch (e) {
+		console.error('Failed to render markdown:', e);
+		throw new RenderError('Failed to render article content', e);
 	}
 }

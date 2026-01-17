@@ -71,7 +71,11 @@
 			{/if}
 		</div>
 
-		{#if dataSource.bodyHtml}
+		{#if dataSource.renderError}
+			<div class="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
+				<p class="text-destructive">Failed to load article content.</p>
+			</div>
+		{:else if dataSource.bodyHtml}
 			<div class="prose prose-neutral dark:prose-invert prose-lg max-w-none">
 				{@html dataSource.bodyHtml}
 			</div>

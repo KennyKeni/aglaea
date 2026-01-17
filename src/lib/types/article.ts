@@ -16,6 +16,7 @@ export interface Article {
 	description: string | null;
 	body: string;
 	bodyHtml?: string;
+	renderError?: boolean;
 	author: string | null;
 	createdAt: string;
 	updatedAt: string;
