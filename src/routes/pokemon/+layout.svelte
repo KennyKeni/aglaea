@@ -14,7 +14,7 @@
 	{data}
 	basePath="/pokemon"
 	pageDataKey="pokemon"
-	footer="Pokemon data from PokeAPI."
+	footer="Pokemon Data from Smogon and Cobblemon"
 	createState={(totalCount) => createPokemonSpeciesState([], totalCount, 1)}
 	setDataContext={setPokemonDataContext}
 	setPanelContext={setPanelContext}

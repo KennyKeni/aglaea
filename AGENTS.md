@@ -135,6 +135,44 @@ Containers communicate via service names. SvelteKit uses `BACKEND_URL=http://bac
 3. **Error handling**: Use `error()` helper, handle in `handleError` hook
 4. **Protected routes**: Check `locals.user` in `+layout.server.ts`, redirect if missing
 
+## Panel System Architecture
+
+The app uses a sliding panel UI for detail views. Panel mode is determined by two mechanisms:
+
+### Peek Mode (lightweight preview)
+- Triggered by clicking a card in the grid
+- Adds `?focus=123` query param to URL
+- **No page navigation** — stays on same route (e.g., `/articles`)
+- No server round-trip, instant preview
+- Panel slides in at partial width
+
+### Full Mode (SSR detail page)
+- Triggered by navigating to a detail route (`/articles/[id]`, `/articles/new`, `/articles/[id]/edit`)
+- Route's load function returns `panel: true`
+- Full SSR + CDN caching benefits
+- Panel expands to full width
+
+### Why two mechanisms?
+- **Peek uses query params** for instant client-side overlay without server load
+- **Full uses route data** for proper SSR pages that can be cached and shared
+
+### Adding a new full-panel route
+Return `panel: true` from the load function:
+```ts
+// +page.server.ts or +page.ts
+export const load = () => {
+  return { /* your data */, panel: true };
+};
+```
+
+### Panel mode decision logic
+```ts
+// From panel-mode.svelte.ts
+const mode = isDetailRoute ? 'full' : focusId ? 'peek' : 'closed';
+// isDetailRoute = page.data.panel === true
+// focusId = URL search param ?focus=123
+```
+
 ## Svelte 5 State Initialization (avoiding `state_referenced_locally` warning)
 
 When copying props into local state, Svelte warns that prop changes won't update the local copy. Choose the pattern based on intent:

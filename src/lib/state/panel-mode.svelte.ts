@@ -57,8 +57,12 @@ export function createPanelMode<T>({
 	});
 
 	const focusId = $derived(page.url.searchParams.get(focusParam));
-	const isDetailRoute = $derived(page.route.id?.includes('[id]') ?? false);
-	const isNavigatingToDetail = $derived(navigating?.to?.route.id?.includes('[id]') ?? false);
+	const isDetailRoute = $derived((page.data as { panel?: boolean }).panel === true);
+	const isNavigatingToDetail = $derived.by(() => {
+		const destPath = navigating?.to?.url.pathname;
+		if (!destPath) return false;
+		return destPath.startsWith(basePath + '/');
+	});
 	const navigatingToId = $derived(isNavigatingToDetail ? navigating?.to?.params?.id : null);
 
 	const mode = $derived<PanelMode>(

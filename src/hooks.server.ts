@@ -2,6 +2,7 @@ import type { Handle, HandleFetch } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { BACKEND_URL } from '$env/static/private';
+import { UserPermissionsSchema } from '$lib/types/api';
 
 const handleParaglide: Handle = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {
@@ -17,6 +18,21 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 	if (token) {
 		event.locals.token = token;
+
+		try {
+			const res = await fetch(`${BACKEND_URL}/auth/me/permissions`, {
+				headers: { Authorization: `Bearer ${token}` }
+			});
+			if (res.ok) {
+				const data = await res.json();
+				const parsed = UserPermissionsSchema.safeParse(data);
+				if (parsed.success) {
+					event.locals.permissions = parsed.data;
+				}
+			}
+		} catch {
+			event.locals.permissions = null;
+		}
 	}
 
 	return resolve(event);

@@ -1,4 +1,4 @@
 export * from './base';
-export * from './pokemon';
 export * from './article';
+export * from './pokemon';
 export * from './auth';

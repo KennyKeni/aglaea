@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
+import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import type { Paginated } from '$lib/types/base';
-import type { Article } from '$lib/types/article';
+import { ArticleSchema, PaginatedSchema } from '$lib/types/api';
 
 const PAGE_SIZE = 12;
 
@@ -13,10 +13,14 @@ export const load: LayoutServerLoad = async ({ fetch }) => {
 			return { totalCount: 0, pageSize: PAGE_SIZE };
 		}
 
-		const response: Paginated<Article> = await res.json();
+		const json = await res.json();
+		const parsed = PaginatedSchema(ArticleSchema).safeParse(json);
+		if (!parsed.success) {
+			throw error(500, 'Invalid API response');
+		}
 
 		return {
-			totalCount: response.total ?? 0,
+			totalCount: parsed.data.total ?? 0,
 			pageSize: PAGE_SIZE
 		};
 	} catch {

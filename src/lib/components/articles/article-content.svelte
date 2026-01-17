@@ -59,7 +59,7 @@
 			</div>
 		{/if}
 
-		<h1 class="text-4xl font-bold tracking-tight mb-4">{dataSource.title}</h1>
+		<h1 id="article-title" class="text-5xl font-bold tracking-tight mb-4">{dataSource.title}</h1>
 
 		{#if dataSource.subtitle}
 			<p class="text-xl text-muted-foreground mb-6">{dataSource.subtitle}</p>

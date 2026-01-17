@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { Article } from '$lib/types/article';
+import { ArticleSchema } from '$lib/types/api';
 import { jsonToHtml } from '$lib/server/tiptap';
 import { extractToc } from '$lib/utils/toc';
 
@@ -19,12 +19,18 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 			'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400'
 		});
 
-		const article: Article = await res.json();
+		const json = await res.json();
+		const parsed = ArticleSchema.safeParse(json);
+		if (!parsed.success) {
+			throw error(500, 'Invalid API response');
+		}
+		const article = parsed.data;
 		const doc = JSON.parse(article.body);
-		const toc = extractToc(doc);
+		const bodyToc = extractToc(doc);
+		const toc = [{ id: 'article-title', text: article.title, level: 0 }, ...bodyToc];
 		const bodyHtml = jsonToHtml(article.body);
 
-		return { article: { ...article, bodyHtml }, toc };
+		return { article: { ...article, bodyHtml }, toc, panel: true };
 	} catch (e) {
 		if (e && typeof e === 'object' && 'status' in e) {
 			throw e;

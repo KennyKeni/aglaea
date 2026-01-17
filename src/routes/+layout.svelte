@@ -3,10 +3,27 @@
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import { AppSidebar, AppHeader } from '$lib/components/layout';
 	import * as Sidebar from '$lib/components/ui/sidebar';
+	import { permissions } from '$lib/state/permissions.svelte';
+	import { authClient } from '$lib/auth-client';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 
-	let { children } = $props();
+	let { data, children } = $props();
+
+	const session = authClient.useSession();
+
+	$effect(() => {
+		permissions.init(data.permissions);
+	});
+
+	$effect(() => {
+		const isLoggedIn = !!$session.data;
+		if (!isLoggedIn) {
+			permissions.clear();
+		} else if (!permissions.data && isLoggedIn) {
+			permissions.fetch(fetch);
+		}
+	});
 
 	const isAuthPage = $derived(
 		page.url.pathname === '/login' || page.url.pathname === '/signup'

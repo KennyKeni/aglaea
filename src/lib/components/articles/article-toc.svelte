@@ -1,10 +1,13 @@
 <script lang="ts">
 	import type { TocItem } from '$lib/utils/toc';
+	import { cn } from '$lib/utils';
+	import { createScrollSpy } from '$lib/state/scroll-spy.svelte';
 
 	let { toc, class: className = '' }: { toc: TocItem[]; class?: string } = $props();
 
-	function scrollToHeading(e: MouseEvent, id: string) {
-		e.preventDefault();
+	let activeId = $state<string | null>(null);
+
+	function scrollToId(id: string, behavior: ScrollBehavior = 'smooth') {
 		const target = document.getElementById(id);
 		if (!target) return;
 
@@ -14,28 +17,64 @@
 			const viewportRect = viewport.getBoundingClientRect();
 			viewport.scrollTo({
 				top: viewport.scrollTop + targetRect.top - viewportRect.top - 20,
-				behavior: 'smooth'
+				behavior
 			});
 		} else {
-			target.scrollIntoView({ behavior: 'smooth' });
+			target.scrollIntoView({ behavior });
 		}
+	}
+
+	$effect(() => {
+		if (toc.length === 0) return;
+
+		const firstItem = toc[0];
+		if (!firstItem) return;
+
+		const selector = toc.map((item) => `#${CSS.escape(item.id)}`).join(', ');
+		const firstHeading = document.getElementById(firstItem.id);
+		const root = firstHeading?.closest('[data-slot="scroll-area-viewport"]') as Element | null;
+
+		const spy = createScrollSpy({
+			selector,
+			root,
+			rootMargin: '0px 0px -70% 0px',
+			onActiveChange: (id) => {
+				activeId = id;
+				if (id) history.replaceState(null, '', `#${id}`);
+			}
+		});
+
+		spy.start();
+
+		const hash = window.location.hash.slice(1);
+		if (hash && toc.some((item) => item.id === hash)) {
+			requestAnimationFrame(() => scrollToId(hash, 'instant'));
+		}
+
+		return () => spy.stop();
+	});
+
+	function scrollToHeading(e: MouseEvent, id: string) {
+		e.preventDefault();
+		scrollToId(id);
 	}
 </script>
 
 {#if toc.length > 0}
-	<nav class="sticky top-8 {className}">
-		<h2 class="text-sm font-medium text-muted-foreground mb-3">On this page</h2>
-		<ul class="space-y-2">
+	<nav class={cn('sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto', className)}>
+		<h4 class="mb-3 text-sm font-medium text-foreground/90">On this page</h4>
+		<ul class="flex flex-col gap-1.5 text-sm">
 			{#each toc as item (item.id)}
-				{@const isTopLevel = item.level <= 2}
-				<li style:padding-left="{(item.level - 2) * 0.75}rem">
-					<a
-						href="#{item.id}"
-						class="text-sm hover:text-foreground transition-colors block {isTopLevel
-							? 'text-muted-foreground'
-							: 'text-muted-foreground/50'}"
-						onclick={(e) => scrollToHeading(e, item.id)}
-					>
+				{@const indent = Math.max(item.level, 0) * 0.75}
+				{@const isActive = activeId === item.id}
+				<li
+					style:padding-left={`${indent}rem`}
+					class={cn(
+						'transition-colors hover:text-foreground',
+						isActive ? 'font-medium text-foreground' : 'text-muted-foreground',
+					)}
+				>
+					<a href="#{item.id}" class="block py-0.5" onclick={(e) => scrollToHeading(e, item.id)}>
 						{item.text}
 					</a>
 				</li>

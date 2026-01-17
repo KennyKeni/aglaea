@@ -34,6 +34,7 @@
 	} = $props();
 
 	const hasItem = $derived(itemKey !== null && itemKey !== undefined);
+	const showPanel = $derived(hasItem || mode === 'full');
 
 	function slideIn(node: HTMLElement) {
 		if (!browser) return;
@@ -44,7 +45,7 @@
 	}
 </script>
 
-{#if animation.showPanel && hasItem}
+{#if animation.showPanel && showPanel}
 	{#key itemKey}
 		<button
 			aria-label="Close panel"
