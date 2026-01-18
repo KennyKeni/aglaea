@@ -1,4 +1,4 @@
-import type { Handle, HandleFetch } from '@sveltejs/kit';
+import type { Handle, HandleFetch, HandleServerError } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { env } from '$env/dynamic/private';
@@ -50,3 +50,9 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
   }
   return fetch(request);
 };
+
+export const handleError = (({ error, event, status, message }) => {
+  console.error('[handleError]', status, event.url.pathname);
+  console.error('[handleError] Error:', error);
+  return { message };
+}) satisfies HandleServerError;
