@@ -9,10 +9,10 @@ export const authClient = createAuthClient({
   baseURL,
   fetchOptions: {
     onRequest: (ctx) => {
-      console.log('[DEBUG] Auth request:', ctx.url, ctx.options);
+      console.log('[DEBUG] Auth request:', ctx.url);
     },
     onResponse: (ctx) => {
-      console.log('[DEBUG] Auth response:', ctx.response.status, ctx.data);
+      console.log('[DEBUG] Auth response:', ctx.response.status);
     },
     onError: (ctx) => {
       console.log('[DEBUG] Auth error:', ctx.error);
