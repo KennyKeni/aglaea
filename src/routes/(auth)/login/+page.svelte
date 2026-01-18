@@ -17,18 +17,21 @@
     error = '';
     isLoading = true;
 
-    await authClient.signIn.email(
-      { email, password, callbackURL: '/' },
-      {
-        onSuccess: () => {
-          goto('/');
-        },
-        onError: (ctx) => {
-          error = ctx.error.message || 'Failed to sign in';
-          isLoading = false;
-        },
-      },
-    );
+    const result = await authClient.signIn.email({ email, password });
+
+    if (result.error) {
+      error = result.error.message || 'Failed to sign in';
+      isLoading = false;
+      return;
+    }
+
+    const session = authClient.useSession();
+    const unsubscribe = session.subscribe((state) => {
+      if (state.data && !state.isPending) {
+        unsubscribe();
+        goto('/');
+      }
+    });
   }
 </script>
 

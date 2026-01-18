@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { replaceState } from '$app/navigation';
+  import { goto, replaceState } from '$app/navigation';
   import { page } from '$app/state';
   import { authClient } from '$lib/auth-client';
   import { Button } from '$lib/components/ui/button';
@@ -60,6 +60,7 @@
   async function handleSignOut() {
     await authClient.signOut();
     authClient.$store.atoms.session.set({ data: null, error: null, isPending: false });
+    goto('/', { invalidateAll: true });
   }
 </script>
 
