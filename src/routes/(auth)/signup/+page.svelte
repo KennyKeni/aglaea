@@ -1,3 +1,7 @@
+<svelte:head>
+  <title>Sign Up | Aglaea</title>
+</svelte:head>
+
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { authClient } from '$lib/auth-client';

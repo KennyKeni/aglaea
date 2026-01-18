@@ -1,3 +1,7 @@
+<svelte:head>
+  <title>Paraglide Demo | Aglaea</title>
+</svelte:head>
+
 <script lang="ts">
   import { setLocale } from '$lib/paraglide/runtime';
   import { m } from '$lib/paraglide/messages.js';

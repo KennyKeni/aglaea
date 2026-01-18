@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { ArticleSchema, PaginatedSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/utils';
+import { parseResponse } from '$lib/server/api';
 
 const PAGE_SIZE = 12;
 

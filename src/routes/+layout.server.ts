@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { ArticleCategorySchema } from '$lib/types/api';
-import { parseResponse } from '$lib/utils';
+import { parseResponse } from '$lib/server/api';
 import { z } from 'zod';
 import type { ArticleCategory } from '$lib/types';
 

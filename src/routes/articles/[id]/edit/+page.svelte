@@ -1,3 +1,7 @@
+<svelte:head>
+  <title>Edit {data.article.title} | Aglaea</title>
+</svelte:head>
+
 <script lang="ts">
   import { goto } from '$app/navigation';
   import LoadingSpinner from '$lib/components/ui/loading-spinner.svelte';

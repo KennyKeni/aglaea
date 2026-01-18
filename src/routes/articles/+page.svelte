@@ -1,3 +1,7 @@
+<svelte:head>
+  <title>Articles | Aglaea</title>
+</svelte:head>
+
 <script lang="ts">
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -6,13 +10,16 @@
   import { Button } from '$lib/components/ui/button';
   import { Plus } from '@lucide/svelte';
   import { getArticleDataContext, getArticlePanelContext } from '$lib/context/articles';
+  import { StreamableResolver } from '$lib/state/streamable.svelte';
   import { can } from '$lib/state/permissions.svelte';
   import { Resource, Action } from '$lib/types/auth';
   import type { Article } from '$lib/types/article';
   import type { FilterOption } from '$lib/utils/filters';
+  import type { Streamable } from '$lib/utils/streaming';
 
   interface PageData {
-    articles: Article[] | Promise<Article[]>;
+    articles: Streamable<Article[]>;
+    filteredCount: Streamable<number>;
     currentPage: number;
     totalCount: number;
     pageSize: number;
@@ -24,29 +31,22 @@
   const articleData = getArticleDataContext();
   const { mode: panelMode } = getArticlePanelContext();
 
-  let resolvedArticles: Article[] = $state([]);
-  let isLoading = $state(true);
+  const articles = new StreamableResolver<Article[]>([]);
+  const filteredCount = new StreamableResolver<number>(0);
 
   $effect(() => {
-    const articles = data.articles;
-    if (articles instanceof Promise) {
-      isLoading = true;
-      articles.then((resolved) => {
-        resolvedArticles = resolved;
-        if (!articleData.searchQuery) {
-          articleData.setItems(resolved);
-          articleData.setPage(data.currentPage);
-        }
-        isLoading = false;
-      });
-    } else {
-      resolvedArticles = articles;
-      if (!articleData.searchQuery) {
-        articleData.setItems(articles);
-        articleData.setPage(data.currentPage);
-      }
-      isLoading = false;
+    articles.resolve(data.articles);
+  });
+
+  $effect(() => {
+    if (!articles.loading && !articleData.searchQuery) {
+      articleData.setItems(articles.value);
+      articleData.setPage(data.currentPage);
     }
+  });
+
+  $effect(() => {
+    filteredCount.resolve(data.filteredCount);
   });
 
   $effect(() => {
@@ -76,17 +76,17 @@
 </div>
 
 <ArticleGrid
-  articles={articleData.searchQuery ? articleData.items : resolvedArticles}
-  {isLoading}
+  articles={articleData.searchQuery ? articleData.items : articles.value}
+  isLoading={articles.loading}
   skeletonCount={data.pageSize}
   onCardClick={(article) => panelMode.openPeek(article)}
 />
 
-{#if !articleData.searchQuery && data.totalCount > 0}
+{#if !articleData.searchQuery && filteredCount.value > 0}
   <div class="mx-auto max-w-6xl px-4 pb-8">
     <Pagination
       currentPage={data.currentPage}
-      totalPages={Math.ceil(data.totalCount / data.pageSize)}
+      totalPages={Math.ceil(filteredCount.value / data.pageSize)}
       onPageChange={handlePageChange}
     />
   </div>

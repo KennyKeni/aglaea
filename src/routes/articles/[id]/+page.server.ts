@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 import { ArticleSchema } from '$lib/types/api';
 import { jsonToHtml, RenderError } from '$lib/server/tiptap';
 import { extractToc } from '$lib/utils/toc';
-import { parseResponse } from '$lib/utils';
+import { parseResponse } from '$lib/server/api';
 
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
   try {

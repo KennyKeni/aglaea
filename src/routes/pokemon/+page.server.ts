@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { PaginatedSchema, PokemonSchema } from '$lib/types/api';
+import { streamOnNav, streamMap } from '$lib/utils/streaming';
 
 export const load: PageServerLoad = async ({ fetch, url, parent, isDataRequest }) => {
   const { totalCount, pageSize } = await parent();
@@ -55,15 +56,20 @@ export const load: PageServerLoad = async ({ fetch, url, parent, isDataRequest }
   }
 
   const pokemonPromise = fetch(`${env.BACKEND_URL}/pokemon?${apiParams.toString()}`)
-    .then((res) => (res.ok ? res.json() : { data: [] }))
+    .then((res) => (res.ok ? res.json() : { data: [], total: 0 }))
     .then((json) => {
       const parsed = PaginatedSchema(PokemonSchema).safeParse(json);
-      return parsed.success ? (parsed.data.data ?? []) : [];
+      return parsed.success
+        ? { data: parsed.data.data ?? [], total: parsed.data.total ?? 0 }
+        : { data: [], total: 0 };
     })
-    .catch(() => []);
+    .catch(() => ({ data: [], total: 0 }));
+
+  const result = await streamOnNav(pokemonPromise, isDataRequest);
 
   return {
-    pokemon: isDataRequest ? pokemonPromise : await pokemonPromise,
+    pokemon: streamMap(result, (r) => r.data),
+    filteredCount: streamMap(result, (r) => r.total),
     currentPage: validPage,
     pageSize,
   };

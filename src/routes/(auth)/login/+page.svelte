@@ -1,3 +1,7 @@
+<svelte:head>
+  <title>Login | Aglaea</title>
+</svelte:head>
+
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
   import { authClient } from '$lib/auth-client';

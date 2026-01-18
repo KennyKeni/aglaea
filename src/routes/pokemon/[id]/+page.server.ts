@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { PageServerLoad } from './$types';
 import { PokemonSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/utils';
+import { parseResponse } from '$lib/server/api';
 
 export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
   const res = await fetch(

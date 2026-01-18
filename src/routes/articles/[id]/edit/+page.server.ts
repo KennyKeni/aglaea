@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { ArticleSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/utils';
+import { parseResponse } from '$lib/server/api';
 
 export const load: PageServerLoad = async ({ fetch, params }) => {
   const res = await fetch(

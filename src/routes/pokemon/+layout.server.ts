@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { PaginatedSchema, PokemonSchema, NamedRefSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/utils';
+import { parseResponse } from '$lib/server/api';
 import { z } from 'zod';
 
 const PAGE_SIZE = 24;

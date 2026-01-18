@@ -1,3 +1,7 @@
+<svelte:head>
+  <title>Aglaea | Cobblemon Species Database</title>
+</svelte:head>
+
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
   import { ArrowRight, Clock, Database, FileText, Shield, Zap } from '@lucide/svelte';
