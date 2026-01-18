@@ -19,7 +19,22 @@
   });
 
   const hasToc = $derived(toc.length > 0);
+
+  const metaDescription = $derived.by(() => {
+    if (!article) return '';
+    if (article.description) return article.description;
+    if (article.subtitle) return article.subtitle;
+    const authorText = article.author ? ` by ${article.author.name}` : '';
+    return `${article.title}${authorText}`;
+  });
 </script>
+
+<svelte:head>
+  {#if article}
+    <title>{article.title}</title>
+    <meta name="description" content={metaDescription} />
+  {/if}
+</svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8">
   {#if !article}
@@ -32,7 +47,12 @@
       <div>
         {#if can(Resource.Article, Action.Update)}
           <div class="mb-6 flex justify-end">
-            <Button variant="ghost" size="sm" href="/articles/{article.id}/edit">
+            <Button
+              variant="ghost"
+              size="sm"
+              href="/articles/{article.id}/edit"
+              data-sveltekit-preload-data="off"
+            >
               <Pencil class="mr-2 h-4 w-4" />
               Edit
             </Button>

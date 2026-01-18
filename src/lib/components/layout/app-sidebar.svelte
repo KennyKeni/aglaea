@@ -60,12 +60,12 @@
         <Sidebar.Menu>
           {#each navigation as item (item.label)}
             {#if item.children && item.children.length > 0}
-              <Collapsible.Root
-                open={isExpanded(item.label, item.children)}
-                onOpenChange={(open) => toggleExpanded(item.label, open)}
-                class="group/collapsible"
-              >
-                <Sidebar.MenuItem>
+              <Sidebar.MenuItem>
+                <Collapsible.Root
+                  open={isExpanded(item.label, item.children)}
+                  onOpenChange={(open) => toggleExpanded(item.label, open)}
+                  class="group/collapsible"
+                >
                   <Collapsible.Trigger>
                     {#snippet child({ props })}
                       <Sidebar.MenuButton {...props} tooltipContent={item.label}>
@@ -93,8 +93,8 @@
                       {/each}
                     </Sidebar.MenuSub>
                   </Collapsible.Content>
-                </Sidebar.MenuItem>
-              </Collapsible.Root>
+                </Collapsible.Root>
+              </Sidebar.MenuItem>
             {:else if item.href}
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton isActive={isActive(item.href)} tooltipContent={item.label}>
