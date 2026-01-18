@@ -39,7 +39,11 @@ const proxy: RequestHandler = async ({ request, params, url, cookies }) => {
     const resHeaders = new Headers();
     for (const [key, value] of res.headers) {
       if (!HOP_BY_HOP.has(key.toLowerCase())) {
-        resHeaders.set(key, value);
+        if (key.toLowerCase() === 'set-cookie') {
+          resHeaders.append(key, value);
+        } else {
+          resHeaders.set(key, value);
+        }
       }
     }
 
