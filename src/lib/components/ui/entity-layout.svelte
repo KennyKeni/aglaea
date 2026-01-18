@@ -41,7 +41,7 @@
     return state;
   });
 
-  let isMobileState = $state(false);
+  let isMobileState = $state(true);
 
   const panelMode = untrack(() =>
     createPanelMode<T>({

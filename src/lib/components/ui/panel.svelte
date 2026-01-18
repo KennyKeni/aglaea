@@ -77,16 +77,18 @@
             {/if}
           </div>
           <div class="flex items-center gap-2">
-            {#if mode === 'peek'}
-              <Button variant="secondary" size="sm" onclick={onExpand} class="cursor-pointer">
-                <Maximize2 class="mr-2 h-4 w-4" />
-                Expand
-              </Button>
-            {:else if mode === 'full'}
-              <Button variant="secondary" size="sm" onclick={onCollapse} class="cursor-pointer">
-                <Minimize2 class="mr-2 h-4 w-4" />
-                Half
-              </Button>
+            {#if !animation.isMobile}
+              {#if mode === 'peek'}
+                <Button variant="secondary" size="sm" onclick={onExpand} class="cursor-pointer">
+                  <Maximize2 class="mr-2 h-4 w-4" />
+                  Expand
+                </Button>
+              {:else if mode === 'full'}
+                <Button variant="secondary" size="sm" onclick={onCollapse} class="cursor-pointer">
+                  <Minimize2 class="mr-2 h-4 w-4" />
+                  Half
+                </Button>
+              {/if}
             {/if}
             <Button
               variant="ghost"

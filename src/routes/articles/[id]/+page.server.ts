@@ -43,6 +43,7 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
     if (e && typeof e === 'object' && 'status' in e) {
       throw e;
     }
+    console.error('Article load failed:', e instanceof Error ? e.stack : e);
     throw error(500, 'Failed to load article');
   }
 };
