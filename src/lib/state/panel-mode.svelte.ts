@@ -115,14 +115,14 @@ export function createPanelMode<T>({
   function openPeek(item: T) {
     cachedItem = item;
     const id = getId(item);
-    const currentPage = page.url.searchParams.get('page');
+    const params = new URLSearchParams(page.url.searchParams);
 
     if (isMobile?.()) {
-      const url = currentPage ? `${basePath}/${id}?page=${currentPage}` : `${basePath}/${id}`;
+      params.delete(focusParam);
+      const queryString = params.toString();
+      const url = queryString ? `${basePath}/${id}?${queryString}` : `${basePath}/${id}`;
       goto(url, { noScroll: true });
     } else {
-      const params = new URLSearchParams();
-      if (currentPage) params.set('page', currentPage);
       params.set(focusParam, String(id));
       goto(`${basePath}?${params.toString()}`, { noScroll: true });
       preloadData(`${basePath}/${id}`);
@@ -132,25 +132,27 @@ export function createPanelMode<T>({
   function expand() {
     const id = focusId ?? (cachedItem ? getId(cachedItem) : null);
     if (!id) return;
-    const currentPage = page.url.searchParams.get('page');
-    const url = currentPage ? `${basePath}/${id}?page=${currentPage}` : `${basePath}/${id}`;
+    const params = new URLSearchParams(page.url.searchParams);
+    params.delete(focusParam);
+    const queryString = params.toString();
+    const url = queryString ? `${basePath}/${id}?${queryString}` : `${basePath}/${id}`;
     goto(url, { noScroll: true });
   }
 
   function collapse() {
     const currentId = page.params.id ?? (cachedItem ? getId(cachedItem) : null);
     if (!currentId) return;
-    const currentPage = page.url.searchParams.get('page');
-    const params = new URLSearchParams();
-    if (currentPage) params.set('page', currentPage);
+    const params = new URLSearchParams(page.url.searchParams);
     params.set(focusParam, String(currentId));
     goto(`${basePath}?${params.toString()}`, { noScroll: true });
   }
 
   function close() {
     cachedItem = null;
-    const currentPage = page.url.searchParams.get('page');
-    const targetUrl = currentPage ? `${basePath}?page=${currentPage}` : basePath;
+    const params = new URLSearchParams(page.url.searchParams);
+    params.delete(focusParam);
+    const queryString = params.toString();
+    const targetUrl = queryString ? `${basePath}?${queryString}` : basePath;
     goto(targetUrl, { noScroll: true });
   }
 
