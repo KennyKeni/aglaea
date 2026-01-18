@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import type { Editor } from '@tiptap/core';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
-import { Node } from '@tiptap/pm/model';
+import type { Node } from '@tiptap/pm/model';
 import './types';
 import { uploadImage, ImageUploadError } from '$lib/utils/image-upload';
 

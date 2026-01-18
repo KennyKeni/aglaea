@@ -1,7 +1,7 @@
 import { Editor, findParentNode } from '@tiptap/core';
-import { EditorState, Selection, Transaction } from '@tiptap/pm/state';
+import type { EditorState, Selection, Transaction } from '@tiptap/pm/state';
 import { CellSelection, type Rect, TableMap } from '@tiptap/pm/tables';
-import { Node, ResolvedPos } from '@tiptap/pm/model';
+import type { Node, ResolvedPos } from '@tiptap/pm/model';
 import type { EditorView } from '@tiptap/pm/view';
 import Table from './table.js';
 
