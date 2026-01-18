@@ -35,16 +35,18 @@
     side = 'right',
     portalProps,
     children,
+    onOverlayClick,
     ...restProps
   }: WithoutChildrenOrChild<SheetPrimitive.ContentProps> & {
     portalProps?: WithoutChildrenOrChild<ComponentProps<typeof SheetPortal>>;
     side?: Side;
     children: Snippet;
+    onOverlayClick?: (e: MouseEvent | TouchEvent) => void;
   } = $props();
 </script>
 
 <SheetPortal {...portalProps}>
-  <SheetOverlay />
+  <SheetOverlay onclick={onOverlayClick} />
   <SheetPrimitive.Content
     bind:ref
     data-slot="sheet-content"
