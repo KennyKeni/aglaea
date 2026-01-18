@@ -10,6 +10,15 @@
 
   const session = authClient.useSession();
 
+  // DEBUG: Log session state changes
+  $effect(() => {
+    console.log('[DEBUG] Session state:', {
+      data: $session.data,
+      isPending: $session.isPending,
+      error: $session.error,
+    });
+  });
+
   let searchQuery = $state(page.url.searchParams.get('search') ?? '');
   let isDark = $state(browser ? document.documentElement.classList.contains('dark') : false);
 
