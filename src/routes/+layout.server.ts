@@ -2,6 +2,7 @@ import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
   return {
-    permissions: locals.permissions ?? null,
+    session: locals.session,
+    permissions: locals.permissions,
   };
 };

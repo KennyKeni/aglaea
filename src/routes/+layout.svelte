@@ -1,27 +1,28 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { page } from '$app/state';
   import { locales, localizeHref } from '$lib/paraglide/runtime';
   import { AppSidebar, AppHeader } from '$lib/components/layout';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import { permissions } from '$lib/state/permissions.svelte';
-  import { authClient } from '$lib/auth-client';
   import './layout.css';
   import favicon from '$lib/assets/favicon.svg';
 
   let { data, children } = $props();
 
-  const session = authClient.useSession();
+  $effect(() => {
+    if (browser) {
+      console.log('[+layout.svelte] data.session:', data.session);
+    }
+  });
 
   $effect(() => {
     permissions.init(data.permissions);
   });
 
   $effect(() => {
-    const isLoggedIn = !!$session.data;
-    if (!isLoggedIn) {
+    if (!data.session) {
       permissions.clear();
-    } else if (!permissions.data && isLoggedIn) {
-      permissions.fetch(fetch);
     }
   });
 
@@ -36,7 +37,7 @@
   <Sidebar.Provider>
     <AppSidebar />
     <Sidebar.Inset>
-      <AppHeader />
+      <AppHeader session={data.session} />
       <main class="flex-1">
         {@render children()}
       </main>

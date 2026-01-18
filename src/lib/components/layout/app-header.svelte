@@ -1,23 +1,15 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { goto, replaceState } from '$app/navigation';
+  import { invalidateAll, replaceState } from '$app/navigation';
   import { page } from '$app/state';
   import { authClient } from '$lib/auth-client';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import { LogIn, LogOut, Search, Sun, Moon } from '@lucide/svelte';
+  import type { Session } from '$lib/types/auth';
 
-  const session = authClient.useSession();
-
-  // DEBUG: Log session state changes
-  $effect(() => {
-    console.log('[DEBUG] Session state:', {
-      data: $session.data,
-      isPending: $session.isPending,
-      error: $session.error,
-    });
-  });
+  let { session }: { session: Session | null } = $props();
 
   let searchQuery = $state(page.url.searchParams.get('search') ?? '');
   let isDark = $state(browser ? document.documentElement.classList.contains('dark') : false);
@@ -59,8 +51,7 @@
 
   async function handleSignOut() {
     await authClient.signOut();
-    authClient.$store.atoms.session.set({ data: null, error: null, isPending: false });
-    goto('/', { invalidateAll: true });
+    invalidateAll();
   }
 </script>
 
@@ -97,9 +88,9 @@
     <div class="h-6 w-px bg-border"></div>
 
     <div class="flex items-center gap-1">
-      {#if $session.data}
+      {#if session}
         <span class="hidden text-sm font-medium md:inline">
-          {$session.data.user.name || $session.data.user.email}
+          {session.user.name || session.user.email}
         </span>
         <Button variant="ghost" size="sm" onclick={handleSignOut}>
           <LogOut class="h-4 w-4" />

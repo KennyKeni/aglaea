@@ -1,2 +1,2 @@
-export { Role, Resource, Action } from './api/auth';
-export type { UserPermissions } from './api/auth';
+export { Role, Resource, Action, SessionSchema, SessionUserSchema } from './api/auth';
+export type { UserPermissions, Session, SessionUser } from './api/auth';

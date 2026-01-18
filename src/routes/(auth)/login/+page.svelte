@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { authClient } from '$lib/auth-client';
   import * as Card from '$lib/components/ui/card';
   import { Input } from '$lib/components/ui/input';
@@ -17,7 +17,9 @@
     error = '';
     isLoading = true;
 
+    console.log('[login] signing in...');
     const result = await authClient.signIn.email({ email, password });
+    console.log('[login] result:', result);
 
     if (result.error) {
       error = result.error.message || 'Failed to sign in';
@@ -25,13 +27,10 @@
       return;
     }
 
-    const session = authClient.useSession();
-    const unsubscribe = session.subscribe((state) => {
-      if (state.data && !state.isPending) {
-        unsubscribe();
-        goto('/');
-      }
-    });
+    console.log('[login] calling invalidateAll...');
+    await invalidateAll();
+    console.log('[login] navigating to /...');
+    goto('/');
   }
 </script>
 
