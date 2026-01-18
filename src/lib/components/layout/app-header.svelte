@@ -59,7 +59,7 @@
 
   async function handleSignOut() {
     await authClient.signOut();
-    session.refetch();
+    authClient.$store.atoms.session.set({ data: null, error: null, isPending: false });
   }
 </script>
 
