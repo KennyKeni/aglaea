@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
   import { page } from '$app/state';
   import { locales, localizeHref } from '$lib/paraglide/runtime';
   import { AppSidebar, AppHeader } from '$lib/components/layout';
@@ -9,12 +8,6 @@
   import favicon from '$lib/assets/favicon.svg';
 
   let { data, children } = $props();
-
-  $effect(() => {
-    if (browser) {
-      console.log('[+layout.svelte] data.session:', data.session);
-    }
-  });
 
   $effect(() => {
     permissions.init(data.permissions);

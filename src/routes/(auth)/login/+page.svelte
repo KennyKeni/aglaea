@@ -17,9 +17,7 @@
     error = '';
     isLoading = true;
 
-    console.log('[login] signing in...');
     const result = await authClient.signIn.email({ email, password });
-    console.log('[login] result:', result);
 
     if (result.error) {
       error = result.error.message || 'Failed to sign in';
@@ -27,9 +25,7 @@
       return;
     }
 
-    console.log('[login] calling invalidateAll...');
     await invalidateAll();
-    console.log('[login] navigating to /...');
     goto('/');
   }
 </script>

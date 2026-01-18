@@ -18,23 +18,15 @@ const handleAuth: Handle = async ({ event, resolve }) => {
   event.locals.permissions = null;
 
   const cookie = event.request.headers.get('cookie') || '';
-  console.log('[handleAuth] cookie:', cookie ? cookie.substring(0, 100) + '...' : '(empty)');
 
   try {
     const sessionRes = await fetch(`${env.BACKEND_URL}/auth/get-session`, {
       headers: { cookie },
     });
 
-    console.log('[handleAuth] sessionRes.status:', sessionRes.status);
-
     if (sessionRes.ok) {
       const sessionData = await sessionRes.json();
-      console.log('[handleAuth] sessionData:', JSON.stringify(sessionData).substring(0, 200));
       const parsed = SessionSchema.safeParse(sessionData);
-      console.log('[handleAuth] parsed.success:', parsed.success);
-      if (!parsed.success) {
-        console.log('[handleAuth] parse error:', JSON.stringify(parsed.error.issues));
-      }
       if (parsed.success) {
         event.locals.session = parsed.data;
 
