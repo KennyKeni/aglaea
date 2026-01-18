@@ -8,6 +8,7 @@ RUN bun run build
 FROM oven/bun:1-alpine
 WORKDIR /app
 COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package.json /app/bun.lock ./
+RUN bun install --frozen-lockfile --production
 EXPOSE 3000
 CMD ["bun", "./build"]
