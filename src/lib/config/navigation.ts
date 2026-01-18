@@ -1,14 +1,7 @@
-import type { Component } from 'svelte';
 import { Cat, FileText } from '@lucide/svelte';
+import type { Navigation } from '$lib/types/navigation';
 
-export type NavItem = {
-  label: string;
-  href?: string;
-  icon?: Component<{ class?: string }>;
-  children?: NavItem[];
-};
-
-export const navigation: NavItem[] = [
+export const baseNavigation: Navigation = [
   {
     label: 'Pokemon',
     icon: Cat,
