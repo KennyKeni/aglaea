@@ -1,6 +1,8 @@
 import type { NamedRef } from './base';
 
-export interface ArticleCategory extends NamedRef {}
+export interface ArticleCategory extends NamedRef {
+  description: string | null;
+}
 
 export interface ArticleImage {
   imageId: string;

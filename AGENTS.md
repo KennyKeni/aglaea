@@ -34,6 +34,10 @@ SvelteKit acts as a BFF (Backend-for-Frontend) proxy. All browser requests go th
 
 ## API: herta.kennykeni.com
 
+## Backend Source Code
+
+The Elysia backend lives in a separate project directory: `/Users/klin344/Projects/herta`
+
 ## File Structure & Responsibilities
 
 ### `src/lib/` Structure

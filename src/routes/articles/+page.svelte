@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { ArticleGrid } from '$lib/components/articles';
+  import { ArticleGrid, ArticleFilters } from '$lib/components/articles';
   import Pagination from '$lib/components/ui/pagination.svelte';
   import { Button } from '$lib/components/ui/button';
   import { Plus } from '@lucide/svelte';
@@ -9,12 +9,14 @@
   import { can } from '$lib/state/permissions.svelte';
   import { Resource, Action } from '$lib/types/auth';
   import type { Article } from '$lib/types/article';
+  import type { FilterOption } from '$lib/utils/filters';
 
   interface PageData {
     articles: Article[] | Promise<Article[]>;
     currentPage: number;
     totalCount: number;
     pageSize: number;
+    categories: FilterOption[];
   }
 
   let { data }: { data: PageData } = $props();
@@ -59,16 +61,19 @@
   }
 </script>
 
-{#if can(Resource.Article, Action.Create)}
-  <div class="mx-auto max-w-6xl px-4 py-4">
-    <div class="flex justify-end">
+<div class="mx-auto max-w-6xl px-4 pt-4">
+  <div class="flex items-center justify-between">
+    <div class="flex-1">
+      <ArticleFilters categories={data.categories} />
+    </div>
+    {#if can(Resource.Article, Action.Create)}
       <Button href="/articles/new">
         <Plus class="mr-2 h-4 w-4" />
         New Article
       </Button>
-    </div>
+    {/if}
   </div>
-{/if}
+</div>
 
 <ArticleGrid
   articles={articleData.searchQuery ? articleData.items : resolvedArticles}

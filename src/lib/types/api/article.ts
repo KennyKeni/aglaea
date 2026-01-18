@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { NamedRefSchema } from './base';
 
-export const ArticleCategorySchema = NamedRefSchema;
+export const ArticleCategorySchema = NamedRefSchema.extend({
+  description: z.string().nullable(),
+});
 
 export const ArticleImageSchema = z.object({
   imageId: z.string(),
