@@ -11,7 +11,7 @@
   import type { Article } from '$lib/types/article';
 
   interface PageData {
-    articles: Article[];
+    articles: Article[] | Promise<Article[]>;
     currentPage: number;
     totalCount: number;
     pageSize: number;
@@ -22,10 +22,28 @@
   const articleData = getArticleDataContext();
   const { mode: panelMode } = getArticlePanelContext();
 
+  let resolvedArticles: Article[] = $state([]);
+  let isLoading = $state(true);
+
   $effect(() => {
-    if (!articleData.searchQuery) {
-      articleData.setItems(data.articles);
-      articleData.setPage(data.currentPage);
+    const articles = data.articles;
+    if (articles instanceof Promise) {
+      isLoading = true;
+      articles.then((resolved) => {
+        resolvedArticles = resolved;
+        if (!articleData.searchQuery) {
+          articleData.setItems(resolved);
+          articleData.setPage(data.currentPage);
+        }
+        isLoading = false;
+      });
+    } else {
+      resolvedArticles = articles;
+      if (!articleData.searchQuery) {
+        articleData.setItems(articles);
+        articleData.setPage(data.currentPage);
+      }
+      isLoading = false;
     }
   });
 
@@ -53,8 +71,9 @@
 {/if}
 
 <ArticleGrid
-  articles={articleData.items}
-  isLoading={false}
+  articles={articleData.searchQuery ? articleData.items : resolvedArticles}
+  {isLoading}
+  skeletonCount={data.pageSize}
   onCardClick={(article) => panelMode.openPeek(article)}
 />
 

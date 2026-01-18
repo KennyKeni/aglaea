@@ -136,6 +136,67 @@ Containers communicate via service names. SvelteKit uses `BACKEND_URL=http://bac
 3. **Error handling**: Use `error()` helper, handle in `handleError` hook
 4. **Protected routes**: Check `locals.user` in `+layout.server.ts`, redirect if missing
 
+## Conditional Streaming with `isDataRequest`
+
+List pages use `isDataRequest` to show skeletons during client-side navigation while preserving full SSR on initial load.
+
+### Server: Conditionally await based on request type
+
+```typescript
+// +page.server.ts
+export const load: PageServerLoad = async ({ fetch, isDataRequest }) => {
+  const dataPromise = fetch('/api/items')
+    .then((res) => res.json())
+    .then((json) => json.data ?? [])
+    .catch(() => []);
+
+  return {
+    // SSR: await for full HTML | Client nav: stream for instant skeleton
+    items: isDataRequest ? dataPromise : await dataPromise,
+  };
+};
+```
+
+### Client: Handle both promise and resolved data in `$effect`
+
+**Important:** Don't use `{@const}` to call state-mutating functions - it causes `state_unsafe_mutation` errors.
+
+```svelte
+<script lang="ts">
+  let { data } = $props();
+
+  let resolvedItems: Item[] = $state([]);
+  let isLoading = $state(true);
+
+  $effect(() => {
+    const items = data.items;
+    if (items instanceof Promise) {
+      isLoading = true;
+      items.then((resolved) => {
+        resolvedItems = resolved;
+        isLoading = false;
+      });
+    } else {
+      resolvedItems = items;
+      isLoading = false;
+    }
+  });
+</script>
+
+<Grid items={resolvedItems} {isLoading} />
+```
+
+### Why `isDataRequest`?
+
+- `isDataRequest: false` → Initial page load (SSR) → Await data for complete HTML (SEO)
+- `isDataRequest: true` → Client-side navigation → Return promise for instant skeleton
+
+This gives both full SSR benefits AND instant navigation feedback.
+
+## Optimistic Panel Close
+
+The panel system also uses optimistic UI for instant close animations. See `panel-mode.svelte.ts` for the `isNavigatingAway` detection.
+
 ## Panel System Architecture
 
 The app uses a sliding panel UI for detail views. Panel mode is determined by two mechanisms:

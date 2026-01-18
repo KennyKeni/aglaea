@@ -2,9 +2,8 @@ import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { PaginatedSchema, PokemonSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/utils';
 
-export const load: PageServerLoad = async ({ fetch, url, parent }) => {
+export const load: PageServerLoad = async ({ fetch, url, parent, isDataRequest }) => {
   const { totalCount, pageSize } = await parent();
 
   const pageParam = url.searchParams.get('page');
@@ -19,23 +18,19 @@ export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 
   const offset = (validPage - 1) * pageSize;
 
-  try {
-    const res = await fetch(
-      `${env.BACKEND_URL}/pokemon?includeTypes=true&includeAbilities=true&limit=${pageSize}&offset=${offset}`,
-    );
+  const pokemonPromise = fetch(
+    `${env.BACKEND_URL}/pokemon?includeTypes=true&includeAbilities=true&limit=${pageSize}&offset=${offset}`,
+  )
+    .then((res) => (res.ok ? res.json() : { data: [] }))
+    .then((json) => {
+      const parsed = PaginatedSchema(PokemonSchema).safeParse(json);
+      return parsed.success ? (parsed.data.data ?? []) : [];
+    })
+    .catch(() => []);
 
-    if (!res.ok) {
-      return { pokemon: [], currentPage: validPage, pageSize };
-    }
-
-    const data = await parseResponse(res, PaginatedSchema(PokemonSchema));
-
-    return {
-      pokemon: data.data ?? [],
-      currentPage: validPage,
-      pageSize,
-    };
-  } catch {
-    return { pokemon: [], currentPage: validPage, pageSize };
-  }
+  return {
+    pokemon: isDataRequest ? pokemonPromise : await pokemonPromise,
+    currentPage: validPage,
+    pageSize,
+  };
 };

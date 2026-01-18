@@ -65,8 +65,21 @@ export function createPanelMode<T>({
   });
   const navigatingToId = $derived(isNavigatingToDetail ? navigating?.to?.params?.id : null);
 
+  const isNavigatingAway = $derived.by(() => {
+    if (!navigating?.to) return false;
+    const toPath = navigating.to.url.pathname;
+    const toFocus = navigating.to.url.searchParams.get(focusParam);
+    return toPath === basePath && !toFocus;
+  });
+
   const mode = $derived<PanelMode>(
-    isDetailRoute || isNavigatingToDetail ? 'full' : focusId ? 'peek' : 'closed',
+    isNavigatingAway
+      ? 'closed'
+      : isDetailRoute || isNavigatingToDetail
+        ? 'full'
+        : focusId
+          ? 'peek'
+          : 'closed',
   );
 
   const focusedItem = $derived(

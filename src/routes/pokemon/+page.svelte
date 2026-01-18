@@ -7,7 +7,7 @@
   import type { Pokemon } from '$lib/types/pokemon';
 
   interface PageData {
-    pokemon: Pokemon[];
+    pokemon: Pokemon[] | Promise<Pokemon[]>;
     currentPage: number;
     totalCount: number;
     pageSize: number;
@@ -18,10 +18,28 @@
   const pokemonData = getPokemonDataContext();
   const { mode: panelMode } = getPanelContext();
 
+  let resolvedPokemon: Pokemon[] = $state([]);
+  let isLoading = $state(true);
+
   $effect(() => {
-    if (!pokemonData.searchQuery) {
-      pokemonData.setItems(data.pokemon);
-      pokemonData.setPage(data.currentPage);
+    const pokemon = data.pokemon;
+    if (pokemon instanceof Promise) {
+      isLoading = true;
+      pokemon.then((resolved) => {
+        resolvedPokemon = resolved;
+        if (!pokemonData.searchQuery) {
+          pokemonData.setItems(resolved);
+          pokemonData.setPage(data.currentPage);
+        }
+        isLoading = false;
+      });
+    } else {
+      resolvedPokemon = pokemon;
+      if (!pokemonData.searchQuery) {
+        pokemonData.setItems(pokemon);
+        pokemonData.setPage(data.currentPage);
+      }
+      isLoading = false;
     }
   });
 
@@ -38,8 +56,9 @@
 </script>
 
 <PokemonGrid
-  pokemon={pokemonData.items}
-  isLoading={false}
+  pokemon={pokemonData.searchQuery ? pokemonData.items : resolvedPokemon}
+  {isLoading}
+  skeletonCount={data.pageSize}
   onCardClick={(mon) => panelMode.openPeek(mon)}
 />
 

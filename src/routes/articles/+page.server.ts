@@ -2,9 +2,8 @@ import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { ArticleSchema, PaginatedSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/utils';
 
-export const load: PageServerLoad = async ({ fetch, url, parent }) => {
+export const load: PageServerLoad = async ({ fetch, url, parent, isDataRequest }) => {
   const { totalCount, pageSize } = await parent();
 
   const pageParam = url.searchParams.get('page');
@@ -19,23 +18,19 @@ export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 
   const offset = (validPage - 1) * pageSize;
 
-  try {
-    const res = await fetch(
-      `${env.BACKEND_URL}/articles?includeCategories=true&includeImages=true&limit=${pageSize}&offset=${offset}`,
-    );
+  const articlesPromise = fetch(
+    `${env.BACKEND_URL}/articles?includeCategories=true&includeImages=true&limit=${pageSize}&offset=${offset}`,
+  )
+    .then((res) => (res.ok ? res.json() : { data: [] }))
+    .then((json) => {
+      const parsed = PaginatedSchema(ArticleSchema).safeParse(json);
+      return parsed.success ? (parsed.data.data ?? []) : [];
+    })
+    .catch(() => []);
 
-    if (!res.ok) {
-      return { articles: [], currentPage: validPage, pageSize };
-    }
-
-    const data = await parseResponse(res, PaginatedSchema(ArticleSchema));
-
-    return {
-      articles: data.data ?? [],
-      currentPage: validPage,
-      pageSize,
-    };
-  } catch {
-    return { articles: [], currentPage: validPage, pageSize };
-  }
+  return {
+    articles: isDataRequest ? articlesPromise : await articlesPromise,
+    currentPage: validPage,
+    pageSize,
+  };
 };
