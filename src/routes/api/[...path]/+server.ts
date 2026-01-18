@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import { BACKEND_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 
 const HOP_BY_HOP = new Set([
@@ -13,7 +13,7 @@ const HOP_BY_HOP = new Set([
 ]);
 
 const proxy: RequestHandler = async ({ request, params, url, cookies }) => {
-  const targetUrl = `${BACKEND_URL}/${params.path}${url.search}`;
+  const targetUrl = `${env.BACKEND_URL}/${params.path}${url.search}`;
 
   const headers = new Headers();
   for (const [key, value] of request.headers) {

@@ -1,7 +1,7 @@
 import type { Handle, HandleFetch } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { paraglideMiddleware } from '$lib/paraglide/server';
-import { BACKEND_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { UserPermissionsSchema } from '$lib/types/api';
 
 const handleParaglide: Handle = ({ event, resolve }) =>
@@ -20,7 +20,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
     event.locals.token = token;
 
     try {
-      const res = await fetch(`${BACKEND_URL}/auth/me/permissions`, {
+      const res = await fetch(`${env.BACKEND_URL}/auth/me/permissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -42,7 +42,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 export const handle: Handle = sequence(handleAuth, handleParaglide);
 
 export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
-  if (request.url.startsWith(BACKEND_URL)) {
+  if (request.url.startsWith(env.BACKEND_URL)) {
     const token = event.cookies.get('session');
     if (token) {
       request.headers.set('Authorization', `Bearer ${token}`);
