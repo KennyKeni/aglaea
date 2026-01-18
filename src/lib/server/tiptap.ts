@@ -10,8 +10,53 @@ import Highlight from '@tiptap/extension-highlight';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
 import { Table, TableCell, TableRow, TableHeader } from '@tiptap/extension-table';
 import Mathematics from '@tiptap/extension-mathematics';
+import Image from '@tiptap/extension-image';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Link from '@tiptap/extension-link';
 import { slugify } from '$lib/utils/slugify';
 import DOMPurify from 'isomorphic-dompurify';
+import { createLowlight } from 'lowlight';
+import javascript from 'highlight.js/lib/languages/javascript';
+import typescript from 'highlight.js/lib/languages/typescript';
+import python from 'highlight.js/lib/languages/python';
+import css from 'highlight.js/lib/languages/css';
+import xml from 'highlight.js/lib/languages/xml';
+import json from 'highlight.js/lib/languages/json';
+import bash from 'highlight.js/lib/languages/bash';
+import sql from 'highlight.js/lib/languages/sql';
+import markdown from 'highlight.js/lib/languages/markdown';
+import java from 'highlight.js/lib/languages/java';
+import kotlin from 'highlight.js/lib/languages/kotlin';
+import go from 'highlight.js/lib/languages/go';
+import rust from 'highlight.js/lib/languages/rust';
+import c from 'highlight.js/lib/languages/c';
+import cpp from 'highlight.js/lib/languages/cpp';
+import csharp from 'highlight.js/lib/languages/csharp';
+import ruby from 'highlight.js/lib/languages/ruby';
+import swift from 'highlight.js/lib/languages/swift';
+import yaml from 'highlight.js/lib/languages/yaml';
+
+const lowlight = createLowlight({
+  javascript,
+  typescript,
+  python,
+  css,
+  xml,
+  json,
+  bash,
+  sql,
+  markdown,
+  java,
+  kotlin,
+  go,
+  rust,
+  c,
+  cpp,
+  csharp,
+  ruby,
+  swift,
+  yaml,
+});
 
 function createHeadingWithIds() {
   const slugCounts = new Map<string, number>();
@@ -37,6 +82,7 @@ function getServerExtensions() {
       bulletList: { HTMLAttributes: { class: 'list-disc' } },
       heading: false,
       codeBlock: false,
+      link: false,
     }),
     createHeadingWithIds(),
     Highlight.configure({ multicolor: true }),
@@ -54,6 +100,9 @@ function getServerExtensions() {
     TableRow,
     TableCell,
     Mathematics,
+    Image,
+    CodeBlockLowlight.configure({ lowlight }),
+    Link.configure({ openOnClick: false }),
   ];
 }
 

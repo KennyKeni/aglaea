@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { replaceState } from '$app/navigation';
   import type { TocItem } from '$lib/utils/toc';
   import { cn } from '$lib/utils';
   import { createScrollSpy } from '$lib/state/scroll-spy.svelte';
@@ -40,7 +41,7 @@
       rootMargin: '0px 0px -70% 0px',
       onActiveChange: (id) => {
         activeId = id;
-        if (id) history.replaceState(null, '', `#${id}`);
+        if (id) replaceState(`#${id}`, {});
       },
     });
 

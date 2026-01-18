@@ -39,6 +39,7 @@
   import Link from './menus/Link.svelte';
   import slashcommand from '../extensions/slash-command/slashcommand.js';
   import SlashCommandList from './components/SlashCommandList.svelte';
+  import ImageUploadModal from './components/ImageUploadModal.svelte';
 
   const lowlight = createLowlight({
     javascript,
@@ -66,6 +67,7 @@
    * Bind the element to the editor
    */
   let element = $state<HTMLElement>();
+  let imageModalOpen = $state(false);
   let {
     editor = $bindable(),
     editable = true,
@@ -73,6 +75,7 @@
     onUpdate,
     autofocus = false,
     class: className,
+    imageUpload,
   }: EdraEditorProps = $props();
 
   onMount(() => {
@@ -101,6 +104,15 @@
         autofocus,
       },
     );
+
+    if (editor) {
+      if (imageUpload) {
+        editor.storage.imageUpload = imageUpload;
+      }
+      editor.storage.openImageModal = () => {
+        imageModalOpen = true;
+      };
+    }
   });
 
   onDestroy(() => {
@@ -125,3 +137,5 @@
   }}
   class={cn('edra-editor h-full w-full cursor-auto *:outline-none', className)}
 ></div>
+
+<ImageUploadModal bind:open={imageModalOpen} {editor} />

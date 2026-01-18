@@ -2,6 +2,8 @@ import { browser } from '$app/environment';
 import type { Editor } from '@tiptap/core';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
 import { Node } from '@tiptap/pm/model';
+import './types';
+import { uploadImage, ImageUploadError } from '$lib/utils/image-upload';
 
 /**
  * Check if the current browser is in mac or not
@@ -12,33 +14,48 @@ export const isMac = browser
 
 /**
  * Function to handle paste event of an image
- * @param editor Editor - editor instance
- * @param maxSize number - max size of the image to be pasted in MB, default is 2MB
+ * Uses editor.storage.imageUpload if available, otherwise falls back to default uploadImage
  */
-export function getHandlePaste(editor: Editor, maxSize: number = 2) {
-  return (view: EditorView, event: ClipboardEvent) => {
+export function getHandlePaste(editor: Editor) {
+  return (_view: EditorView, event: ClipboardEvent) => {
     const item = event.clipboardData?.items[0];
 
     if (item?.type.indexOf('image') !== 0) {
-      return;
+      return false;
     }
 
     const file = item.getAsFile();
-    if (file === null || file.size === undefined) return;
-    const filesize = (file?.size / 1024 / 1024).toFixed(4);
+    if (!file) return false;
 
-    if (filesize && Number(filesize) > maxSize) {
-      window.alert(`too large image! filesize: ${filesize} mb`);
-      return;
+    event.preventDefault();
+
+    const uploadOptions = editor.storage.imageUpload;
+    const maxSizeMB = uploadOptions?.maxSizeMB ?? 10;
+    const sizeMB = file.size / 1024 / 1024;
+
+    if (sizeMB > maxSizeMB) {
+      console.warn(`Image too large: ${sizeMB.toFixed(1)}MB (max ${maxSizeMB}MB)`);
+      return true;
     }
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    // reader.onload = (e) => {
-    // 	if (e.target?.result) {
-    // 		editor.commands.setImage({ src: e.target.result as string });
-    // 	}
-    // };
+    const doUpload = async () => {
+      try {
+        let result;
+        if (uploadOptions) {
+          result = await uploadOptions.upload(file);
+        } else {
+          result = await uploadImage(file);
+        }
+        editor.commands.setImage({ src: result.publicUrl });
+      } catch (err) {
+        if (err instanceof ImageUploadError && err.type !== 'aborted') {
+          console.error('Image upload failed:', err.message);
+        }
+      }
+    };
+
+    doUpload();
+    return true;
   };
 }
 

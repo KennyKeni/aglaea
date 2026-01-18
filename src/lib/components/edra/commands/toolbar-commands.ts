@@ -1,4 +1,5 @@
 import type { EdraToolBarCommands } from './types.js';
+import '../types.js';
 import { isMac } from '../utils.js';
 import Undo from '@lucide/svelte/icons/undo-2';
 import Redo from '@lucide/svelte/icons/redo-2';
@@ -414,12 +415,16 @@ const commands: Record<string, EdraToolBarCommands[]> = {
   media: [
     {
       icon: Image,
-      name: 'image-placeholder',
-      tooltip: 'Image Placeholder',
+      name: 'image',
+      tooltip: 'Insert Image',
       onClick: (editor) => {
-        editor.chain().focus().insertImagePlaceholder().run();
+        if (editor.storage.openImageModal) {
+          editor.storage.openImageModal();
+        } else {
+          editor.chain().focus().insertImagePlaceholder().run();
+        }
       },
-      isActive: (editor) => editor.isActive('image-placeholder'),
+      isActive: (editor) => editor.isActive('image'),
     },
   ],
   table: [

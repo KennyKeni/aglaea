@@ -12,6 +12,7 @@ export enum Resource {
   Move = 'move',
   Ability = 'ability',
   Item = 'item',
+  Image = 'image',
 }
 
 export enum Action {
@@ -19,6 +20,7 @@ export enum Action {
   Update = 'update',
   Delete = 'delete',
   Publish = 'publish',
+  Upload = 'upload',
 }
 
 export const RoleSchema = z.enum(Role);
