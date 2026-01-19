@@ -9,7 +9,7 @@
   let {
     data,
     children: content,
-  }: { data: { totalCount: number; pageSize: number }; children: any } = $props();
+  }: { data: { pageSize: number }; children: any } = $props();
 </script>
 
 <EntityLayout

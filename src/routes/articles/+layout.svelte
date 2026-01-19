@@ -3,12 +3,12 @@
   import EntityLayout from '$lib/components/ui/entity-layout.svelte';
   import { createArticleState } from '$lib/state/article-data.svelte';
   import { setArticleDataContext, setArticlePanelContext } from '$lib/context/articles';
-  import type { Article, ArticleCategory } from '$lib/types/article';
+  import type { Article } from '$lib/types/article';
 
   let {
     data,
     children: content,
-  }: { data: { totalCount: number; pageSize: number; categories: ArticleCategory[] }; children: any } = $props();
+  }: { data: { pageSize: number }; children: any } = $props();
 </script>
 
 <EntityLayout

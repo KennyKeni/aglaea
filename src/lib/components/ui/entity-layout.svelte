@@ -8,7 +8,7 @@
   import type { EntityPanelContext } from '$lib/context/entity';
 
   interface Props {
-    data: { totalCount: number; pageSize: number };
+    data: { totalCount?: number; pageSize: number };
     children: Snippet;
     renderPeekContent: Snippet<[T]>;
     footer: string;

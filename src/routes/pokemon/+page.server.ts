@@ -1,14 +1,101 @@
 import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { PaginatedSchema, PokemonSchema } from '$lib/types/api';
-import { streamOnNav, streamMap } from '$lib/utils/streaming';
+import { PaginatedSchema, PokemonSchema, NamedRefSchema } from '$lib/types/api';
+import { parseResponse } from '$lib/server/api';
+import { streamOnNav, type Streamable } from '$lib/utils/streaming';
+import { z } from 'zod';
 
-export const load: PageServerLoad = async ({ fetch, url, parent, isDataRequest }) => {
-  const { totalCount, pageSize } = await parent();
+const PAGE_SIZE = 24;
 
+const AbilitySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  desc: z.string().nullable(),
+  shortDesc: z.string().nullable(),
+  flags: z.array(z.unknown()),
+});
+
+const MoveSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  desc: z.string().nullable(),
+  shortDesc: z.string().nullable(),
+  type: NamedRefSchema,
+  category: z.object({ id: z.number(), slug: z.string(), name: z.string() }),
+  target: z.unknown().nullable(),
+  power: z.number().nullable(),
+  accuracy: z.number().nullable(),
+  pp: z.number(),
+  priority: z.number(),
+  critRatio: z.number().nullable(),
+  minHits: z.number().nullable(),
+  maxHits: z.number().nullable(),
+  drainPercent: z.number().nullable(),
+  healPercent: z.number().nullable(),
+  recoilPercent: z.number().nullable(),
+  flags: z.array(z.unknown()),
+  boosts: z.array(z.unknown()),
+  effects: z.array(z.unknown()),
+  maxPower: z.number().nullable(),
+  zData: z.unknown().nullable(),
+  gmaxSpecies: z.array(z.unknown()),
+});
+
+type FilterOption = { id: number; slug: string; name: string };
+
+async function fetchPokemonList(
+  fetch: typeof globalThis.fetch,
+  apiParams: URLSearchParams
+): Promise<{ pokemon: z.infer<typeof PokemonSchema>[]; filteredCount: number }> {
+  const res = await fetch(`${env.BACKEND_URL}/pokemon?${apiParams.toString()}`).catch(() => null);
+  if (!res?.ok) return { pokemon: [], filteredCount: 0 };
+  try {
+    const data = await parseResponse(res, PaginatedSchema(PokemonSchema));
+    return { pokemon: data.data ?? [], filteredCount: data.total ?? 0 };
+  } catch {
+    return { pokemon: [], filteredCount: 0 };
+  }
+}
+
+async function fetchTypes(fetch: typeof globalThis.fetch): Promise<FilterOption[]> {
+  const res = await fetch(`${env.BACKEND_URL}/types?limit=9999`).catch(() => null);
+  if (!res?.ok) return [];
+  try {
+    const data = await parseResponse(res, PaginatedSchema(NamedRefSchema));
+    return data.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchAbilities(fetch: typeof globalThis.fetch): Promise<FilterOption[]> {
+  const res = await fetch(`${env.BACKEND_URL}/abilities?limit=9999`).catch(() => null);
+  if (!res?.ok) return [];
+  try {
+    const data = await parseResponse(res, PaginatedSchema(AbilitySchema));
+    return (data.data ?? []).map((a) => ({ id: a.id, slug: a.slug, name: a.name }));
+  } catch {
+    return [];
+  }
+}
+
+async function fetchMoves(fetch: typeof globalThis.fetch): Promise<FilterOption[]> {
+  const res = await fetch(`${env.BACKEND_URL}/moves?limit=9999`).catch(() => null);
+  if (!res?.ok) return [];
+  try {
+    const data = await parseResponse(res, PaginatedSchema(MoveSchema));
+    return (data.data ?? []).map((m) => ({ id: m.id, slug: m.slug, name: m.name }));
+  } catch {
+    return [];
+  }
+}
+
+export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   const pageParam = url.searchParams.get('page');
-  const requestedPage = parseInt(pageParam ?? '1', 10);
+  const requestedPage = Math.max(1, parseInt(pageParam ?? '1', 10));
 
   const typesParam = url.searchParams.get('types');
   const abilitiesParam = url.searchParams.get('abilities');
@@ -17,21 +104,12 @@ export const load: PageServerLoad = async ({ fetch, url, parent, isDataRequest }
 
   const statParams = ['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed', 'totalStats'] as const;
 
-  const totalPages = Math.ceil(totalCount / pageSize);
-  const validPage = Math.max(1, Math.min(requestedPage, totalPages || 1));
-
-  if (requestedPage !== validPage) {
-    const params = new URLSearchParams(url.searchParams);
-    params.set('page', String(validPage));
-    throw redirect(302, `/pokemon?${params.toString()}`);
-  }
-
-  const offset = (validPage - 1) * pageSize;
+  const offset = (requestedPage - 1) * PAGE_SIZE;
 
   const apiParams = new URLSearchParams({
     includeTypes: 'true',
     includeAbilities: 'true',
-    limit: String(pageSize),
+    limit: String(PAGE_SIZE),
     offset: String(offset),
   });
 
@@ -55,22 +133,39 @@ export const load: PageServerLoad = async ({ fetch, url, parent, isDataRequest }
     if (maxParam) apiParams.append(`${stat}Max`, maxParam);
   }
 
-  const pokemonPromise = fetch(`${env.BACKEND_URL}/pokemon?${apiParams.toString()}`)
-    .then((res) => (res.ok ? res.json() : { data: [], total: 0 }))
-    .then((json) => {
-      const parsed = PaginatedSchema(PokemonSchema).safeParse(json);
-      return parsed.success
-        ? { data: parsed.data.data ?? [], total: parsed.data.total ?? 0 }
-        : { data: [], total: 0 };
-    })
-    .catch(() => ({ data: [], total: 0 }));
+  const pokemonPromise = fetchPokemonList(fetch, apiParams);
+  const typesPromise = fetchTypes(fetch);
+  const abilitiesPromise = fetchAbilities(fetch);
+  const movesPromise = fetchMoves(fetch);
 
-  const result = await streamOnNav(pokemonPromise, isDataRequest);
+  const pokemonResult = await streamOnNav(pokemonPromise, isDataRequest);
+  const types = await streamOnNav(typesPromise, isDataRequest);
+  const abilities = await streamOnNav(abilitiesPromise, isDataRequest);
+  const moves = await streamOnNav(movesPromise, isDataRequest);
+
+  // Page validation only on SSR (when we have resolved data)
+  if (!isDataRequest && !(pokemonResult instanceof Promise)) {
+    const totalPages = Math.ceil(pokemonResult.filteredCount / PAGE_SIZE);
+    const validPage = Math.max(1, Math.min(requestedPage, totalPages || 1));
+    if (requestedPage !== validPage && pokemonResult.filteredCount > 0) {
+      const params = new URLSearchParams(url.searchParams);
+      params.set('page', String(validPage));
+      throw redirect(302, `/pokemon?${params.toString()}`);
+    }
+  }
+
+  const pokemon: Streamable<z.infer<typeof PokemonSchema>[]> =
+    pokemonResult instanceof Promise ? pokemonResult.then((r) => r.pokemon) : pokemonResult.pokemon;
+  const filteredCount: Streamable<number> =
+    pokemonResult instanceof Promise ? pokemonResult.then((r) => r.filteredCount) : pokemonResult.filteredCount;
 
   return {
-    pokemon: streamMap(result, (r) => r.data),
-    filteredCount: streamMap(result, (r) => r.total),
-    currentPage: validPage,
-    pageSize,
+    pokemon,
+    filteredCount,
+    currentPage: requestedPage,
+    pageSize: PAGE_SIZE,
+    types,
+    abilities,
+    moves,
   };
 };

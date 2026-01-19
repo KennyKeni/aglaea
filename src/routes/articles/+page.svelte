@@ -10,7 +10,6 @@
   import { Button } from '$lib/components/ui/button';
   import { Plus } from '@lucide/svelte';
   import { getArticleDataContext, getArticlePanelContext } from '$lib/context/articles';
-  import { StreamableResolver } from '$lib/state/streamable.svelte';
   import { can } from '$lib/state/permissions.svelte';
   import { Resource, Action } from '$lib/types/auth';
   import type { Article } from '$lib/types/article';
@@ -21,9 +20,8 @@
     articles: Streamable<Article[]>;
     filteredCount: Streamable<number>;
     currentPage: number;
-    totalCount: number;
     pageSize: number;
-    categories: FilterOption[];
+    categories: Streamable<FilterOption[]>;
   }
 
   let { data }: { data: PageData } = $props();
@@ -31,22 +29,52 @@
   const articleData = getArticleDataContext();
   const { mode: panelMode } = getArticlePanelContext();
 
-  const articles = new StreamableResolver<Article[]>([]);
-  const filteredCount = new StreamableResolver<number>(0);
+  let articles: Article[] = $state([]);
+  let filteredCount: number = $state(0);
+  let categories: FilterOption[] = $state([]);
+  let isLoading = $state(true);
 
   $effect(() => {
-    articles.resolve(data.articles);
-  });
-
-  $effect(() => {
-    if (!articles.loading && !articleData.searchQuery) {
-      articleData.setItems(articles.value);
-      articleData.setPage(data.currentPage);
+    const a = data.articles;
+    if (a instanceof Promise) {
+      isLoading = true;
+      a.then((resolved) => {
+        articles = resolved;
+        isLoading = false;
+      });
+    } else {
+      articles = a;
+      isLoading = false;
     }
   });
 
   $effect(() => {
-    filteredCount.resolve(data.filteredCount);
+    const fc = data.filteredCount;
+    if (fc instanceof Promise) {
+      fc.then((resolved) => {
+        filteredCount = resolved;
+      });
+    } else {
+      filteredCount = fc;
+    }
+  });
+
+  $effect(() => {
+    const c = data.categories;
+    if (c instanceof Promise) {
+      c.then((resolved) => {
+        categories = resolved;
+      });
+    } else {
+      categories = c;
+    }
+  });
+
+  $effect(() => {
+    if (!isLoading && !articleData.searchQuery) {
+      articleData.setItems(articles);
+      articleData.setPage(data.currentPage);
+    }
   });
 
   $effect(() => {
@@ -64,7 +92,7 @@
 <div class="mx-auto max-w-6xl px-4 pt-4">
   <div class="flex items-center justify-between">
     <div class="flex-1">
-      <ArticleFilters categories={data.categories} />
+      <ArticleFilters {categories} />
     </div>
     {#if can(Resource.Article, Action.Create)}
       <Button href="/articles/new">
@@ -76,17 +104,17 @@
 </div>
 
 <ArticleGrid
-  articles={articleData.searchQuery ? articleData.items : articles.value}
-  isLoading={articles.loading}
+  articles={articleData.searchQuery ? articleData.items : articles}
+  {isLoading}
   skeletonCount={data.pageSize}
   onCardClick={(article) => panelMode.openPeek(article)}
 />
 
-{#if !articleData.searchQuery && filteredCount.value > 0}
+{#if !articleData.searchQuery && filteredCount > 0}
   <div class="mx-auto max-w-6xl px-4 pb-8">
     <Pagination
       currentPage={data.currentPage}
-      totalPages={Math.ceil(filteredCount.value / data.pageSize)}
+      totalPages={Math.ceil(filteredCount / data.pageSize)}
       onPageChange={handlePageChange}
     />
   </div>
