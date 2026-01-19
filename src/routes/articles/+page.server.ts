@@ -3,7 +3,6 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { ArticleSchema, ArticleCategorySchema, PaginatedSchema } from '$lib/types/api';
 import { parseResponse } from '$lib/server/api';
-import { streamOnNav, type Streamable } from '$lib/utils/streaming';
 import { z } from 'zod';
 
 const PAGE_SIZE = 12;
@@ -57,29 +56,33 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   const articlesPromise = fetchArticles(fetch, apiParams);
   const categoriesPromise = fetchCategories(fetch);
 
-  const articlesResult = await streamOnNav(articlesPromise, isDataRequest);
-  const categories = await streamOnNav(categoriesPromise, isDataRequest);
-
-  // Page validation only on SSR (when we have resolved data)
-  if (!isDataRequest && !(articlesResult instanceof Promise)) {
-    const totalPages = Math.ceil(articlesResult.filteredCount / PAGE_SIZE);
-    const validPage = Math.max(1, Math.min(requestedPage, totalPages || 1));
-    if (requestedPage !== validPage && articlesResult.filteredCount > 0) {
-      const params = new URLSearchParams(url.searchParams);
-      params.set('page', String(validPage));
-      throw redirect(302, `/articles?${params.toString()}`);
-    }
+  // Client navigation: return promises directly for streaming
+  if (isDataRequest) {
+    return {
+      articles: articlesPromise.then((r) => r.articles),
+      filteredCount: articlesPromise.then((r) => r.filteredCount),
+      currentPage: requestedPage,
+      pageSize: PAGE_SIZE,
+      categories: categoriesPromise,
+    };
   }
 
-  const articles: Streamable<z.infer<typeof ArticleSchema>[]> =
-    articlesResult instanceof Promise ? articlesResult.then((r) => r.articles) : articlesResult.articles;
-  const filteredCount: Streamable<number> =
-    articlesResult instanceof Promise ? articlesResult.then((r) => r.filteredCount) : articlesResult.filteredCount;
+  // SSR: await everything for full HTML
+  const [articlesResult, categories] = await Promise.all([articlesPromise, categoriesPromise]);
+
+  // Page validation only on SSR
+  const totalPages = Math.ceil(articlesResult.filteredCount / PAGE_SIZE);
+  const validPage = Math.max(1, Math.min(requestedPage, totalPages || 1));
+  if (requestedPage !== validPage && articlesResult.filteredCount > 0) {
+    const params = new URLSearchParams(url.searchParams);
+    params.set('page', String(validPage));
+    throw redirect(302, `/articles?${params.toString()}`);
+  }
 
   return {
-    articles,
-    filteredCount,
-    currentPage: requestedPage,
+    articles: articlesResult.articles,
+    filteredCount: articlesResult.filteredCount,
+    currentPage: validPage,
     pageSize: PAGE_SIZE,
     categories,
   };

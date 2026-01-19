@@ -3,7 +3,6 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { PaginatedSchema, PokemonSchema, NamedRefSchema } from '$lib/types/api';
 import { parseResponse } from '$lib/server/api';
-import { streamOnNav, type Streamable } from '$lib/utils/streaming';
 import { z } from 'zod';
 
 const PAGE_SIZE = 24;
@@ -138,31 +137,40 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   const abilitiesPromise = fetchAbilities(fetch);
   const movesPromise = fetchMoves(fetch);
 
-  const pokemonResult = await streamOnNav(pokemonPromise, isDataRequest);
-  const types = await streamOnNav(typesPromise, isDataRequest);
-  const abilities = await streamOnNav(abilitiesPromise, isDataRequest);
-  const moves = await streamOnNav(movesPromise, isDataRequest);
-
-  // Page validation only on SSR (when we have resolved data)
-  if (!isDataRequest && !(pokemonResult instanceof Promise)) {
-    const totalPages = Math.ceil(pokemonResult.filteredCount / PAGE_SIZE);
-    const validPage = Math.max(1, Math.min(requestedPage, totalPages || 1));
-    if (requestedPage !== validPage && pokemonResult.filteredCount > 0) {
-      const params = new URLSearchParams(url.searchParams);
-      params.set('page', String(validPage));
-      throw redirect(302, `/pokemon?${params.toString()}`);
-    }
+  // Client navigation: return promises directly for streaming
+  if (isDataRequest) {
+    return {
+      pokemon: pokemonPromise.then((r) => r.pokemon),
+      filteredCount: pokemonPromise.then((r) => r.filteredCount),
+      currentPage: requestedPage,
+      pageSize: PAGE_SIZE,
+      types: typesPromise,
+      abilities: abilitiesPromise,
+      moves: movesPromise,
+    };
   }
 
-  const pokemon: Streamable<z.infer<typeof PokemonSchema>[]> =
-    pokemonResult instanceof Promise ? pokemonResult.then((r) => r.pokemon) : pokemonResult.pokemon;
-  const filteredCount: Streamable<number> =
-    pokemonResult instanceof Promise ? pokemonResult.then((r) => r.filteredCount) : pokemonResult.filteredCount;
+  // SSR: await everything for full HTML
+  const [pokemonResult, types, abilities, moves] = await Promise.all([
+    pokemonPromise,
+    typesPromise,
+    abilitiesPromise,
+    movesPromise,
+  ]);
+
+  // Page validation only on SSR
+  const totalPages = Math.ceil(pokemonResult.filteredCount / PAGE_SIZE);
+  const validPage = Math.max(1, Math.min(requestedPage, totalPages || 1));
+  if (requestedPage !== validPage && pokemonResult.filteredCount > 0) {
+    const params = new URLSearchParams(url.searchParams);
+    params.set('page', String(validPage));
+    throw redirect(302, `/pokemon?${params.toString()}`);
+  }
 
   return {
-    pokemon,
-    filteredCount,
-    currentPage: requestedPage,
+    pokemon: pokemonResult.pokemon,
+    filteredCount: pokemonResult.filteredCount,
+    currentPage: validPage,
     pageSize: PAGE_SIZE,
     types,
     abilities,
