@@ -39,6 +39,11 @@ export function createPanelMode<T>({
 
     const fromPath = navigation.from?.url.pathname ?? '';
     const toPath = navigation.to?.url.pathname ?? '';
+
+    const staysWithinEntity =
+      fromPath.startsWith(basePath) && toPath.startsWith(basePath);
+    if (!staysWithinEntity) return;
+
     const pattern = new RegExp(`${basePath}/(\\d+)`);
     const fromId = fromPath.match(pattern)?.[1];
     const toId = toPath.match(pattern)?.[1];
