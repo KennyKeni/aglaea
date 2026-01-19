@@ -9,6 +9,7 @@
   import { Loader2 } from '@lucide/svelte';
   import type { Article, ArticleCategory, ArticleImage, TiptapDoc, ArticleAuthor } from '$lib/types/article';
   import initEditor from '$lib/components/edra/editor';
+  import { articles as articlesApi } from '$lib/api/endpoints/articles';
 
   onDestroy(() => {
     if (editor) {
@@ -93,53 +94,42 @@
     error = '';
 
     const content = getEditorContent();
-    const url = isCreateMode ? '/api/articles' : `/api/articles/${editMeta!.id}`;
-    const method = isCreateMode ? 'POST' : 'PATCH';
+    const input = {
+      title,
+      subtitle: subtitle || null,
+      description: description || null,
+      content,
+    };
 
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          subtitle: subtitle || null,
-          description: description || null,
-          content,
-        }),
-      });
+    const result = isCreateMode
+      ? await articlesApi.create(input)
+      : await articlesApi.update(editMeta!.id, input);
 
-      if (!res.ok) {
-        if (res.status === 401) {
-          error = 'Session expired. Please log in again.';
-          return;
-        }
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || `Failed to save (${res.status})`);
-      }
-
-      const response = await res.json();
-      const contentHtml = generateHTML(content, getEditorExtensions());
-
-      onSave({
-        id: response.id,
-        slug: response.slug,
-        title,
-        subtitle: subtitle || null,
-        description: description || null,
-        content,
-        contentHtml,
-        ownerId: editMeta?.ownerId ?? null,
-        author: editMeta?.author ?? null,
-        createdAt: editMeta?.createdAt ?? new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        categories: editMeta?.categories ?? [],
-        images: editMeta?.images ?? [],
-      });
-    } catch (e) {
-      error = e instanceof Error ? e.message : 'An unexpected error occurred';
-    } finally {
+    if (!result.ok) {
+      error = result.message;
       isSaving = false;
+      return;
     }
+
+    const contentHtml = generateHTML(content, getEditorExtensions());
+
+    onSave({
+      id: result.data.id,
+      slug: result.data.slug,
+      title,
+      subtitle: subtitle || null,
+      description: description || null,
+      content,
+      contentHtml,
+      ownerId: editMeta?.ownerId ?? null,
+      author: editMeta?.author ?? null,
+      createdAt: editMeta?.createdAt ?? new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      categories: editMeta?.categories ?? [],
+      images: editMeta?.images ?? [],
+    });
+
+    isSaving = false;
   }
 </script>
 

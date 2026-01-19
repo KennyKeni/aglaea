@@ -1,98 +1,45 @@
-import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { PaginatedSchema, PokemonSchema, NamedRefSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/server/api';
-import { z } from 'zod';
+import { createServerClient } from '$lib/server/client';
+import {
+  createPokemonEndpoint,
+  type Pokemon,
+  type FilterOption,
+  type PokemonSearchParams,
+} from '$lib/server/endpoints/pokemon';
 
 const PAGE_SIZE = 24;
 
-const AbilitySchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  slug: z.string(),
-  desc: z.string().nullable(),
-  shortDesc: z.string().nullable(),
-  flags: z.array(z.unknown()),
-});
-
-const MoveSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  slug: z.string(),
-  desc: z.string().nullable(),
-  shortDesc: z.string().nullable(),
-  type: NamedRefSchema,
-  category: z.object({ id: z.number(), slug: z.string(), name: z.string() }),
-  target: z.unknown().nullable(),
-  power: z.number().nullable(),
-  accuracy: z.number().nullable(),
-  pp: z.number(),
-  priority: z.number(),
-  critRatio: z.number().nullable(),
-  minHits: z.number().nullable(),
-  maxHits: z.number().nullable(),
-  drainPercent: z.number().nullable(),
-  healPercent: z.number().nullable(),
-  recoilPercent: z.number().nullable(),
-  flags: z.array(z.unknown()),
-  boosts: z.array(z.unknown()),
-  effects: z.array(z.unknown()),
-  maxPower: z.number().nullable(),
-  zData: z.unknown().nullable(),
-  gmaxSpecies: z.array(z.unknown()),
-});
-
-type FilterOption = { id: number; slug: string; name: string };
-
-async function fetchPokemonList(
-  fetch: typeof globalThis.fetch,
-  apiParams: URLSearchParams
-): Promise<{ pokemon: z.infer<typeof PokemonSchema>[]; filteredCount: number }> {
-  const res = await fetch(`${env.BACKEND_URL}/pokemon?${apiParams.toString()}`).catch(() => null);
-  if (!res?.ok) return { pokemon: [], filteredCount: 0 };
-  try {
-    const data = await parseResponse(res, PaginatedSchema(PokemonSchema));
-    return { pokemon: data.data ?? [], filteredCount: data.total ?? 0 };
-  } catch {
-    return { pokemon: [], filteredCount: 0 };
-  }
-}
-
-async function fetchTypes(fetch: typeof globalThis.fetch): Promise<FilterOption[]> {
-  const res = await fetch(`${env.BACKEND_URL}/types?limit=9999`).catch(() => null);
-  if (!res?.ok) return [];
-  try {
-    const data = await parseResponse(res, PaginatedSchema(NamedRefSchema));
-    return data.data ?? [];
-  } catch {
-    return [];
-  }
-}
-
-async function fetchAbilities(fetch: typeof globalThis.fetch): Promise<FilterOption[]> {
-  const res = await fetch(`${env.BACKEND_URL}/abilities?limit=9999`).catch(() => null);
-  if (!res?.ok) return [];
-  try {
-    const data = await parseResponse(res, PaginatedSchema(AbilitySchema));
-    return (data.data ?? []).map((a) => ({ id: a.id, slug: a.slug, name: a.name }));
-  } catch {
-    return [];
-  }
-}
-
-async function fetchMoves(fetch: typeof globalThis.fetch): Promise<FilterOption[]> {
-  const res = await fetch(`${env.BACKEND_URL}/moves?limit=9999`).catch(() => null);
-  if (!res?.ok) return [];
-  try {
-    const data = await parseResponse(res, PaginatedSchema(MoveSchema));
-    return (data.data ?? []).map((m) => ({ id: m.id, slug: m.slug, name: m.name }));
-  } catch {
-    return [];
-  }
-}
-
 export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
+  const client = createServerClient(fetch);
+  const pokemonApi = createPokemonEndpoint(client);
+
+  async function fetchPokemonList(
+    params: PokemonSearchParams,
+  ): Promise<{ pokemon: Pokemon[]; filteredCount: number }> {
+    const result = await pokemonApi.search(params);
+    if (!result.ok) return { pokemon: [], filteredCount: 0 };
+    return { pokemon: result.data.data ?? [], filteredCount: result.data.total ?? 0 };
+  }
+
+  async function fetchTypes(): Promise<FilterOption[]> {
+    const result = await pokemonApi.getTypes();
+    if (!result.ok) return [];
+    return result.data.data ?? [];
+  }
+
+  async function fetchAbilities(): Promise<FilterOption[]> {
+    const result = await pokemonApi.getAbilities();
+    if (!result.ok) return [];
+    return result.data.data ?? [];
+  }
+
+  async function fetchMoves(): Promise<FilterOption[]> {
+    const result = await pokemonApi.getMoves();
+    if (!result.ok) return [];
+    return result.data.data ?? [];
+  }
+
   const pageParam = url.searchParams.get('page');
   const requestedPage = Math.max(1, parseInt(pageParam ?? '1', 10));
 
@@ -105,37 +52,41 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
 
   const offset = (requestedPage - 1) * PAGE_SIZE;
 
-  const apiParams = new URLSearchParams({
-    includeTypes: 'true',
-    includeAbilities: 'true',
-    limit: String(PAGE_SIZE),
-    offset: String(offset),
-  });
+  const searchParams: PokemonSearchParams = {
+    includeTypes: true,
+    includeAbilities: true,
+    limit: PAGE_SIZE,
+    offset,
+  };
 
   if (typesParam) {
-    typesParam.split(',').filter(Boolean).forEach((slug) => apiParams.append('typeSlugs', slug));
+    searchParams.typeSlugs = typesParam.split(',').filter(Boolean);
   }
   if (abilitiesParam) {
-    abilitiesParam.split(',').filter(Boolean).forEach((slug) => apiParams.append('abilitySlugs', slug));
+    searchParams.abilitySlugs = abilitiesParam.split(',').filter(Boolean);
   }
   if (movesParam) {
-    movesParam.split(',').filter(Boolean).forEach((slug) => apiParams.append('moveSlugs', slug));
+    searchParams.moveSlugs = movesParam.split(',').filter(Boolean);
   }
   if (generationsParam) {
-    generationsParam.split(',').filter(Boolean).forEach((gen) => apiParams.append('generations', gen));
+    searchParams.generations = generationsParam.split(',').filter(Boolean);
   }
 
   for (const stat of statParams) {
     const minParam = url.searchParams.get(`${stat}Min`);
     const maxParam = url.searchParams.get(`${stat}Max`);
-    if (minParam) apiParams.append(`${stat}Min`, minParam);
-    if (maxParam) apiParams.append(`${stat}Max`, maxParam);
+    if (minParam) {
+      (searchParams as Record<string, unknown>)[`${stat}Min`] = parseInt(minParam, 10);
+    }
+    if (maxParam) {
+      (searchParams as Record<string, unknown>)[`${stat}Max`] = parseInt(maxParam, 10);
+    }
   }
 
-  const pokemonPromise = fetchPokemonList(fetch, apiParams);
-  const typesPromise = fetchTypes(fetch);
-  const abilitiesPromise = fetchAbilities(fetch);
-  const movesPromise = fetchMoves(fetch);
+  const pokemonPromise = fetchPokemonList(searchParams);
+  const typesPromise = fetchTypes();
+  const abilitiesPromise = fetchAbilities();
+  const movesPromise = fetchMoves();
 
   // Client navigation: return promises directly for streaming
   if (isDataRequest) {

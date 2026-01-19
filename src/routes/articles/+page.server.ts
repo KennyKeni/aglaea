@@ -1,60 +1,47 @@
-import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { ArticleSchema, ArticleCategorySchema, PaginatedSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/server/api';
-import { z } from 'zod';
+import { createServerClient } from '$lib/server/client';
+import { createArticlesEndpoint } from '$lib/server/endpoints/articles';
+import type { Article, ArticleCategory } from '$lib/types/api';
 
 const PAGE_SIZE = 12;
 
 type FilterOption = { id: number; slug: string; name: string };
 
-async function fetchArticles(
-  fetch: typeof globalThis.fetch,
-  apiParams: URLSearchParams
-): Promise<{ articles: z.infer<typeof ArticleSchema>[]; filteredCount: number }> {
-  const res = await fetch(`${env.BACKEND_URL}/articles?${apiParams.toString()}`).catch(() => null);
-  if (!res?.ok) return { articles: [], filteredCount: 0 };
-  try {
-    const data = await parseResponse(res, PaginatedSchema(ArticleSchema));
-    return { articles: data.data ?? [], filteredCount: data.total ?? 0 };
-  } catch {
-    return { articles: [], filteredCount: 0 };
-  }
-}
-
-async function fetchCategories(fetch: typeof globalThis.fetch): Promise<FilterOption[]> {
-  const res = await fetch(`${env.BACKEND_URL}/articles/categories`).catch(() => null);
-  if (!res?.ok) return [];
-  try {
-    const data = await parseResponse(res, z.array(ArticleCategorySchema));
-    return data.map((c) => ({ id: c.id, slug: c.slug, name: c.name }));
-  } catch {
-    return [];
-  }
-}
-
 export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
+  const client = createServerClient(fetch);
+  const articlesApi = createArticlesEndpoint(client);
+
+  async function fetchArticles(
+    categorySlugs: string[] | undefined,
+    offset: number,
+  ): Promise<{ articles: Article[]; filteredCount: number }> {
+    const result = await articlesApi.search({
+      includeCategories: true,
+      includeImages: true,
+      limit: PAGE_SIZE,
+      offset,
+      ...(categorySlugs && { categorySlugs }),
+    });
+    if (!result.ok) return { articles: [], filteredCount: 0 };
+    return { articles: result.data.data ?? [], filteredCount: result.data.total ?? 0 };
+  }
+
+  async function fetchCategories(): Promise<FilterOption[]> {
+    const result = await articlesApi.getCategories();
+    if (!result.ok) return [];
+    return result.data.map((c: ArticleCategory) => ({ id: c.id, slug: c.slug, name: c.name }));
+  }
+
   const pageParam = url.searchParams.get('page');
   const requestedPage = Math.max(1, parseInt(pageParam ?? '1', 10));
   const categoriesParam = url.searchParams.get('categories');
 
   const offset = (requestedPage - 1) * PAGE_SIZE;
+  const categorySlugs = categoriesParam ? categoriesParam.split(',').filter(Boolean) : undefined;
 
-  const apiParams = new URLSearchParams({
-    includeCategories: 'true',
-    includeImages: 'true',
-    limit: String(PAGE_SIZE),
-    offset: String(offset),
-  });
-
-  if (categoriesParam) {
-    const categorySlugs = categoriesParam.split(',').filter(Boolean);
-    categorySlugs.forEach((slug) => apiParams.append('categorySlugs', slug));
-  }
-
-  const articlesPromise = fetchArticles(fetch, apiParams);
-  const categoriesPromise = fetchCategories(fetch);
+  const articlesPromise = fetchArticles(categorySlugs, offset);
+  const categoriesPromise = fetchCategories();
 
   // Client navigation: return promises directly for streaming
   if (isDataRequest) {

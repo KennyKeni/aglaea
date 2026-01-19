@@ -55,8 +55,19 @@ export const ArticleSchema = z.object({
   images: z.array(ArticleImageSchema),
 });
 
+export const ArticleMutationResponseSchema = z.object({
+  id: z.number(),
+  slug: z.string(),
+});
+
+export const ArticleDeleteResponseSchema = z.object({
+  success: z.boolean(),
+});
+
 export type Article = z.infer<typeof ArticleSchema>;
 export type ArticleCategory = z.infer<typeof ArticleCategorySchema>;
 export type ArticleImage = z.infer<typeof ArticleImageSchema>;
 export type ArticleAuthor = z.infer<typeof ArticleAuthorSchema>;
 export type TiptapDoc = z.infer<typeof TiptapDocSchema>;
+export type ArticleMutationResponse = z.infer<typeof ArticleMutationResponseSchema>;
+export type ArticleDeleteResponse = z.infer<typeof ArticleDeleteResponseSchema>;

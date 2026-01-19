@@ -1,18 +1,25 @@
-import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { ArticleSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/server/api';
+import { createServerClient } from '$lib/server/client';
+import { createArticlesEndpoint } from '$lib/server/endpoints/articles';
 
 export const load: PageServerLoad = async ({ fetch, params }) => {
-  const res = await fetch(
-    `${env.BACKEND_URL}/articles/${params.id}?includeCategories=true&includeImages=true&includeContent=true&includeAuthor=true`,
-  );
+  const client = createServerClient(fetch);
+  const articles = createArticlesEndpoint(client);
 
-  if (!res.ok) {
-    throw error(404, 'Article not found');
+  const result = await articles.getById(params.id, {
+    includeCategories: true,
+    includeImages: true,
+    includeContent: true,
+    includeAuthor: true,
+  });
+
+  if (!result.ok) {
+    if (result.status === 404) {
+      throw error(404, 'Article not found');
+    }
+    throw error(result.status, result.message);
   }
 
-  const article = await parseResponse(res, ArticleSchema);
-  return { article, panel: true };
+  return { article: result.data, panel: true };
 };

@@ -1,23 +1,33 @@
 import { error } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
 import type { PageServerLoad } from './$types';
-import { PokemonSchema } from '$lib/types/api';
-import { parseResponse } from '$lib/server/api';
+import { createServerClient } from '$lib/server/client';
+import { createPokemonEndpoint } from '$lib/server/endpoints/pokemon';
 
 export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
-  const res = await fetch(
-    `${env.BACKEND_URL}/pokemon/${params.id}?includeTypes=true&includeAbilities=true&includeMoves=true&includeSpawns=true&includeDrops=true&includeLabels=true&includeEggGroups=true&includeExperienceGroup=true`,
-  );
+  const client = createServerClient(fetch);
+  const pokemonApi = createPokemonEndpoint(client);
 
-  if (!res.ok) {
-    error(404, 'Pokemon not found');
+  const result = await pokemonApi.getById(params.id, {
+    includeTypes: true,
+    includeAbilities: true,
+    includeMoves: true,
+    includeSpawns: true,
+    includeDrops: true,
+    includeLabels: true,
+    includeEggGroups: true,
+    includeExperienceGroup: true,
+  });
+
+  if (!result.ok) {
+    if (result.status === 404) {
+      error(404, 'Pokemon not found');
+    }
+    error(result.status, result.message);
   }
 
   setHeaders({
     'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
   });
 
-  const pokemon = await parseResponse(res, PokemonSchema);
-
-  return { pokemon, panel: true };
+  return { pokemon: result.data, panel: true };
 };

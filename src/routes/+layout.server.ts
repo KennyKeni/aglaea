@@ -1,21 +1,14 @@
-import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
-import { ArticleCategorySchema } from '$lib/types/api';
-import { parseResponse } from '$lib/server/api';
-import { z } from 'zod';
 import type { ArticleCategory } from '$lib/types';
+import { createServerClient } from '$lib/server/client';
+import { createArticlesEndpoint } from '$lib/server/endpoints/articles';
 
 export const load: LayoutServerLoad = async ({ locals, fetch }) => {
-  const categoriesRes = await fetch(`${env.BACKEND_URL}/articles/categories`).catch(() => null);
+  const client = createServerClient(fetch);
+  const articlesApi = createArticlesEndpoint(client);
 
-  let articleCategories: ArticleCategory[] = [];
-  if (categoriesRes?.ok) {
-    try {
-      articleCategories = await parseResponse(categoriesRes, z.array(ArticleCategorySchema));
-    } catch {
-      // Ignore parse errors
-    }
-  }
+  const result = await articlesApi.getCategories();
+  const articleCategories: ArticleCategory[] = result.ok ? result.data : [];
 
   return {
     session: locals.session,
