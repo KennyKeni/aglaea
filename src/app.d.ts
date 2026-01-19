@@ -11,7 +11,16 @@ declare global {
     }
     // interface PageData {}
     // interface PageState {}
-    // interface Platform {}
+    interface Platform {
+      env: {
+        BACKEND_URL: string;
+        PUBLIC_APP_URL: string;
+      };
+      context: {
+        waitUntil(promise: Promise<unknown>): void;
+      };
+      caches: CacheStorage & { default: Cache };
+    }
   }
 }
 

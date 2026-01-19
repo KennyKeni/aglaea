@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { Button } from '$lib/components/ui/button';
   import { Home } from '@lucide/svelte';
@@ -29,7 +28,7 @@
       {/if}
     </p>
 
-    <Button size="lg" class="mt-6" onclick={() => goto('/')}>
+    <Button size="lg" class="mt-6" href="/">
       <Home class="h-4 w-4" />
       Return home
     </Button>
