@@ -14,7 +14,6 @@ import Image from '@tiptap/extension-image';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Link from '@tiptap/extension-link';
 import { slugify } from '$lib/utils/slugify';
-import DOMPurify from 'isomorphic-dompurify';
 import { createLowlight } from 'lowlight';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
@@ -118,11 +117,10 @@ export class RenderError extends Error {
 
 export function jsonToHtml(content: object): string {
   try {
-    const html = renderToHTMLString({
+    return renderToHTMLString({
       extensions: getServerExtensions(),
       content,
     });
-    return DOMPurify.sanitize(html);
   } catch (e) {
     console.error('Failed to render JSON:', e);
     throw new RenderError('Failed to render article content', e);
