@@ -2,7 +2,6 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { createServerClient } from '$lib/server/client';
 import { createArticlesEndpoint } from '$lib/server/endpoints/articles';
-import { jsonToHtml, RenderError } from '$lib/server/tiptap';
 import { extractToc } from '$lib/utils/toc';
 
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
@@ -31,19 +30,7 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
   const contentToc = article.content ? extractToc(article.content) : [];
   const toc = [{ id: 'article-title', text: article.title, level: 0 }, ...contentToc];
 
-  let contentHtml: string | undefined;
-  let renderError = false;
-  if (article.content) {
-    try {
-      contentHtml = jsonToHtml(article.content);
-    } catch (e) {
-      if (e instanceof RenderError) {
-        renderError = true;
-      } else {
-        throw e;
-      }
-    }
-  }
+  const renderError = !!(article.content && !article.contentHtml);
 
-  return { article: { ...article, contentHtml, renderError }, toc, panel: true };
+  return { article: { ...article, renderError }, toc, panel: true };
 };

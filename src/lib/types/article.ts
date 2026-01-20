@@ -30,7 +30,7 @@ export interface Article {
   subtitle: string | null;
   description: string | null;
   content: TiptapDoc | null;
-  contentHtml?: string;
+  contentHtml: string | null;
   renderError?: boolean;
   ownerId: string | null;
   author: ArticleAuthor | null;

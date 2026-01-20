@@ -47,6 +47,7 @@ export const ArticleSchema = z.object({
   subtitle: z.string().nullable(),
   description: z.string().nullable(),
   content: TiptapDocSchema.nullable(),
+  contentHtml: z.string().nullable(),
   ownerId: z.string().nullable(),
   author: ArticleAuthorSchema.nullable(),
   createdAt: z.string(),
