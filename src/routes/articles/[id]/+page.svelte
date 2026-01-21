@@ -12,14 +12,8 @@
 
   let { data }: { data: { article: Article; toc: TocItem[] } } = $props();
 
-  let article: Article | null = $state(data.article);
-  let toc: TocItem[] = $state(data.toc);
-
-  $effect(() => {
-    article = data.article;
-    toc = data.toc;
-  });
-
+  const article = $derived(data.article);
+  const toc = $derived(data.toc);
   const hasToc = $derived(toc.length > 0);
 
   const metaDescription = $derived.by(() => {

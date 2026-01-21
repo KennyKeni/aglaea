@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
   }
 
   setHeaders({
-    'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    'Cache-Control': 'public, max-age=0, stale-while-revalidate=86400',
   });
 
   const article = result.data;
