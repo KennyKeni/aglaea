@@ -16,6 +16,9 @@
   });
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<svelte:head>
+  <link rel="icon" href={favicon} />
+  <meta name="description" content="Cobblemon species database and Pokedex" />
+</svelte:head>
 
 {@render children()}
