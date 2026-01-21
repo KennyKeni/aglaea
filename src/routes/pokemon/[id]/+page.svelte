@@ -1,6 +1,7 @@
 <script lang="ts">
   import { PokemonContent } from '$lib/components/pokemon';
   import { Button } from '$lib/components/ui/button';
+  import DetailFooter from '$lib/components/ui/detail-footer.svelte';
   import { X } from '@lucide/svelte';
   import { pokemonStore } from '$lib/state/pokemon-store.svelte';
   import { formatId } from '$lib/utils/pokemon';
@@ -36,3 +37,5 @@
 <div class="px-4 py-4 md:px-6 md:py-6">
   <PokemonContent pokemon={data.pokemon} fullPokemon={data.pokemon} mode="full" />
 </div>
+
+<DetailFooter />

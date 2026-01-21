@@ -6,6 +6,10 @@
 
   let { toc, class: className = '' }: { toc: TocItem[]; class?: string } = $props();
 
+  const titleItem = $derived(toc.find((item) => item.level === 0));
+  const contentItems = $derived(toc.filter((item) => item.level > 0));
+  const minLevel = $derived(Math.min(...contentItems.map((item) => item.level)));
+
   let activeId = $state<string | null>(null);
 
   function scrollToId(id: string, behavior: ScrollBehavior = 'smooth') {
@@ -38,7 +42,7 @@
     const spy = createScrollSpy({
       selector,
       root,
-      rootMargin: '-5rem 0px -70% 0px',
+      rootMargin: '-80px 0px -70% 0px',
       onActiveChange: (id) => {
         activeId = id;
         if (id) replaceState(`#${id}`, {});
@@ -63,23 +67,53 @@
 
 {#if toc.length > 0}
   <nav class={cn('sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto', className)}>
-    <h4 class="mb-3 text-sm font-medium text-foreground/90">On this page</h4>
-    <ul class="flex flex-col gap-1.5 text-sm">
-      {#each toc as item (item.id)}
-        {@const indent = Math.max(item.level, 0) * 0.5}
-        {@const isActive = activeId === item.id}
-        <li
-          style:padding-left={`${indent}rem`}
-          class={cn(
-            'transition-colors hover:text-foreground',
-            isActive ? 'font-medium text-foreground' : 'text-muted-foreground',
-          )}
-        >
-          <a href="#{item.id}" class="block py-0.5" onclick={(e) => scrollToHeading(e, item.id)}>
-            {item.text}
-          </a>
-        </li>
-      {/each}
-    </ul>
+    {#if titleItem}
+      {@const isActive = activeId === titleItem.id}
+      <a
+        href="#{titleItem.id}"
+        class={cn(
+          'mb-4 block text-sm font-medium tracking-tight transition-colors',
+          isActive ? 'text-foreground' : 'text-foreground/90 hover:text-foreground',
+        )}
+        onclick={(e) => scrollToHeading(e, titleItem.id)}
+      >
+        {titleItem.text}
+      </a>
+    {:else}
+      <h4 class="mb-4 text-sm font-medium tracking-tight text-foreground/90">On this page</h4>
+    {/if}
+    {#if contentItems.length > 0}
+      <ul class="relative flex flex-col gap-0 border-l border-border/50">
+        {#each contentItems as item (item.id)}
+          {@const indent = (item.level - minLevel) * 0.75 + 0.75}
+          {@const isActive = activeId === item.id}
+          <li
+            class={cn(
+              'relative -ml-px border-l-2 transition-[border-color] duration-300 ease-in-out',
+              isActive ? 'border-foreground' : 'border-transparent hover:border-foreground/30',
+            )}
+          >
+            <a
+              href="#{item.id}"
+              class={cn(
+                'block py-1.5 pr-2 text-sm leading-snug transition-[color,opacity] duration-300 ease-in-out',
+                isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+              )}
+              style:padding-left={`${indent}rem`}
+              onclick={(e) => scrollToHeading(e, item.id)}
+            >
+              <span
+                class={cn(
+                  'block origin-left transition-[transform,font-weight] duration-300 ease-in-out',
+                  isActive && 'scale-[1.02] font-medium',
+                )}
+              >
+                {item.text}
+              </span>
+            </a>
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </nav>
 {/if}

@@ -56,19 +56,16 @@ export function createScrollSpy(options: ScrollSpyOptions) {
           }
         }
 
-        let newActiveId: string | null = null;
         if (visibleIds.size > 0) {
           for (const el of allElements) {
             if (el.id && visibleIds.has(el.id)) {
-              newActiveId = el.id;
+              if (el.id !== currentActiveId) {
+                currentActiveId = el.id;
+                onActiveChange?.(el.id);
+              }
               break;
             }
           }
-        }
-
-        if (newActiveId !== currentActiveId) {
-          currentActiveId = newActiveId;
-          onActiveChange?.(newActiveId);
         }
       },
       { root, rootMargin, threshold },

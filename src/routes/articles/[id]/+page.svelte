@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ArticleContent, ArticleToc } from '$lib/components/articles';
+  import DetailFooter from '$lib/components/ui/detail-footer.svelte';
   import { Button } from '$lib/components/ui/button';
   import LoadingSpinner from '$lib/components/ui/loading-spinner.svelte';
   import { Pencil, X } from '@lucide/svelte';
@@ -11,8 +12,8 @@
 
   let { data }: { data: { article: Article; toc: TocItem[] } } = $props();
 
-  let article: Article | null = $state(null);
-  let toc: TocItem[] = $state([]);
+  let article: Article | null = $state(data.article);
+  let toc: TocItem[] = $state(data.toc);
 
   $effect(() => {
     article = data.article;
@@ -59,15 +60,14 @@
   </div>
 </header>
 
-<div class="px-4 py-4 md:px-6 md:py-6">
-  {#if !article}
+{#if !article}
+  <div class="px-4 py-4 md:px-6 md:py-6">
     <LoadingSpinner class="py-20" />
-  {:else}
-    <div
-      class="mx-auto max-w-3xl xl:mx-0 xl:grid xl:max-w-none xl:grid-cols-[1fr_48rem_16rem] xl:gap-8"
-    >
-      <div class="hidden xl:block"></div>
-      <div>
+  </div>
+{:else}
+  <div class="px-4 py-4 md:px-6 md:py-6">
+    <div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
+      <div class="mx-auto max-w-4xl">
         <ArticleContent {article} mode="full" />
       </div>
       {#if hasToc}
@@ -76,5 +76,6 @@
         </aside>
       {/if}
     </div>
-  {/if}
-</div>
+  </div>
+  <DetailFooter />
+{/if}

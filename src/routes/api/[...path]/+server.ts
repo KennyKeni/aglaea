@@ -12,7 +12,7 @@ const HOP_BY_HOP = new Set([
   'proxy-authorization',
 ]);
 
-const proxy: RequestHandler = async ({ request, params, url, cookies }) => {
+const proxy: RequestHandler = async ({ request, params, url }) => {
   const targetUrl = `${env.BACKEND_URL}/${params.path}${url.search}`;
 
   const headers = new Headers();
@@ -20,11 +20,6 @@ const proxy: RequestHandler = async ({ request, params, url, cookies }) => {
     if (!HOP_BY_HOP.has(key.toLowerCase())) {
       headers.set(key, value);
     }
-  }
-
-  const token = cookies.get('session');
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
   }
 
   try {
