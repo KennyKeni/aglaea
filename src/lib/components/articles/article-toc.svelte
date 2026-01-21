@@ -66,16 +66,17 @@
 </script>
 
 {#if toc.length > 0}
-  <nav class={cn('sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto', className)}>
+  <nav class={cn('sticky top-24 max-h-[calc(100vh-8rem)] w-80 overflow-y-auto pl-6 pr-4', className)}>
     {#if titleItem}
       {@const isActive = activeId === titleItem.id}
       <a
         href="#{titleItem.id}"
         class={cn(
-          'mb-4 block text-sm font-medium tracking-tight transition-colors',
+          'mb-4 block truncate text-sm font-medium tracking-tight transition-colors',
           isActive ? 'text-foreground' : 'text-foreground/90 hover:text-foreground',
         )}
         onclick={(e) => scrollToHeading(e, titleItem.id)}
+        title={titleItem.text}
       >
         {titleItem.text}
       </a>
@@ -104,9 +105,10 @@
             >
               <span
                 class={cn(
-                  'block origin-left transition-[transform,font-weight] duration-300 ease-in-out',
+                  'block truncate origin-left transition-[transform,font-weight] duration-300 ease-in-out',
                   isActive && 'scale-[1.02] font-medium',
                 )}
+                title={item.text}
               >
                 {item.text}
               </span>
