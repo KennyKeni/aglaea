@@ -8,7 +8,7 @@
   import { Button } from '$lib/components/ui/button';
   import { Loader2 } from '@lucide/svelte';
   import type { Article, ArticleCategory, ArticleImage, TiptapDoc, ArticleAuthor } from '$lib/types/article';
-  import initEditor from '$lib/components/edra/editor';
+  import { getHtmlExtensions } from '$lib/components/edra/editor';
   import { articles as articlesApi } from '$lib/api/endpoints/articles';
 
   onDestroy(() => {
@@ -71,13 +71,6 @@
     return initialContent;
   });
 
-  function getEditorExtensions() {
-    const tempEditor = initEditor(undefined, undefined, [], {});
-    const extensions = tempEditor.extensionManager.extensions;
-    tempEditor.destroy();
-    return extensions;
-  }
-
   function getEditorContent(): TiptapDoc {
     const json = editor!.getJSON();
     return {
@@ -111,7 +104,7 @@
       return;
     }
 
-    const contentHtml = generateHTML(content, getEditorExtensions());
+    const contentHtml = generateHTML(content, getHtmlExtensions());
 
     onSave({
       id: result.data.id,

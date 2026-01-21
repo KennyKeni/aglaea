@@ -20,6 +20,36 @@ import AutoJoiner from 'tiptap-extension-auto-joiner';
 import 'katex/dist/katex.min.css';
 import { InlineMathReplacer } from './extensions/InlineMathReplacer.js';
 
+export function getHtmlExtensions(): Extensions {
+  return [
+    StarterKit.configure({
+      orderedList: { HTMLAttributes: { class: 'list-decimal' } },
+      bulletList: { HTMLAttributes: { class: 'list-disc' } },
+      heading: { levels: [1, 2, 3, 4] },
+      link: { openOnClick: false, autolink: true, linkOnPaste: true },
+      codeBlock: false,
+    }),
+    Highlight.configure({ multicolor: true }),
+    Color,
+    Subscript,
+    Superscript,
+    Typography,
+    ColorHighlighter,
+    TextStyle,
+    FontSize,
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    TaskList,
+    TaskItem.configure({ nested: true }),
+    MathMatics,
+    Table,
+    TableHeader,
+    TableRow,
+    TableCell,
+    Markdown,
+    Image.configure({ allowBase64: true }),
+  ];
+}
+
 export default (
   element?: HTMLElement,
   content?: Content,
@@ -117,7 +147,6 @@ export default (
       TableRow,
       TableCell,
       Markdown,
-      Image.configure({ allowBase64: true }),
       ...(extensions ?? []),
     ],
     ...options,
