@@ -38,7 +38,7 @@
     const spy = createScrollSpy({
       selector,
       root,
-      rootMargin: '0px 0px -70% 0px',
+      rootMargin: '-5rem 0px -70% 0px',
       onActiveChange: (id) => {
         activeId = id;
         if (id) replaceState(`#${id}`, {});

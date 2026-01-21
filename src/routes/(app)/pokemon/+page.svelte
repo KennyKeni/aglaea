@@ -7,7 +7,7 @@
   import { goto } from '$app/navigation';
   import { PokemonGrid, PokemonFilters } from '$lib/components/pokemon';
   import Pagination from '$lib/components/ui/pagination.svelte';
-  import { getPokemonDataContext, getPanelContext } from '$lib/context/pokemon';
+  import { pokemonStore } from '$lib/state/pokemon-store.svelte';
   import type { Pokemon } from '$lib/types/pokemon';
   import type { FilterOption } from '$lib/utils/filters';
   import type { Streamable } from '$lib/utils/streaming';
@@ -24,9 +24,6 @@
 
   let { data }: { data: PageData } = $props();
 
-  const pokemonData = getPokemonDataContext();
-  const { mode: panelMode } = getPanelContext();
-
   let pokemon: Pokemon[] = $state([]);
   let filteredCount: number = $state(0);
   let types: FilterOption[] = $state([]);
@@ -34,10 +31,20 @@
   let moves: FilterOption[] = $state([]);
   let isLoading = $state(true);
 
+  const hasCachedItems = $derived(
+    pokemonStore.items.length > 0 && pokemonStore.currentPage === data.currentPage,
+  );
+
+  $effect(() => {
+    pokemonStore.setListParams(page.url.searchParams);
+  });
+
   $effect(() => {
     const p = data.pokemon;
     if (p instanceof Promise) {
-      isLoading = true;
+      if (!hasCachedItems) {
+        isLoading = true;
+      }
       p.then((resolved) => {
         pokemon = resolved;
         isLoading = false;
@@ -93,15 +100,15 @@
   });
 
   $effect(() => {
-    if (!isLoading && !pokemonData.searchQuery) {
-      pokemonData.setItems(pokemon);
-      pokemonData.setPage(data.currentPage);
+    if (!isLoading && !pokemonStore.searchQuery) {
+      pokemonStore.setItems(pokemon);
+      pokemonStore.setPage(data.currentPage);
     }
   });
 
   $effect(() => {
     const query = page.url.searchParams.get('search') || '';
-    pokemonData.search(query);
+    pokemonStore.search(query);
   });
 
   function handlePageChange(newPage: number) {
@@ -109,6 +116,12 @@
     params.set('page', String(newPage));
     goto(`/pokemon?${params.toString()}`, { keepFocus: true });
   }
+
+  const displayPokemon = $derived.by(() => {
+    if (pokemonStore.searchQuery) return pokemonStore.items;
+    if (hasCachedItems && isLoading) return pokemonStore.items;
+    return pokemon;
+  });
 </script>
 
 <div class="mx-auto max-w-6xl px-4 pt-4">
@@ -116,14 +129,13 @@
 </div>
 
 <PokemonGrid
-  pokemon={pokemonData.searchQuery ? pokemonData.items : pokemon}
-  {isLoading}
+  pokemon={displayPokemon}
+  isLoading={isLoading && !hasCachedItems}
   isRefreshing={false}
   skeletonCount={data.pageSize}
-  onCardClick={(mon) => panelMode.openPeek(mon)}
 />
 
-{#if !pokemonData.searchQuery && filteredCount > 0}
+{#if !pokemonStore.searchQuery && filteredCount > 0}
   <div class="mx-auto max-w-6xl px-4 pb-8">
     <Pagination
       currentPage={data.currentPage}

@@ -32,5 +32,5 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 
   const renderError = !!(article.content && !article.contentHtml);
 
-  return { article: { ...article, renderError }, toc, panel: true };
+  return { article: { ...article, renderError }, toc };
 };

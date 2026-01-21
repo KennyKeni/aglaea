@@ -6,12 +6,10 @@
     articles,
     isLoading = false,
     skeletonCount = 6,
-    onCardClick,
   }: {
     articles: Article[];
     isLoading?: boolean;
     skeletonCount?: number;
-    onCardClick: (article: Article) => void;
   } = $props();
 </script>
 
@@ -23,7 +21,7 @@
       {/each}
     {:else}
       {#each articles as article (article.id)}
-        <ArticleCard {article} onclick={() => onCardClick(article)} />
+        <ArticleCard {article} href="/articles/{article.id}" />
       {/each}
     {/if}
   </div>

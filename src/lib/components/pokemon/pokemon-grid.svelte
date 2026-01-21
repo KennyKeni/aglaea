@@ -7,13 +7,11 @@
     isLoading = false,
     isRefreshing = false,
     skeletonCount = 8,
-    onCardClick,
   }: {
     pokemon: Pokemon[];
     isLoading?: boolean;
     isRefreshing?: boolean;
     skeletonCount?: number;
-    onCardClick: (mon: Pokemon) => void;
   } = $props();
 </script>
 
@@ -28,7 +26,7 @@
       {/each}
     {:else}
       {#each pokemon as mon (mon.id)}
-        <PokemonCard pokemon={mon} onclick={() => onCardClick(mon)} />
+        <PokemonCard pokemon={mon} href="/pokemon/{mon.id}" />
       {/each}
     {/if}
   </div>

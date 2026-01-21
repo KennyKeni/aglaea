@@ -21,5 +21,5 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
     throw error(result.status, result.message);
   }
 
-  return { article: result.data, panel: true };
+  return { article: result.data };
 };

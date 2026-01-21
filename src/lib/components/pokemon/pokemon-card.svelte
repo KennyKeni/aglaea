@@ -8,11 +8,11 @@
   let {
     pokemon,
     loading = false,
-    onclick,
+    href,
   }: {
     pokemon?: Pokemon;
     loading?: boolean;
-    onclick?: () => void;
+    href?: string;
   } = $props();
 
   let defaultForm = $derived(pokemon?.forms[0]);
@@ -36,7 +36,7 @@
     </div>
   </div>
 {:else if pokemon}
-  <button {onclick} class="group w-full text-left">
+  <a {href} class="group w-full text-left">
     <Card.Root
       class="aspect-square rounded-2xl transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
     >
@@ -73,5 +73,5 @@
         </div>
       </Card.Content>
     </Card.Root>
-  </button>
+  </a>
 {/if}

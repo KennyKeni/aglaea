@@ -1,3 +1,5 @@
+import { browser } from '$app/environment';
+
 export interface GridDataConfig {
   apiEndpoint: string;
   pageSize?: number;
@@ -17,6 +19,8 @@ export interface GridDataState<T> {
   clearSearch(): void;
   setPage(page: number): void;
   setItems(items: T[]): void;
+  setListParams(params: URLSearchParams): void;
+  getReturnHref(basePath: string): string;
 }
 
 export class GridDataStateImpl<T> implements GridDataState<T> {
@@ -30,6 +34,7 @@ export class GridDataStateImpl<T> implements GridDataState<T> {
   #totalCount: number;
   #searchTimeout: ReturnType<typeof setTimeout> | null = null;
   #config: Required<GridDataConfig>;
+  #listParams: URLSearchParams = new URLSearchParams();
 
   constructor(initialItems: T[], totalCount: number, currentPage: number, config: GridDataConfig) {
     this.items = initialItems ?? [];
@@ -80,6 +85,8 @@ export class GridDataStateImpl<T> implements GridDataState<T> {
       return;
     }
 
+    if (!browser) return;
+
     this.isSearching = true;
     this.#searchTimeout = setTimeout(async () => {
       try {
@@ -107,6 +114,15 @@ export class GridDataStateImpl<T> implements GridDataState<T> {
     if (this.#searchTimeout) {
       clearTimeout(this.#searchTimeout);
     }
+  }
+
+  setListParams(params: URLSearchParams) {
+    this.#listParams = new URLSearchParams(params);
+  }
+
+  getReturnHref(basePath: string): string {
+    const qs = this.#listParams.toString();
+    return qs ? `${basePath}?${qs}` : basePath;
   }
 }
 

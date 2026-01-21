@@ -29,5 +29,5 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
     'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
   });
 
-  return { pokemon: result.data, panel: true };
+  return { pokemon: result.data };
 };

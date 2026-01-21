@@ -9,7 +9,7 @@
   import Pagination from '$lib/components/ui/pagination.svelte';
   import { Button } from '$lib/components/ui/button';
   import { Plus } from '@lucide/svelte';
-  import { getArticleDataContext, getArticlePanelContext } from '$lib/context/articles';
+  import { articleStore } from '$lib/state/article-store.svelte';
   import { can } from '$lib/state/permissions.svelte';
   import { Resource, Action } from '$lib/types/auth';
   import type { Article } from '$lib/types/article';
@@ -26,18 +26,25 @@
 
   let { data }: { data: PageData } = $props();
 
-  const articleData = getArticleDataContext();
-  const { mode: panelMode } = getArticlePanelContext();
-
   let articles: Article[] = $state([]);
   let filteredCount: number = $state(0);
   let categories: FilterOption[] = $state([]);
   let isLoading = $state(true);
 
+  const hasCachedItems = $derived(
+    articleStore.items.length > 0 && articleStore.currentPage === data.currentPage,
+  );
+
+  $effect(() => {
+    articleStore.setListParams(page.url.searchParams);
+  });
+
   $effect(() => {
     const a = data.articles;
     if (a instanceof Promise) {
-      isLoading = true;
+      if (!hasCachedItems) {
+        isLoading = true;
+      }
       a.then((resolved) => {
         articles = resolved;
         isLoading = false;
@@ -71,15 +78,15 @@
   });
 
   $effect(() => {
-    if (!isLoading && !articleData.searchQuery) {
-      articleData.setItems(articles);
-      articleData.setPage(data.currentPage);
+    if (!isLoading && !articleStore.searchQuery) {
+      articleStore.setItems(articles);
+      articleStore.setPage(data.currentPage);
     }
   });
 
   $effect(() => {
     const query = page.url.searchParams.get('search') || '';
-    articleData.search(query);
+    articleStore.search(query);
   });
 
   function handlePageChange(newPage: number) {
@@ -87,6 +94,12 @@
     params.set('page', String(newPage));
     goto(`/articles?${params.toString()}`, { keepFocus: true });
   }
+
+  const displayArticles = $derived.by(() => {
+    if (articleStore.searchQuery) return articleStore.items;
+    if (hasCachedItems && isLoading) return articleStore.items;
+    return articles;
+  });
 </script>
 
 <div class="mx-auto max-w-6xl px-4 pt-4">
@@ -104,13 +117,12 @@
 </div>
 
 <ArticleGrid
-  articles={articleData.searchQuery ? articleData.items : articles}
-  {isLoading}
+  articles={displayArticles}
+  isLoading={isLoading && !hasCachedItems}
   skeletonCount={data.pageSize}
-  onCardClick={(article) => panelMode.openPeek(article)}
 />
 
-{#if !articleData.searchQuery && filteredCount > 0}
+{#if !articleStore.searchQuery && filteredCount > 0}
   <div class="mx-auto max-w-6xl px-4 pb-8">
     <Pagination
       currentPage={data.currentPage}

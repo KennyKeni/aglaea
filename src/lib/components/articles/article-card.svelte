@@ -7,11 +7,11 @@
   let {
     article,
     loading = false,
-    onclick,
+    href,
   }: {
     article?: Article;
     loading?: boolean;
-    onclick?: () => void;
+    href?: string;
   } = $props();
 
   const coverImage = $derived(article?.images?.find((img) => img.isCover)?.url);
@@ -33,7 +33,7 @@
     </div>
   </div>
 {:else if article}
-  <button {onclick} class="group h-full w-full text-left">
+  <a {href} class="group h-full w-full text-left">
     <Card.Root
       class="flex h-full flex-col overflow-hidden rounded-2xl transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
     >
@@ -71,5 +71,5 @@
         {/if}
       </Card.Content>
     </Card.Root>
-  </button>
+  </a>
 {/if}
