@@ -4,6 +4,7 @@
 
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { env } from '$env/dynamic/public';
   import { authClient } from '$lib/auth-client';
   import * as Card from '$lib/components/ui/card';
   import { Input } from '$lib/components/ui/input';
@@ -32,10 +33,10 @@
     isLoading = true;
 
     await authClient.signUp.email(
-      { name, email, password, callbackURL: '/' },
+      { name, email, password, callbackURL: `${env.PUBLIC_APP_URL}/email-verified` },
       {
         onSuccess: () => {
-          goto('/');
+          goto(`/verify-email?email=${encodeURIComponent(email)}`);
         },
         onError: (ctx) => {
           error = ctx.error.message || 'Failed to create account';

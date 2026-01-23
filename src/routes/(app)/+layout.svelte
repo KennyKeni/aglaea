@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AppSidebar, AppHeader } from '$lib/components/layout';
+  import { AppSidebar, AppHeader, EmailVerificationBanner } from '$lib/components/layout';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import { baseNavigation } from '$lib/config/navigation';
 
@@ -28,6 +28,9 @@
   <AppSidebar {navigation} />
   <Sidebar.Inset>
     <AppHeader session={data.session} />
+    {#if data.session && !data.session.user.emailVerified}
+      <EmailVerificationBanner email={data.session.user.email} />
+    {/if}
     <main class="flex-1">
       {@render children()}
     </main>
