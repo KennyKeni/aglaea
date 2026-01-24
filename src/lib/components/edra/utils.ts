@@ -46,7 +46,7 @@ export function getHandlePaste(editor: Editor) {
         } else {
           result = await uploadImage(file);
         }
-        editor.commands.setImage({ src: result.publicUrl });
+        editor.commands.setS3Image({ s3Key: result.s3Key });
       } catch (err) {
         if (err instanceof ImageUploadError && err.type !== 'aborted') {
           console.error('Image upload failed:', err.message);

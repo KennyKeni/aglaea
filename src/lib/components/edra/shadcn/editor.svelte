@@ -7,10 +7,10 @@
   import '../editor.css';
   import './style.css';
   import '../onedark.css';
-  import { ImagePlaceholder } from '../extensions/image/ImagePlaceholder.js';
-  import ImagePlaceholderComp from './components/ImagePlaceholder.svelte';
-  import { ImageExtended } from '../extensions/image/ImageExtended.js';
-  import ImageExtendedComp from './components/ImageExtended.svelte';
+  import { S3ImagePlaceholder } from '../extensions/image/S3ImagePlaceholder.js';
+  import S3ImagePlaceholderComp from './components/S3ImagePlaceholder.svelte';
+  import { S3Image } from '../extensions/image/S3Image.js';
+  import S3ImageComp from './components/S3Image.svelte';
   import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
   import { createLowlight } from 'lowlight';
   import javascript from 'highlight.js/lib/languages/javascript';
@@ -90,8 +90,8 @@
             return SvelteNodeViewRenderer(CodeBlock);
           },
         }),
-        ImagePlaceholder(ImagePlaceholderComp),
-        ImageExtended(ImageExtendedComp),
+        S3ImagePlaceholder(S3ImagePlaceholderComp),
+        S3Image(S3ImageComp),
         slashcommand(SlashCommandList),
       ],
       {

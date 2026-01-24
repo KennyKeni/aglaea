@@ -421,10 +421,10 @@ const commands: Record<string, EdraToolBarCommands[]> = {
         if (editor.storage.openImageModal) {
           editor.storage.openImageModal();
         } else {
-          editor.chain().focus().insertImagePlaceholder().run();
+          editor.chain().focus().insertS3ImagePlaceholder().run();
         }
       },
-      isActive: (editor) => editor.isActive('image'),
+      isActive: (editor) => editor.isActive('s3-image'),
     },
   ],
   table: [

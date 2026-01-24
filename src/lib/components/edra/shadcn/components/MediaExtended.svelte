@@ -13,8 +13,11 @@
   import Fullscreen from '@lucide/svelte/icons/fullscreen';
   import Trash from '@lucide/svelte/icons/trash';
   import Captions from '@lucide/svelte/icons/captions';
+  import TextCursorInput from '@lucide/svelte/icons/text-cursor-input';
 
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+  import * as Dialog from '$lib/components/ui/dialog/index.js';
+  import { Input } from '$lib/components/ui/input/index.js';
   import { duplicateContent } from '../../utils.js';
 
   interface MediaExtendedProps extends NodeViewProps {
@@ -42,6 +45,8 @@
   let resizingInitialMouseX = $state(0);
   let resizingPosition = $state<'left' | 'right'>('left');
   let openedMore = $state(false);
+  let altDialogOpen = $state(false);
+  let altTextValue = $state('');
 
   function handleResizingPosition(e: MouseEvent, position: 'left' | 'right') {
     startResize(e);
@@ -246,6 +251,14 @@
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 onclick={() => {
+                  altTextValue = node.attrs.alt ?? '';
+                  altDialogOpen = true;
+                }}
+              >
+                <TextCursorInput class="mr-1 size-4" /> Alt Text
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onclick={() => {
                   duplicateContent(editor, node);
                 }}
               >
@@ -275,3 +288,37 @@
     </div>
   </NodeViewWrapper>
 {/key}
+
+<Dialog.Root bind:open={altDialogOpen}>
+  <Dialog.Content class="sm:max-w-md">
+    <Dialog.Header>
+      <Dialog.Title>Alt Text</Dialog.Title>
+      <Dialog.Description>
+        Describe this image for screen readers and accessibility.
+      </Dialog.Description>
+    </Dialog.Header>
+    <div class="py-4">
+      <Input
+        bind:value={altTextValue}
+        placeholder="A descriptive text of the image..."
+        onkeydown={(e) => {
+          if (e.key === 'Enter') {
+            updateAttributes({ alt: altTextValue });
+            altDialogOpen = false;
+          }
+        }}
+      />
+    </div>
+    <Dialog.Footer>
+      <Button variant="outline" onclick={() => (altDialogOpen = false)}>Cancel</Button>
+      <Button
+        onclick={() => {
+          updateAttributes({ alt: altTextValue });
+          altDialogOpen = false;
+        }}
+      >
+        Save
+      </Button>
+    </Dialog.Footer>
+  </Dialog.Content>
+</Dialog.Root>

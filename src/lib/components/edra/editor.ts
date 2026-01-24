@@ -1,4 +1,4 @@
-import { Editor, type Extensions, type EditorOptions, type Content } from '@tiptap/core';
+import { Editor, Node, type Extensions, type EditorOptions, type Content } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { getHandlePaste } from './utils.js';
 import Subscript from '@tiptap/extension-subscript';
@@ -14,7 +14,7 @@ import { Table, TableCell, TableRow, TableHeader } from './extensions/table/inde
 import { Placeholder } from '@tiptap/extensions';
 import { Markdown } from '@tiptap/markdown';
 import MathMatics from '@tiptap/extension-mathematics';
-import Image from '@tiptap/extension-image';
+import { s3Config } from '$lib/config/s3';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { createLowlight } from 'lowlight';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -40,6 +40,32 @@ import yaml from 'highlight.js/lib/languages/yaml';
 import AutoJoiner from 'tiptap-extension-auto-joiner';
 import 'katex/dist/katex.min.css';
 import { InlineMathReplacer } from './extensions/InlineMathReplacer.js';
+
+// S3ImageHtml: HTML-only extension for static rendering (getHtmlExtensions).
+// The interactive editor uses S3Image with a Svelte NodeView instead.
+const S3ImageHtml = Node.create({
+  name: 's3-image',
+  group: 'block',
+  atom: true,
+
+  addAttributes() {
+    return {
+      s3Key: { default: null },
+      alt: { default: null },
+      title: { default: null },
+      width: { default: '100%' },
+      align: { default: 'left' },
+    };
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const { s3Key, align, width, ...rest } = HTMLAttributes;
+    if (!s3Key) return ['span'];
+    const src = `${s3Config.baseUrl}/${s3Key}`;
+    const style = width ? `width: ${width}` : undefined;
+    return ['img', { ...rest, src, style, 'data-align': align }];
+  },
+});
 
 const lowlight = createLowlight({
   javascript,
@@ -69,7 +95,12 @@ export function getHtmlExtensions(): Extensions {
       orderedList: { HTMLAttributes: { class: 'list-decimal' } },
       bulletList: { HTMLAttributes: { class: 'list-disc' } },
       heading: { levels: [1, 2, 3, 4] },
-      link: { openOnClick: false, autolink: true, linkOnPaste: true },
+      link: {
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        validate: (href) => href.startsWith('/') || href.startsWith('#'),
+      },
       codeBlock: false,
     }),
     CodeBlockLowlight.configure({ lowlight }),
@@ -90,7 +121,7 @@ export function getHtmlExtensions(): Extensions {
     TableRow,
     TableCell,
     Markdown,
-    Image.configure({ allowBase64: true }),
+    S3ImageHtml,
   ];
 }
 
@@ -122,6 +153,7 @@ export default (
           openOnClick: false,
           autolink: true,
           linkOnPaste: true,
+          validate: (href) => href.startsWith('/') || href.startsWith('#'),
         },
         codeBlock: false,
       }),

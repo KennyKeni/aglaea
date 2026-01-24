@@ -1,14 +1,11 @@
 <script lang="ts">
   import type { NodeViewProps } from '@tiptap/core';
   import { NodeViewWrapper } from 'svelte-tiptap';
-  import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
   import { Button } from '$lib/components/ui/button';
-  import { Input } from '$lib/components/ui/input';
   import { Progress } from '$lib/components/ui/progress';
   import { uploadImage, ImageUploadError } from '$lib/utils/image-upload';
   import '../../types';
   import Upload from '@lucide/svelte/icons/upload';
-  import Link from '@lucide/svelte/icons/link';
   import X from '@lucide/svelte/icons/x';
   import ImageIcon from '@lucide/svelte/icons/image';
 
@@ -22,7 +19,6 @@
 
   let uploadState: UploadState = $state({ mode: 'idle' });
   let isDragOver = $state(false);
-  let embedUrl = $state('');
   let fileInputRef: HTMLInputElement | undefined = $state();
 
   const maxSizeMB = $derived(uploadOptions?.maxSizeMB ?? 10);
@@ -54,7 +50,15 @@
         });
       }
 
-      props.editor.chain().focus().setImage({ src: result.publicUrl }).run();
+      const pos = props.getPos();
+      if (pos !== undefined) {
+        props.editor
+          .chain()
+          .focus()
+          .deleteRange({ from: pos, to: pos + props.node.nodeSize })
+          .insertContentAt(pos, { type: 's3-image', attrs: { s3Key: result.s3Key } })
+          .run();
+      }
     } catch (err) {
       if (err instanceof ImageUploadError) {
         if (err.type === 'aborted') {
@@ -73,16 +77,6 @@
       uploadState.abortController.abort();
     }
     uploadState = { mode: 'idle' };
-  }
-
-  function handleEmbed() {
-    const url = embedUrl.trim();
-    if (!url) return;
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      uploadState = { mode: 'error', message: 'URL must start with http:// or https://' };
-      return;
-    }
-    props.editor.chain().focus().setImage({ src: url }).run();
   }
 
   function handleDrop(e: DragEvent) {
@@ -135,64 +129,36 @@
       <Button variant="outline" size="sm" onclick={handleRetry}>Try again</Button>
     </div>
   {:else}
-    <Tabs value="upload" class="w-full">
-      <TabsList class="w-full">
-        <TabsTrigger value="upload" class="flex-1 gap-1.5">
-          <Upload class="size-4" />
-          Upload
-        </TabsTrigger>
-        <TabsTrigger value="embed" class="flex-1 gap-1.5">
-          <Link class="size-4" />
-          Embed URL
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="upload" class="mt-3">
-        <button
-          type="button"
-          class="flex w-full cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed p-6 transition-colors hover:border-primary/50 hover:bg-muted {isDragOver
-            ? 'border-primary bg-primary/5'
-            : 'border-muted-foreground/25'}"
-          ondrop={handleDrop}
-          ondragover={handleDragOver}
-          ondragleave={handleDragLeave}
-          onclick={() => fileInputRef?.click()}
-        >
-          <div
-            class="flex size-12 items-center justify-center rounded-full bg-muted {isDragOver
-              ? 'text-primary'
-              : 'text-muted-foreground'}"
-          >
-            <Upload class="size-6" />
-          </div>
-          <div class="text-center">
-            <p class="text-sm font-medium">Drop image here or click to upload</p>
-            <p class="mt-1 text-xs text-muted-foreground">
-              PNG, JPG, GIF, WebP up to {maxSizeMB}MB
-            </p>
-          </div>
-        </button>
-        <input
-          bind:this={fileInputRef}
-          type="file"
-          accept="image/*"
-          class="hidden"
-          onchange={(e) => handleFileSelect(e.currentTarget.files)}
-        />
-      </TabsContent>
-
-      <TabsContent value="embed" class="mt-3">
-        <div class="flex gap-2">
-          <Input
-            type="url"
-            placeholder="https://example.com/image.png"
-            bind:value={embedUrl}
-            onkeydown={(e) => e.key === 'Enter' && handleEmbed()}
-            class="flex-1"
-          />
-          <Button onclick={handleEmbed} disabled={!embedUrl.trim()}>Embed</Button>
-        </div>
-      </TabsContent>
-    </Tabs>
+    <button
+      type="button"
+      class="flex w-full cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed p-6 transition-colors hover:border-primary/50 hover:bg-muted {isDragOver
+        ? 'border-primary bg-primary/5'
+        : 'border-muted-foreground/25'}"
+      ondrop={handleDrop}
+      ondragover={handleDragOver}
+      ondragleave={handleDragLeave}
+      onclick={() => fileInputRef?.click()}
+    >
+      <div
+        class="flex size-12 items-center justify-center rounded-full bg-muted {isDragOver
+          ? 'text-primary'
+          : 'text-muted-foreground'}"
+      >
+        <Upload class="size-6" />
+      </div>
+      <div class="text-center">
+        <p class="text-sm font-medium">Drop image here or click to upload</p>
+        <p class="mt-1 text-xs text-muted-foreground">
+          PNG, JPG, GIF, WebP up to {maxSizeMB}MB
+        </p>
+      </div>
+    </button>
+    <input
+      bind:this={fileInputRef}
+      type="file"
+      accept="image/*"
+      class="hidden"
+      onchange={(e) => handleFileSelect(e.currentTarget.files)}
+    />
   {/if}
 </NodeViewWrapper>

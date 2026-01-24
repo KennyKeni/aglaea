@@ -12,7 +12,7 @@
   let { data }: { data: { article: Article } } = $props();
 
   function handleSave() {
-    goto(`/articles/${data.article.id}`);
+    goto(`/articles/${data.article.id}`, { invalidateAll: true });
   }
 
   function handleCancel() {

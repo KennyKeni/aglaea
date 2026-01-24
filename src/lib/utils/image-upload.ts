@@ -3,6 +3,7 @@ export interface UploadUrlResponse {
   uploadUrl: string;
   uploadToken: string;
   publicUrl: string;
+  s3Key: string;
   maxSize: number;
 }
 
@@ -15,6 +16,7 @@ interface WorkerResponse {
 export interface UploadResult {
   imageId: string;
   publicUrl: string;
+  s3Key: string;
   width?: number;
   height?: number;
 }
@@ -183,6 +185,7 @@ export async function uploadImage(
   return {
     imageId: urlResponse.imageId,
     publicUrl: urlResponse.publicUrl,
+    s3Key: urlResponse.s3Key,
     width: dimensions.width,
     height: dimensions.height,
   };
