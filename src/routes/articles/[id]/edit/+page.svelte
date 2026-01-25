@@ -46,6 +46,7 @@
         ownerId: data.article.ownerId,
         author: data.article.author,
         categories: data.article.categories ?? [],
+        coverImage: data.article.coverImage ?? null,
         images: data.article.images ?? [],
       }}
       onSave={handleSave}

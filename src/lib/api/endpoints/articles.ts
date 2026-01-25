@@ -14,6 +14,7 @@ export interface ArticleInput {
 	subtitle?: string | null;
 	description?: string | null;
 	content?: TiptapDoc | null;
+	coverImageId?: string | null;
 }
 
 export const articles = {

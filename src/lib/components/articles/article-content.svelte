@@ -15,7 +15,7 @@
   } = $props();
 
   const dataSource = $derived(fullArticle ?? article);
-  const coverImage = $derived(dataSource.images?.find((img) => img.isCover)?.url);
+  const coverImage = $derived(dataSource.coverImage?.url);
   const fallbackImage = $derived(dataSource.images?.[0]?.url);
   const displayImage = $derived(coverImage ?? fallbackImage);
   const isFull = $derived(mode === 'full');

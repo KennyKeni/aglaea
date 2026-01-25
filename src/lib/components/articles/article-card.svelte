@@ -14,7 +14,7 @@
     href?: string;
   } = $props();
 
-  const coverImage = $derived(article?.images?.find((img) => img.isCover)?.url);
+  const coverImage = $derived(article?.coverImage?.url);
   const fallbackImage = $derived(article?.images?.[0]?.url);
   const displayImage = $derived(coverImage ?? fallbackImage);
 </script>

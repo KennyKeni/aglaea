@@ -7,7 +7,7 @@
   import { Label } from '$lib/components/ui/label';
   import { Button } from '$lib/components/ui/button';
   import { Loader2 } from '@lucide/svelte';
-  import type { Article, ArticleCategory, ArticleImage, TiptapDoc, ArticleAuthor } from '$lib/types/article';
+  import type { Article, ArticleCategory, ArticleImage, TiptapDoc, ArticleAuthor, CoverImage } from '$lib/types/article';
   import { getHtmlExtensions } from '$lib/components/edra/editor';
   import { articles as articlesApi } from '$lib/api/endpoints/articles';
 
@@ -24,6 +24,7 @@
     ownerId: string | null;
     author: ArticleAuthor | null;
     categories: ArticleCategory[];
+    coverImage: CoverImage | null;
     images: ArticleImage[];
   }
 
@@ -119,6 +120,7 @@
       createdAt: editMeta?.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       categories: editMeta?.categories ?? [],
+      coverImage: editMeta?.coverImage ?? null,
       images: editMeta?.images ?? [],
     });
 

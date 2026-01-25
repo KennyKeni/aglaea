@@ -4,11 +4,16 @@ export interface ArticleCategory extends NamedRef {
   description: string | null;
 }
 
+export interface CoverImage {
+  imageId: string;
+  url: string;
+  mimeType: string | null;
+}
+
 export interface ArticleImage {
   imageId: string;
   url: string;
   mimeType: string | null;
-  isCover: boolean;
   sortOrder: number;
 }
 
@@ -37,5 +42,6 @@ export interface Article {
   createdAt: string;
   updatedAt: string;
   categories: ArticleCategory[];
+  coverImage: CoverImage | null;
   images: ArticleImage[];
 }

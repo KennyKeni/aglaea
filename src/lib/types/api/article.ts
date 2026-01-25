@@ -5,11 +5,16 @@ export const ArticleCategorySchema = NamedRefSchema.extend({
   description: z.string().nullable(),
 });
 
+export const CoverImageSchema = z.object({
+  imageId: z.string(),
+  url: z.string(),
+  mimeType: z.string().nullable(),
+});
+
 export const ArticleImageSchema = z.object({
   imageId: z.string(),
   url: z.string(),
   mimeType: z.string().nullable(),
-  isCover: z.boolean(),
   sortOrder: z.number(),
 });
 
@@ -53,6 +58,7 @@ export const ArticleSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   categories: z.array(ArticleCategorySchema),
+  coverImage: CoverImageSchema.nullable(),
   images: z.array(ArticleImageSchema),
 });
 
@@ -67,6 +73,7 @@ export const ArticleDeleteResponseSchema = z.object({
 
 export type Article = z.infer<typeof ArticleSchema>;
 export type ArticleCategory = z.infer<typeof ArticleCategorySchema>;
+export type CoverImage = z.infer<typeof CoverImageSchema>;
 export type ArticleImage = z.infer<typeof ArticleImageSchema>;
 export type ArticleAuthor = z.infer<typeof ArticleAuthorSchema>;
 export type TiptapDoc = z.infer<typeof TiptapDocSchema>;

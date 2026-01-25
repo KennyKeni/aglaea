@@ -67,3 +67,7 @@ src/lib/
 - Event listeners on window/document
 - Observers (Intersection, Resize, Mutation)
 - Intervals, WebSockets, third-party instances
+
+# Verification
+
+- Run `bun check` after code changes to verify TypeScript compiles
