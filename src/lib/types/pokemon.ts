@@ -2,7 +2,13 @@ import type { Ref, NamedRef } from './base';
 
 export type TypeRef = NamedRef;
 export type AbilityRef = NamedRef;
-export type MoveRef = NamedRef;
+export type MoveRef = NamedRef & {
+  type: NamedRef;
+  category: NamedRef;
+  power: number | null;
+  accuracy: number | null;
+  pp: number | null;
+};
 export type LabelRef = NamedRef;
 export type EggGroupRef = NamedRef;
 export type AspectRef = NamedRef;

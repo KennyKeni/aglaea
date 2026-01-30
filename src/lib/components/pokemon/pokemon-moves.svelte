@@ -29,13 +29,26 @@
         {#each moves as mv, i (`move-${i}-${mv.move.id}`)}
           <div class="rounded-xl border bg-background p-3 hover:bg-muted">
             <div class="flex items-start justify-between gap-3">
-              <div>
-                <div class="font-medium">{mv.move.name}</div>
-                <div class="mt-1 flex flex-wrap items-center gap-2">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">{mv.move.name}</span>
+                  <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">{mv.move.type.name}</span>
+                  <span class="text-xs text-muted-foreground">{mv.move.category.name}</span>
+                </div>
+                <div class="mt-1 flex flex-wrap items-center gap-3">
                   <span class="text-xs text-muted-foreground">{mv.method.name}</span>
                   {#if mv.level}
                     <span class="text-xs text-muted-foreground">Lv. {mv.level}</span>
                   {/if}
+                  <span class="text-xs text-muted-foreground">
+                    Pow: {mv.move.power ?? '—'}
+                  </span>
+                  <span class="text-xs text-muted-foreground">
+                    Acc: {mv.move.accuracy ?? '—'}
+                  </span>
+                  <span class="text-xs text-muted-foreground">
+                    PP: {mv.move.pp ?? '—'}
+                  </span>
                 </div>
               </div>
             </div>

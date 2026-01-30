@@ -23,8 +23,16 @@ const FormAbilitySchema = z.object({
   slot: AbilitySlotSchema,
 });
 
+const MoveRefSchema = NamedRefSchema.extend({
+  type: NamedRefSchema,
+  category: NamedRefSchema,
+  power: z.number().nullable(),
+  accuracy: z.number().nullable(),
+  pp: z.number().nullable(),
+});
+
 const FormMoveSchema = z.object({
-  move: NamedRefSchema,
+  move: MoveRefSchema,
   method: MoveMethodSchema,
   level: z.number().nullable(),
 });
