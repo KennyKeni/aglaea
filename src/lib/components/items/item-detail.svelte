@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
+	import RecipeDisplay from './recipe-display.svelte';
 	import type { Item } from '$lib/types/item';
 
 	let { item }: { item: Item } = $props();
@@ -44,6 +45,24 @@
 		</Card.Root>
 	</section>
 
+	<!-- Recipes -->
+	{#if item.recipes.length > 0}
+		<section id="recipes">
+			<h2 class="mb-4 text-lg font-semibold">Recipes</h2>
+			{#each item.recipes as recipe (recipe.id)}
+				<Card.Root class="mb-4">
+					<Card.Content class="p-4">
+						<RecipeDisplay
+							{recipe}
+							resultItem={{ id: item.id, name: item.name }}
+							resultCount={recipe.resultCount}
+						/>
+					</Card.Content>
+				</Card.Root>
+			{/each}
+		</section>
+	{/if}
+
 	<!-- Tags -->
 	{#if item.tags.length > 0}
 		<section id="tags">
@@ -71,7 +90,7 @@
 			<Card.Root>
 				<Card.Content class="p-4">
 					<div class="space-y-2">
-						{#each item.boosts as boost}
+						{#each item.boosts as boost (boost.stat.id)}
 							<div class="flex items-center gap-2">
 								<span class="font-medium">{boost.stat.name}</span>
 								<span
@@ -104,79 +123,6 @@
 					</div>
 				</Card.Content>
 			</Card.Root>
-		</section>
-	{/if}
-
-	<!-- Recipes -->
-	{#if item.recipes.length > 0}
-		<section id="recipes">
-			<h2 class="mb-4 text-lg font-semibold">Recipes</h2>
-			{#each item.recipes as recipe (recipe.id)}
-				<Card.Root class="mb-4">
-					<Card.Content class="p-4">
-						<div class="space-y-3">
-							<div class="flex flex-wrap items-center gap-3">
-								<span
-									class="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm font-medium"
-								>
-									{recipe.type.name}
-								</span>
-								<span class="text-sm text-muted-foreground">
-									Yields: {recipe.resultCount}
-								</span>
-								{#if recipe.experience}
-									<span class="text-sm text-muted-foreground">
-										XP: {recipe.experience}
-									</span>
-								{/if}
-								{#if recipe.cookingTime}
-									<span class="text-sm text-muted-foreground">
-										Time: {recipe.cookingTime}s
-									</span>
-								{/if}
-							</div>
-
-							{#if recipe.inputs.length > 0}
-								<div>
-									<div class="text-xs font-medium text-muted-foreground">Inputs</div>
-									<div class="mt-1 flex flex-wrap gap-2">
-										{#each recipe.inputs as input}
-											<span
-												class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium"
-											>
-												{input.item.name}
-												{#if input.slotType}
-													<span class="ml-1 text-muted-foreground">({input.slotType.name})</span>
-												{/if}
-											</span>
-										{/each}
-									</div>
-								</div>
-							{/if}
-
-							{#if recipe.tagInputs.length > 0}
-								<div>
-									<div class="text-xs font-medium text-muted-foreground">Tag Inputs</div>
-									<div class="mt-1 flex flex-wrap gap-2">
-										{#each recipe.tagInputs as tagInput}
-											<span
-												class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium"
-											>
-												{tagInput.tag.name}
-												{#if tagInput.slotType}
-													<span class="ml-1 text-muted-foreground"
-														>({tagInput.slotType.name})</span
-													>
-												{/if}
-											</span>
-										{/each}
-									</div>
-								</div>
-							{/if}
-						</div>
-					</Card.Content>
-				</Card.Root>
-			{/each}
 		</section>
 	{/if}
 </div>

@@ -42,13 +42,20 @@
 								{item.namespace.name}
 							</span>
 						{/if}
-						{#each item.tags as tag (tag.id)}
+						{#each item.tags.slice(0, 3) as tag (tag.id)}
 							<span
 								class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium"
 							>
 								{tag.name}
 							</span>
 						{/each}
+						{#if item.tags.length > 3}
+							<span
+								class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+							>
+								+{item.tags.length - 3}
+							</span>
+						{/if}
 					</div>
 				</div>
 
