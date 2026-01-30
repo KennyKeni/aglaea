@@ -1,26 +1,26 @@
 <script lang="ts">
-	import PokemonCard from './pokemon-card.svelte';
+	import MoveCard from './move-card.svelte';
 	import EntityGrid from '$lib/components/ui/entity-grid.svelte';
-	import type { Pokemon } from '$lib/types/pokemon';
+	import type { Move } from '$lib/types/move';
 
 	let {
-		pokemon,
+		moves,
 		isLoading = false,
 		isRefreshing = false,
 		skeletonCount = 8,
 	}: {
-		pokemon: Pokemon[];
+		moves: Move[];
 		isLoading?: boolean;
 		isRefreshing?: boolean;
 		skeletonCount?: number;
 	} = $props();
 </script>
 
-<EntityGrid items={pokemon} {isLoading} {isRefreshing} {skeletonCount}>
-	{#snippet card(mon)}
-		<PokemonCard pokemon={mon} href="/pokemon/{mon.id}" />
+<EntityGrid items={moves} {isLoading} {isRefreshing} {skeletonCount}>
+	{#snippet card(move)}
+		<MoveCard {move} href="/moves/{move.id}" />
 	{/snippet}
 	{#snippet skeleton()}
-		<PokemonCard loading />
+		<MoveCard loading />
 	{/snippet}
 </EntityGrid>

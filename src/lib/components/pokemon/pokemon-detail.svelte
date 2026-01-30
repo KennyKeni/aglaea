@@ -46,7 +46,7 @@
             <div class="text-xs font-medium text-muted-foreground">
               {formatId(pokemon.id)}
             </div>
-            <div class="text-3xl font-semibold">{pokemon.name}</div>
+            <div id="pokemon-title" class="text-3xl font-semibold">{pokemon.name}</div>
           </div>
           <div class="flex flex-wrap gap-2">
             {#each form.types as { type } (type.id)}

@@ -34,41 +34,42 @@
   {/if}
 </svelte:head>
 
-<DetailHeader
-  title={article?.title ?? ''}
-  closeHref={articleStore.getReturnHref('/articles')}
->
-  {#snippet actions()}
-    {#if article && can(Resource.Article, Action.Update)}
-      <Button
-        variant="ghost"
-        size="sm"
-        href="/articles/{article.id}/edit"
-        data-sveltekit-preload-data="off"
-      >
-        <Pencil class="mr-2 h-4 w-4" />
-        Edit
-      </Button>
-    {/if}
-  {/snippet}
-</DetailHeader>
-
-{#if !article}
-  <div class="px-4 py-4 md:px-6 md:py-6">
-    <LoadingSpinner class="py-20" />
-  </div>
-{:else}
-  <div class="px-4 py-4 md:px-6 md:py-6">
-    <div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
-      <div class="mx-auto max-w-4xl">
-        <ArticleContent {article} mode="full" />
-      </div>
-      {#if hasToc}
-        <aside class="hidden xl:block">
-          <Toc {toc} />
-        </aside>
+<div class="flex min-h-svh flex-col">
+  <DetailHeader
+    title={article?.title ?? ''}
+    closeHref={articleStore.getReturnHref('/articles')}
+  >
+    {#snippet actions()}
+      {#if article && can(Resource.Article, Action.Update)}
+        <Button
+          variant="ghost"
+          size="sm"
+          href="/articles/{article.id}/edit"
+          data-sveltekit-preload-data="off"
+        >
+          <Pencil class="mr-2 h-4 w-4" />
+          Edit
+        </Button>
       {/if}
+    {/snippet}
+  </DetailHeader>
+  {#if !article}
+    <div class="flex-1 px-4 py-4 md:px-6 md:py-6">
+      <LoadingSpinner class="py-20" />
     </div>
-  </div>
-  <DetailFooter />
-{/if}
+  {:else}
+    <div class="flex-1 px-4 py-4 md:px-6 md:py-6">
+      <div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
+        <div class="mx-auto max-w-4xl">
+          <ArticleContent {article} mode="full" />
+        </div>
+        {#if hasToc}
+          <aside class="hidden xl:block">
+            <Toc {toc} />
+          </aside>
+        {/if}
+      </div>
+    </div>
+    <DetailFooter />
+  {/if}
+</div>

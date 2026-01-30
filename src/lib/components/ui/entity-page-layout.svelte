@@ -9,7 +9,7 @@
   let { footerText, children }: Props = $props();
 </script>
 
-<div class="flex min-h-screen flex-col bg-muted/30">
+<div class="flex flex-1 flex-col bg-muted/30">
   <div class="flex-1">
     {@render children()}
   </div>

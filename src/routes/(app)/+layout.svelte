@@ -31,7 +31,7 @@
     {#if data.session && !data.session.user.emailVerified}
       <EmailVerificationBanner email={data.session.user.email} />
     {/if}
-    <main class="flex-1">
+    <main class="flex flex-1 flex-col">
       {@render children()}
     </main>
   </Sidebar.Inset>

@@ -40,7 +40,7 @@
 </script>
 
 <div class="space-y-4">
-  <Card.Root class="rounded-2xl">
+  <Card.Root id="training" class="rounded-2xl">
     <Card.Header class="pb-3">
       <Card.Title class="text-base">Training</Card.Title>
     </Card.Header>
@@ -80,7 +80,7 @@
     </Card.Content>
   </Card.Root>
 
-  <Card.Root class="rounded-2xl">
+  <Card.Root id="breeding" class="rounded-2xl">
     <Card.Header class="pb-3">
       <Card.Title class="text-base">Breeding</Card.Title>
     </Card.Header>
@@ -121,7 +121,7 @@
     </Card.Content>
   </Card.Root>
 
-  <Card.Root class="rounded-2xl">
+  <Card.Root id="physical" class="rounded-2xl">
     <Card.Header class="pb-3">
       <Card.Title class="text-base">Physical</Card.Title>
     </Card.Header>
@@ -154,7 +154,7 @@
   </Card.Root>
 
   {#if form?.labels?.length}
-    <Card.Root class="rounded-2xl">
+    <Card.Root id="labels" class="rounded-2xl">
       <Card.Header class="pb-3">
         <Card.Title class="flex items-center gap-2 text-base">
           <Sparkles class="h-4 w-4" />
@@ -172,7 +172,7 @@
   {/if}
 
   {#if form?.spawns?.length}
-    <Card.Root class="rounded-2xl">
+    <Card.Root id="spawn-locations" class="rounded-2xl">
       <Card.Header class="pb-3">
         <Card.Title class="flex items-center gap-2 text-base">
           <MapPin class="h-4 w-4" />
@@ -204,7 +204,7 @@
   {/if}
 
   {#if form?.drops && (form.drops.percentages.length || form.drops.ranges.length)}
-    <Card.Root class="rounded-2xl">
+    <Card.Root id="drops" class="rounded-2xl">
       <Card.Header class="pb-3">
         <Card.Title class="flex items-center gap-2 text-base">
           <Droplets class="h-4 w-4" />

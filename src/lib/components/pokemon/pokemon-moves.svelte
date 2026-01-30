@@ -6,7 +6,7 @@
   let { moves = [], loading = false }: { moves?: FormMove[]; loading?: boolean } = $props();
 </script>
 
-<Card.Root class="rounded-2xl">
+<Card.Root id="moves" class="rounded-2xl">
   <Card.Header class="pb-3">
     <div>
       <Card.Title class="text-base">Moves</Card.Title>

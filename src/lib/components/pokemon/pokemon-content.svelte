@@ -57,18 +57,20 @@
     </div>
   {/if}
 
-  <PokemonDetail pokemon={dataSource} form={activeForm} loading={isLoading} />
+  <div id="overview">
+    <PokemonDetail pokemon={dataSource} form={activeForm} loading={isLoading} />
+  </div>
 
   <div class="h-4"></div>
 
-  <Tabs.Root value="moves" class="w-full">
-    <Tabs.List class="grid w-full grid-cols-2 rounded-2xl">
-      <Tabs.Trigger value="moves">Moves</Tabs.Trigger>
-      <Tabs.Trigger value="details">Details</Tabs.Trigger>
-    </Tabs.List>
+  {#if isPeek}
+    <Tabs.Root value="moves" class="w-full">
+      <Tabs.List class="grid w-full grid-cols-2 rounded-2xl">
+        <Tabs.Trigger value="moves">Moves</Tabs.Trigger>
+        <Tabs.Trigger value="details">Details</Tabs.Trigger>
+      </Tabs.List>
 
-    <Tabs.Content value="moves" class="mt-4">
-      {#if isPeek}
+      <Tabs.Content value="moves" class="mt-4">
         <Card.Root class="rounded-2xl">
           <Card.Header class="pb-3">
             <div class="flex items-start justify-between gap-3">
@@ -92,13 +94,9 @@
             </div>
           </Card.Content>
         </Card.Root>
-      {:else}
-        <PokemonMoves moves={activeForm.moves} loading={isLoading} />
-      {/if}
-    </Tabs.Content>
+      </Tabs.Content>
 
-    <Tabs.Content value="details" class="mt-4">
-      {#if isPeek}
+      <Tabs.Content value="details" class="mt-4">
         <Card.Root class="rounded-2xl">
           <Card.Header class="pb-3">
             <div class="flex items-start justify-between gap-3">
@@ -122,9 +120,12 @@
             </div>
           </Card.Content>
         </Card.Root>
-      {:else}
-        <PokemonDetailsTab form={activeForm} pokemon={dataSource} loading={isLoading} />
-      {/if}
-    </Tabs.Content>
-  </Tabs.Root>
+      </Tabs.Content>
+    </Tabs.Root>
+  {:else}
+    <div class="space-y-4">
+      <PokemonMoves moves={activeForm.moves} loading={isLoading} />
+      <PokemonDetailsTab form={activeForm} pokemon={dataSource} loading={isLoading} />
+    </div>
+  {/if}
 {/if}
