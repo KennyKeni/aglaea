@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { ArticleContent, ArticleToc } from '$lib/components/articles';
+  import { ArticleContent } from '$lib/components/articles';
   import DetailFooter from '$lib/components/ui/detail-footer.svelte';
+  import Toc from '$lib/components/ui/toc.svelte';
+  import DetailHeader from '$lib/components/ui/detail-header.svelte';
   import { Button } from '$lib/components/ui/button';
   import LoadingSpinner from '$lib/components/ui/loading-spinner.svelte';
-  import { Pencil, X } from '@lucide/svelte';
+  import { Pencil } from '@lucide/svelte';
   import { can } from '$lib/state/permissions.svelte';
   import { Resource, Action } from '$lib/types/auth';
   import { articleStore } from '$lib/state/article-store.svelte';
@@ -32,27 +34,24 @@
   {/if}
 </svelte:head>
 
-<header class="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
-  <div class="flex min-h-14 items-center justify-between gap-3 px-4 py-3">
-    <h1 class="min-w-0 truncate text-sm font-semibold">{article?.title ?? ''}</h1>
-    <div class="flex items-center gap-2">
-      {#if article && can(Resource.Article, Action.Update)}
-        <Button
-          variant="ghost"
-          size="sm"
-          href="/articles/{article.id}/edit"
-          data-sveltekit-preload-data="off"
-        >
-          <Pencil class="mr-2 h-4 w-4" />
-          Edit
-        </Button>
-      {/if}
-      <Button variant="ghost" size="icon" href={articleStore.getReturnHref('/articles')} aria-label="Close">
-        <X class="h-4 w-4" />
+<DetailHeader
+  title={article?.title ?? ''}
+  closeHref={articleStore.getReturnHref('/articles')}
+>
+  {#snippet actions()}
+    {#if article && can(Resource.Article, Action.Update)}
+      <Button
+        variant="ghost"
+        size="sm"
+        href="/articles/{article.id}/edit"
+        data-sveltekit-preload-data="off"
+      >
+        <Pencil class="mr-2 h-4 w-4" />
+        Edit
       </Button>
-    </div>
-  </div>
-</header>
+    {/if}
+  {/snippet}
+</DetailHeader>
 
 {#if !article}
   <div class="px-4 py-4 md:px-6 md:py-6">
@@ -66,7 +65,7 @@
       </div>
       {#if hasToc}
         <aside class="hidden xl:block">
-          <ArticleToc {toc} />
+          <Toc {toc} />
         </aside>
       {/if}
     </div>
