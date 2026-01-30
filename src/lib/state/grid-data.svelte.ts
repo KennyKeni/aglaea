@@ -72,6 +72,8 @@ export class GridDataStateImpl<T> implements GridDataState<T> {
   }
 
   search(query: string) {
+    if (query === this.searchQuery) return;
+
     this.searchQuery = query;
 
     if (this.#searchTimeout) {

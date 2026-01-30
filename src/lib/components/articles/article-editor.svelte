@@ -6,6 +6,7 @@
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import { Button } from '$lib/components/ui/button';
+  import { ImageUpload } from '$lib/components/ui/image-upload';
   import { Loader2 } from '@lucide/svelte';
   import type { Article, ArticleCategory, ArticleImage, TiptapDoc, ArticleAuthor, CoverImage } from '$lib/types/article';
   import { getHtmlExtensions } from '$lib/components/edra/editor';
@@ -51,6 +52,8 @@
   let title = $state('');
   let subtitle = $state('');
   let description = $state('');
+  let coverImageId = $state<string | null>(null);
+  let coverImageUrl = $state<string | null>(null);
   let initialized = $state(false);
 
   $effect(() => {
@@ -58,6 +61,8 @@
     title = initialTitle;
     subtitle = initialSubtitle;
     description = initialDescription;
+    coverImageId = editMeta?.coverImage?.imageId ?? null;
+    coverImageUrl = editMeta?.coverImage?.url ?? null;
     initialized = true;
   });
 
@@ -93,6 +98,7 @@
       subtitle: subtitle || null,
       description: description || null,
       content,
+      coverImageId,
     };
 
     const result = isCreateMode
@@ -107,6 +113,10 @@
 
     const contentHtml = generateHTML(content, getHtmlExtensions());
 
+    const savedCoverImage: CoverImage | null = coverImageId && coverImageUrl
+      ? { imageId: coverImageId, url: coverImageUrl, mimeType: null }
+      : null;
+
     onSave({
       id: result.data.id,
       slug: result.data.slug,
@@ -120,7 +130,7 @@
       createdAt: editMeta?.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       categories: editMeta?.categories ?? [],
-      coverImage: editMeta?.coverImage ?? null,
+      coverImage: savedCoverImage,
       images: editMeta?.images ?? [],
     });
 
@@ -183,6 +193,11 @@
         disabled={isSaving}
         placeholder="Brief description for previews"
       />
+    </div>
+
+    <div class="space-y-2">
+      <Label>Cover Image</Label>
+      <ImageUpload bind:imageId={coverImageId} bind:imageUrl={coverImageUrl} disabled={isSaving} />
     </div>
   </div>
 
