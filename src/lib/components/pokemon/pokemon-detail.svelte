@@ -4,6 +4,7 @@
   import { Progress } from '$lib/components/ui/progress';
   import { cn } from '$lib/utils';
   import { TYPE_COLORS, formatId, getArtworkUrl, getStatTotal, clamp } from '$lib/utils/pokemon';
+  import { abilityUrl } from '$lib/utils/url';
   import type { Pokemon, Form } from '$lib/types/pokemon';
 
   let {
@@ -66,7 +67,9 @@
           <div class="flex flex-wrap gap-2">
             {#each form.abilities as ab (`${ab.ability.id}-${ab.slot.id}`)}
               <Badge variant="outline" class="rounded-full px-3 py-1">
-                {ab.ability.name}
+                <a href={abilityUrl(ab.ability.id)} class="hover:underline">
+                  {ab.ability.name}
+                </a>
                 {#if ab.slot.slug === 'hidden'}
                   <span class="ml-1 text-xs text-muted-foreground">(Hidden)</span>
                 {/if}

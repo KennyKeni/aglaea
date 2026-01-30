@@ -251,16 +251,11 @@
 				<Card.Content class="p-4">
 					<div class="space-y-2">
 						{#each move.forms as form (form.id)}
-							<a
-								href={pokemonUrl(form.speciesId, form.id)}
-								class="block rounded-xl border bg-background p-3 hover:bg-muted"
-							>
-								<div class="flex items-center gap-3">
-									<div class="min-w-0 flex-1">
-										<span class="font-medium">{form.name}</span>
-									</div>
-								</div>
-							</a>
+							<div class="rounded-xl border bg-background p-3">
+								<a href={pokemonUrl(form.speciesId, form.id)} class="font-medium hover:underline">
+									{form.name}
+								</a>
+							</div>
 						{/each}
 					</div>
 				</Card.Content>

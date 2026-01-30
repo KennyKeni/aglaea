@@ -8,7 +8,7 @@
   import { Skeleton } from '$lib/components/ui/skeleton';
   import { Maximize2 } from '@lucide/svelte';
   import { cn } from '$lib/utils';
-  import type { Pokemon } from '$lib/types/pokemon';
+  import type { Pokemon, FormMove } from '$lib/types/pokemon';
 
   export type ContentMode = 'peek' | 'full' | 'loading';
 
@@ -32,6 +32,19 @@
   const activeForm = $derived(dataSource.forms[formIndex] ?? null);
   const isLoading = $derived(mode === 'loading');
   const isPeek = $derived(mode === 'peek');
+
+  const moveGroups = $derived.by(() => {
+    if (!activeForm) return [];
+    const map = new Map<string, { name: string; moves: FormMove[] }>();
+    for (const mv of activeForm.moves) {
+      const key = mv.method.slug;
+      if (!map.has(key)) {
+        map.set(key, { name: mv.method.name, moves: [] });
+      }
+      map.get(key)!.moves.push(mv);
+    }
+    return [...map.values()];
+  });
 
   $effect(() => {
     pokemon.id;
@@ -131,7 +144,9 @@
     </Tabs.Root>
   {:else}
     <div class="space-y-4">
-      <PokemonMoves moves={activeForm.moves} loading={isLoading} />
+      {#each moveGroups as group (group.name)}
+        <PokemonMoves title={group.name} moves={group.moves} loading={isLoading} />
+      {/each}
       <PokemonDetailsTab form={activeForm} pokemon={dataSource} loading={isLoading} />
     </div>
   {/if}
