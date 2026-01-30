@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FormRefSchema } from './base';
 
 export const AbilityFlagSchema = z.object({
 	id: z.number(),
@@ -14,4 +15,5 @@ export const AbilitySchema = z.object({
 	desc: z.string().nullable(),
 	shortDesc: z.string().nullable(),
 	flags: z.array(AbilityFlagSchema),
+	forms: z.array(FormRefSchema),
 });

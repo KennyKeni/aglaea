@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import { PokemonContent } from '$lib/components/pokemon';
   import DetailFooter from '$lib/components/ui/detail-footer.svelte';
   import DetailHeader from '$lib/components/ui/detail-header.svelte';
@@ -16,6 +17,10 @@
 
   const pokemon = $derived(data.pokemon);
   const activeForm = $derived(pokemon.forms[0] ?? null);
+  const initialFormId = $derived.by(() => {
+    const raw = page.url.searchParams.get('form');
+    return raw ? Number(raw) : undefined;
+  });
 
   const toc = $derived.by(() => {
     const items: TocItem[] = [
@@ -55,8 +60,8 @@
 
   <div class="flex-1 px-4 py-4 md:px-6 md:py-6">
     <div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
-      <div class="mx-auto max-w-5xl">
-        <PokemonContent pokemon={pokemon} fullPokemon={pokemon} mode="full" />
+      <div class="mx-auto max-w-5xl md:min-w-2xl">
+        <PokemonContent pokemon={pokemon} fullPokemon={pokemon} mode="full" {initialFormId} />
       </div>
       {#if toc.length > 0}
         <aside class="hidden xl:block">

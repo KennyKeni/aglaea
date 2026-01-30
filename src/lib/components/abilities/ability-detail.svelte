@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import type { Ability } from '$lib/types/ability';
+	import { pokemonUrl } from '$lib/utils/url';
 
 	let { ability }: { ability: Ability } = $props();
 </script>
@@ -37,6 +38,31 @@
 									<span class="text-sm text-muted-foreground"> — {flag.description}</span>
 								{/if}
 							</div>
+						{/each}
+					</div>
+				</Card.Content>
+			</Card.Root>
+		</section>
+	{/if}
+
+	<!-- Forms -->
+	{#if ability.forms.length > 0}
+		<section id="forms">
+			<h2 class="mb-4 text-lg font-semibold">Forms</h2>
+			<Card.Root>
+				<Card.Content class="p-4">
+					<div class="space-y-2">
+						{#each ability.forms as form (form.id)}
+							<a
+								href={pokemonUrl(form.speciesId, form.id)}
+								class="block rounded-xl border bg-background p-3 hover:bg-muted"
+							>
+								<div class="flex items-center gap-3">
+									<div class="min-w-0 flex-1">
+										<span class="font-medium">{form.name}</span>
+									</div>
+								</div>
+							</a>
 						{/each}
 					</div>
 				</Card.Content>

@@ -13,6 +13,7 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
 		includeEffects: true,
 		includeZData: true,
 		includeGmaxSpecies: true,
+		includeForms: true,
 	});
 
 	if (!result.ok) {

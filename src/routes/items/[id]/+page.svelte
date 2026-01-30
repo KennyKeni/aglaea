@@ -46,7 +46,7 @@
 
 	<div class="flex-1 px-4 py-4 md:px-6 md:py-6">
 		<div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
-			<div class="mx-auto max-w-5xl">
+			<div class="mx-auto max-w-5xl md:min-w-2xl">
 				<ItemDetail {item} />
 			</div>
 			{#if toc.length > 0}

@@ -3,6 +3,7 @@
 	import { cn } from '$lib/utils';
 	import { TYPE_COLORS } from '$lib/utils/pokemon';
 	import type { Move } from '$lib/types/move';
+	import { pokemonUrl } from '$lib/utils/url';
 
 	let { move }: { move: Move } = $props();
 </script>
@@ -230,10 +231,35 @@
 					<div class="flex flex-wrap gap-2">
 						{#each move.gmaxSpecies as species (species.id)}
 							<a
-								href="/pokemon/{species.id}"
+								href={pokemonUrl(species.id)}
 								class="rounded-full bg-muted px-3 py-1 text-sm font-medium hover:bg-muted/80"
 							>
 								{species.name}
+							</a>
+						{/each}
+					</div>
+				</Card.Content>
+			</Card.Root>
+		</section>
+	{/if}
+
+	<!-- Forms -->
+	{#if move.forms.length > 0}
+		<section id="forms">
+			<h2 class="mb-4 text-lg font-semibold">Forms</h2>
+			<Card.Root>
+				<Card.Content class="p-4">
+					<div class="space-y-2">
+						{#each move.forms as form (form.id)}
+							<a
+								href={pokemonUrl(form.speciesId, form.id)}
+								class="block rounded-xl border bg-background p-3 hover:bg-muted"
+							>
+								<div class="flex items-center gap-3">
+									<div class="min-w-0 flex-1">
+										<span class="font-medium">{form.name}</span>
+									</div>
+								</div>
 							</a>
 						{/each}
 					</div>

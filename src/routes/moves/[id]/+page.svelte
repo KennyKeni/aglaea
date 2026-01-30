@@ -35,6 +35,9 @@
 		if (move.gmaxSpecies.length > 0) {
 			items.push({ id: 'gmax-species', text: 'G-Max Species', level: 2 });
 		}
+		if (move.forms.length > 0) {
+			items.push({ id: 'forms', text: 'Forms', level: 2 });
+		}
 		return items;
 	});
 </script>
@@ -49,7 +52,7 @@
 
 	<div class="flex-1 px-4 py-4 md:px-6 md:py-6">
 		<div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
-			<div class="mx-auto max-w-5xl">
+			<div class="mx-auto max-w-5xl md:min-w-2xl">
 				<MoveDetail {move} />
 			</div>
 			{#if toc.length > 0}

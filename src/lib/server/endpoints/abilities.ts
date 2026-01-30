@@ -13,6 +13,7 @@ export interface AbilitySearchParams {
 
 export interface AbilityDetailParams {
 	includeFlags?: boolean;
+	includeForms?: boolean;
 }
 
 function buildSearchQuery(params: AbilitySearchParams): URLSearchParams {
@@ -29,6 +30,7 @@ function buildSearchQuery(params: AbilitySearchParams): URLSearchParams {
 function buildDetailQuery(params: AbilityDetailParams): URLSearchParams {
 	const q = new URLSearchParams();
 	if (params.includeFlags) q.set('includeFlags', 'true');
+	if (params.includeForms) q.set('includeForms', 'true');
 	return q;
 }
 

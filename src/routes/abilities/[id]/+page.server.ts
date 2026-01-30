@@ -9,6 +9,7 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
 
 	const result = await abilityApi.getById(params.id, {
 		includeFlags: true,
+		includeForms: true,
 	});
 
 	if (!result.ok) {

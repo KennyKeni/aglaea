@@ -16,11 +16,13 @@
     pokemon,
     fullPokemon = null,
     mode = 'full',
+    initialFormId,
     onExpand,
   }: {
     pokemon: Pokemon;
     fullPokemon?: Pokemon | null;
     mode?: ContentMode;
+    initialFormId?: number | undefined;
     onExpand?: () => void;
   } = $props();
 
@@ -33,7 +35,12 @@
 
   $effect(() => {
     pokemon.id;
-    formIndex = 0;
+    if (initialFormId != null) {
+      const idx = dataSource.forms.findIndex((f) => f.id === initialFormId);
+      formIndex = idx >= 0 ? idx : 0;
+    } else {
+      formIndex = 0;
+    }
   });
 </script>
 

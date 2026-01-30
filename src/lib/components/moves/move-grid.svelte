@@ -2,6 +2,7 @@
 	import MoveCard from './move-card.svelte';
 	import EntityGrid from '$lib/components/ui/entity-grid.svelte';
 	import type { Move } from '$lib/types/move';
+	import { moveUrl } from '$lib/utils/url';
 
 	let {
 		moves,
@@ -18,7 +19,7 @@
 
 <EntityGrid items={moves} {isLoading} {isRefreshing} {skeletonCount}>
 	{#snippet card(move)}
-		<MoveCard {move} href="/moves/{move.id}" />
+		<MoveCard {move} href={moveUrl(move.id)} />
 	{/snippet}
 	{#snippet skeleton()}
 		<MoveCard loading />

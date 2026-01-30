@@ -2,6 +2,7 @@
 	import ItemCard from './item-card.svelte';
 	import EntityGrid from '$lib/components/ui/entity-grid.svelte';
 	import type { Item } from '$lib/types/item';
+	import { itemUrl } from '$lib/utils/url';
 
 	let {
 		items,
@@ -18,7 +19,7 @@
 
 <EntityGrid {items} {isLoading} {isRefreshing} {skeletonCount}>
 	{#snippet card(item)}
-		<ItemCard {item} href="/items/{item.id}" />
+		<ItemCard {item} href={itemUrl(item.id)} />
 	{/snippet}
 	{#snippet skeleton()}
 		<ItemCard loading />

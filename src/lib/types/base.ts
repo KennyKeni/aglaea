@@ -7,6 +7,10 @@ export interface NamedRef extends Ref {
   slug: string;
 }
 
+export interface FormRef extends NamedRef {
+  speciesId: number;
+}
+
 export interface Paginated<T> {
   data: T[];
   total: number;

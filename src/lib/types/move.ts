@@ -1,4 +1,4 @@
-import type { NamedRef } from './base';
+import type { FormRef, NamedRef } from './base';
 
 export interface MoveCategory {
 	id: number;
@@ -86,4 +86,5 @@ export interface Move {
 	maxPower: number | null;
 	zData: MoveZData | null;
 	gmaxSpecies: NamedRef[];
+	forms: FormRef[];
 }

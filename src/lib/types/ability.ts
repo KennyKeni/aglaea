@@ -1,3 +1,5 @@
+import type { FormRef } from './base';
+
 export interface AbilityFlag {
 	id: number;
 	slug: string;
@@ -12,4 +14,5 @@ export interface Ability {
 	desc: string | null;
 	shortDesc: string | null;
 	flags: AbilityFlag[];
+	forms: FormRef[];
 }

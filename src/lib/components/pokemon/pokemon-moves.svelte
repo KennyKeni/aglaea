@@ -2,6 +2,7 @@
   import * as Card from '$lib/components/ui/card';
   import { Skeleton } from '$lib/components/ui/skeleton';
   import type { FormMove } from '$lib/types/pokemon';
+  import { moveUrl } from '$lib/utils/url';
 
   let { moves = [], loading = false }: { moves?: FormMove[]; loading?: boolean } = $props();
 </script>
@@ -31,7 +32,7 @@
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2">
-                  <span class="font-medium">{mv.move.name}</span>
+                  <a href={moveUrl(mv.move.id)} class="font-medium hover:underline">{mv.move.name}</a>
                   <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">{mv.move.type.name}</span>
                   <span class="text-xs text-muted-foreground">{mv.move.category.name}</span>
                 </div>

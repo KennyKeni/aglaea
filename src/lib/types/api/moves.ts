@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NamedRefSchema } from './base';
+import { FormRefSchema, NamedRefSchema } from './base';
 
 const MoveCategorySchema = z.object({
 	id: z.number(),
@@ -87,4 +87,5 @@ export const MoveSchema = z.object({
 	maxPower: z.number().nullable(),
 	zData: MoveZDataSchema.nullable(),
 	gmaxSpecies: z.array(NamedRefSchema),
+	forms: z.array(FormRefSchema),
 });

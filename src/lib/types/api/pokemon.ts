@@ -189,3 +189,4 @@ export const PokemonSchema = z.object({
   riding: RidingSchema.nullable(),
   forms: z.array(FormSchema),
 });
+

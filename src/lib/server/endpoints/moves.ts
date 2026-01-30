@@ -31,6 +31,7 @@ export interface MoveDetailParams {
 	includeEffects?: boolean;
 	includeZData?: boolean;
 	includeGmaxSpecies?: boolean;
+	includeForms?: boolean;
 }
 
 function buildSearchQuery(params: MoveSearchParams): URLSearchParams {
@@ -53,6 +54,7 @@ function buildDetailQuery(params: MoveDetailParams): URLSearchParams {
 	if (params.includeEffects) q.set('includeEffects', 'true');
 	if (params.includeZData) q.set('includeZData', 'true');
 	if (params.includeGmaxSpecies) q.set('includeGmaxSpecies', 'true');
+	if (params.includeForms) q.set('includeForms', 'true');
 	return q;
 }
 

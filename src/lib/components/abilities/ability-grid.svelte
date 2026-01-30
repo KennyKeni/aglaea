@@ -2,6 +2,7 @@
 	import AbilityCard from './ability-card.svelte';
 	import EntityGrid from '$lib/components/ui/entity-grid.svelte';
 	import type { Ability } from '$lib/types/ability';
+	import { abilityUrl } from '$lib/utils/url';
 
 	let {
 		abilities,
@@ -18,7 +19,7 @@
 
 <EntityGrid items={abilities} {isLoading} {isRefreshing} {skeletonCount}>
 	{#snippet card(ability)}
-		<AbilityCard {ability} href="/abilities/{ability.id}" />
+		<AbilityCard {ability} href={abilityUrl(ability.id)} />
 	{/snippet}
 	{#snippet skeleton()}
 		<AbilityCard loading />

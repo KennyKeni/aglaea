@@ -2,6 +2,7 @@
 	import type { Recipe } from '$lib/types/item';
 	import { ArrowRight } from '@lucide/svelte';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { itemUrl } from '$lib/utils/url';
 
 	let {
 		recipe,
@@ -77,7 +78,7 @@
 					{#if cell}
 						{#if cell.type === 'item' && cell.id}
 							<a
-								href="/items/{cell.id}"
+								href={itemUrl(cell.id)}
 								class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 								title={cell.name}
 							>
@@ -100,7 +101,7 @@
 			<div class="flex flex-wrap gap-1.5">
 				{#each recipe.inputs as input (input.item.id)}
 					<a
-						href="/items/{input.item.id}"
+						href={itemUrl(input.item.id)}
 						class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 						title={input.item.name}
 					>
@@ -121,7 +122,7 @@
 				<!-- Input slot -->
 				{#if recipe.inputs[0]}
 					<a
-						href="/items/{recipe.inputs[0].item.id}"
+						href={itemUrl(recipe.inputs[0].item.id)}
 						class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 						title={recipe.inputs[0].item.name}
 					>
@@ -145,7 +146,7 @@
 		{:else if isStonecutting}
 			{#if recipe.inputs[0]}
 				<a
-					href="/items/{recipe.inputs[0].item.id}"
+					href={itemUrl(recipe.inputs[0].item.id)}
 					class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 					title={recipe.inputs[0].item.name}
 				>
@@ -169,7 +170,7 @@
 					{#if template}
 						{#if template.type === 'item' && template.id}
 							<a
-								href="/items/{template.id}"
+								href={itemUrl(template.id)}
 								class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 								title={template.name}
 							>
@@ -192,7 +193,7 @@
 					{#if base}
 						{#if base.type === 'item' && base.id}
 							<a
-								href="/items/{base.id}"
+								href={itemUrl(base.id)}
 								class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 								title={base.name}
 							>
@@ -215,7 +216,7 @@
 					{#if addition}
 						{#if addition.type === 'item' && addition.id}
 							<a
-								href="/items/{addition.id}"
+								href={itemUrl(addition.id)}
 								class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 								title={addition.name}
 							>
@@ -239,7 +240,7 @@
 			<div class="flex flex-wrap gap-1.5">
 				{#each recipe.inputs as input (input.item.id)}
 					<a
-						href="/items/{input.item.id}"
+						href={itemUrl(input.item.id)}
 						class="flex h-20 w-20 items-center justify-center rounded border bg-muted p-1 text-center text-sm leading-tight hover:border-primary hover:bg-muted/80"
 						title={input.item.name}
 					>
