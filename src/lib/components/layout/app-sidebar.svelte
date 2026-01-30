@@ -22,8 +22,13 @@
       return fullUrl === href || fullUrl.startsWith(href + '&');
     }
 
-    if (href === '/articles') {
-      return page.url.pathname === '/articles' && !page.url.searchParams.has('categories');
+    const hasSubItems = navigation.some(
+      (section) =>
+        section.children.length > 1 &&
+        section.children[0]?.href === href
+    );
+    if (hasSubItems) {
+      return page.url.pathname === href && page.url.search === '';
     }
 
     return page.url.pathname === href || page.url.pathname.startsWith(href + '/');

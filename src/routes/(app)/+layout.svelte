@@ -7,6 +7,18 @@
 
   const navigation = $derived(
     baseNavigation.map((section) => {
+      if (section.label === 'Moves') {
+        return {
+          ...section,
+          children: [
+            { label: 'All', href: '/moves' },
+            ...data.moveCategories.map((cat: { name: string; slug: string }) => ({
+              label: cat.name,
+              href: `/moves?categories=${cat.slug}`,
+            })),
+          ],
+        };
+      }
       if (section.label === 'Articles') {
         return {
           ...section,

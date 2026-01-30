@@ -84,10 +84,10 @@ export function createMoveEndpoint(client: ServerClient) {
 
 		getCategories: async (limit = 9999): Promise<ApiResponse<{ data: FilterOption[] }>> => {
 			const result = await client.get(
-				'/move-categories',
+				'/moves/categories',
 				new URLSearchParams({ limit: String(limit) }),
 			);
-			return validate(result, FilterDataSchema);
+			return validate(result, PaginatedSchema(FilterItemSchema));
 		},
 	};
 }

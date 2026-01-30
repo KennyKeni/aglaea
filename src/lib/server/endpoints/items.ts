@@ -12,10 +12,6 @@ const FilterItemSchema = z
 	})
 	.catchall(z.unknown());
 
-const FilterDataSchema = z.object({
-	data: z.array(FilterItemSchema),
-});
-
 export interface ItemSearchParams {
 	name?: string;
 	limit?: number;
@@ -69,12 +65,14 @@ export function createItemEndpoint(client: ServerClient) {
 			return validate(result, ItemSchema);
 		},
 
-		getTags: async (limit = 9999): Promise<ApiResponse<{ data: FilterOption[] }>> => {
+		getTags: async (
+			limit = 9999,
+		): Promise<ApiResponse<{ data: FilterOption[]; total: number; limit: number; offset: number }>> => {
 			const result = await client.get(
-				'/item-tags',
+				'/items/tags',
 				new URLSearchParams({ limit: String(limit) }),
 			);
-			return validate(result, FilterDataSchema);
+			return validate(result, PaginatedSchema(FilterItemSchema));
 		},
 	};
 }
