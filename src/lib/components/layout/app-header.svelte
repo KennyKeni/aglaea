@@ -26,6 +26,9 @@
     const path = page.url.pathname;
     if (path.startsWith('/pokemon')) return { entity: 'pokemon', label: 'Pokemon' };
     if (path.startsWith('/articles')) return { entity: 'articles', label: 'Articles' };
+    if (path.startsWith('/moves')) return { entity: 'moves', label: 'Moves' };
+    if (path.startsWith('/abilities')) return { entity: 'abilities', label: 'Abilities' };
+    if (path.startsWith('/items')) return { entity: 'items', label: 'Items' };
     return null;
   });
 

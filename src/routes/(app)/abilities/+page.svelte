@@ -5,7 +5,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { AbilityGrid, AbilityFilters } from '$lib/components/abilities';
+	import { AbilityGrid } from '$lib/components/abilities';
 	import Pagination from '$lib/components/ui/pagination.svelte';
 	import { abilityStore } from '$lib/state/ability-store.svelte';
 	import type { Ability } from '$lib/types/ability';
@@ -77,10 +77,6 @@
 		return abilities;
 	});
 </script>
-
-<div class="mx-auto max-w-6xl px-4 pt-4">
-	<AbilityFilters />
-</div>
 
 <AbilityGrid
 	abilities={displayAbilities}
