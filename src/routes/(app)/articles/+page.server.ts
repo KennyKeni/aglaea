@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   async function fetchArticles(
     categorySlugs: string[] | undefined,
     offset: number,
+    title?: string,
   ): Promise<{ articles: Article[]; filteredCount: number }> {
     const result = await articlesApi.search({
       includeCategories: true,
@@ -22,6 +23,7 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
       limit: PAGE_SIZE,
       offset,
       ...(categorySlugs && { categorySlugs }),
+      ...(title && { title }),
     });
     if (!result.ok) return { articles: [], filteredCount: 0 };
     return { articles: result.data.data ?? [], filteredCount: result.data.total ?? 0 };
@@ -37,10 +39,11 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   const requestedPage = Math.max(1, parseInt(pageParam ?? '1', 10));
   const categoriesParam = url.searchParams.get('categories');
 
+  const searchTerm = url.searchParams.get('search');
   const offset = (requestedPage - 1) * PAGE_SIZE;
   const categorySlugs = categoriesParam ? categoriesParam.split(',').filter(Boolean) : undefined;
 
-  const articlesPromise = fetchArticles(categorySlugs, offset);
+  const articlesPromise = fetchArticles(categorySlugs, offset, searchTerm ?? undefined);
   const categoriesPromise = fetchCategories();
 
   // Client navigation: return promises directly for streaming

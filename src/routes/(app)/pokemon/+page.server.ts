@@ -52,11 +52,14 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
 
   const offset = (requestedPage - 1) * PAGE_SIZE;
 
+  const searchTerm = url.searchParams.get('search');
+
   const searchParams: PokemonSearchParams = {
     includeTypes: true,
     includeAbilities: true,
     limit: PAGE_SIZE,
     offset,
+    ...(searchTerm && { name: searchTerm }),
   };
 
   if (typesParam) {

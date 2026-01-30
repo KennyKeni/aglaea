@@ -100,15 +100,10 @@
   });
 
   $effect(() => {
-    if (!isLoading && !pokemonStore.searchQuery) {
+    if (!isLoading) {
       pokemonStore.setItems(pokemon);
       pokemonStore.setPage(data.currentPage);
     }
-  });
-
-  $effect(() => {
-    const query = page.url.searchParams.get('search') || '';
-    pokemonStore.search(query);
   });
 
   function handlePageChange(newPage: number) {
@@ -118,7 +113,6 @@
   }
 
   const displayPokemon = $derived.by(() => {
-    if (pokemonStore.searchQuery) return pokemonStore.items;
     if (hasCachedItems && isLoading) return pokemonStore.items;
     return pokemon;
   });
@@ -135,7 +129,7 @@
   skeletonCount={data.pageSize}
 />
 
-{#if !pokemonStore.searchQuery && filteredCount > 0}
+{#if !page.url.searchParams.has('search') && filteredCount > 0}
   <div class="mx-auto max-w-6xl px-4 pb-8">
     <Pagination
       currentPage={data.currentPage}

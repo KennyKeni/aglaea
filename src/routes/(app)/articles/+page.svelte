@@ -78,15 +78,10 @@
   });
 
   $effect(() => {
-    if (!isLoading && !articleStore.searchQuery) {
+    if (!isLoading) {
       articleStore.setItems(articles);
       articleStore.setPage(data.currentPage);
     }
-  });
-
-  $effect(() => {
-    const query = page.url.searchParams.get('search') || '';
-    articleStore.search(query);
   });
 
   function handlePageChange(newPage: number) {
@@ -96,7 +91,6 @@
   }
 
   const displayArticles = $derived.by(() => {
-    if (articleStore.searchQuery) return articleStore.items;
     if (hasCachedItems && isLoading) return articleStore.items;
     return articles;
   });
@@ -122,7 +116,7 @@
   skeletonCount={data.pageSize}
 />
 
-{#if !articleStore.searchQuery && filteredCount > 0}
+{#if !page.url.searchParams.has('search') && filteredCount > 0}
   <div class="mx-auto max-w-6xl px-4 pb-8">
     <Pagination
       currentPage={data.currentPage}

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { invalidateAll, replaceState } from '$app/navigation';
+  import { invalidateAll, goto } from '$app/navigation';
   import { page } from '$app/state';
+  import { onDestroy } from 'svelte';
   import { authClient } from '$lib/auth-client';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
@@ -13,6 +14,7 @@
 
   let searchQuery = $state(page.url.searchParams.get('search') ?? '');
   let isDark = $state(browser ? document.documentElement.classList.contains('dark') : false);
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   function toggleTheme() {
     isDark = !isDark;
@@ -37,17 +39,29 @@
 
     if (!searchContext) return;
 
-    const params = new URLSearchParams(page.url.searchParams);
-    if (searchQuery.trim()) {
-      params.set('search', searchQuery);
-      params.delete('page');
-    } else {
-      params.delete('search');
-    }
-    const queryString = params.toString();
-    const basePath = `/${searchContext.entity}`;
-    replaceState(queryString ? `${basePath}?${queryString}` : basePath, {});
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+      const params = new URLSearchParams(page.url.searchParams);
+      if (searchQuery.trim()) {
+        params.set('search', searchQuery);
+        params.delete('page');
+      } else {
+        params.delete('search');
+      }
+      const queryString = params.toString();
+      const basePath = `/${searchContext.entity}`;
+      goto(queryString ? `${basePath}?${queryString}` : basePath, {
+        replaceState: true,
+        keepFocus: true,
+        noScroll: true,
+      });
+    }, 300);
   }
+
+  onDestroy(() => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+  });
 
   async function handleSignOut() {
     await authClient.signOut();

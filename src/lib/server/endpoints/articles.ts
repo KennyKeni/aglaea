@@ -6,6 +6,7 @@ import type { Article, ArticleCategory } from '$lib/types/api';
 import { z } from 'zod';
 
 export interface ArticleSearchParams {
+	title?: string;
 	limit?: number;
 	offset?: number;
 	categorySlugs?: string[];
@@ -22,6 +23,7 @@ export interface ArticleDetailParams {
 
 function buildSearchQuery(params: ArticleSearchParams): URLSearchParams {
 	const q = new URLSearchParams();
+	if (params.title) q.set('title', params.title);
 	if (params.limit) q.set('limit', String(params.limit));
 	if (params.offset) q.set('offset', String(params.offset));
 	if (params.includeCategories) q.set('includeCategories', 'true');

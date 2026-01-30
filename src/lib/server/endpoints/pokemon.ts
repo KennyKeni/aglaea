@@ -17,6 +17,7 @@ const FilterDataSchema = z.object({
 });
 
 export interface PokemonSearchParams {
+	name?: string;
 	limit?: number;
 	offset?: number;
 	typeSlugs?: string[];
@@ -54,6 +55,7 @@ export interface PokemonDetailParams {
 
 function buildSearchQuery(params: PokemonSearchParams): URLSearchParams {
 	const q = new URLSearchParams();
+	if (params.name) q.set('name', params.name);
 	if (params.limit) q.set('limit', String(params.limit));
 	if (params.offset) q.set('offset', String(params.offset));
 	if (params.includeTypes) q.set('includeTypes', 'true');
