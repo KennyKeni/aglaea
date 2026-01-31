@@ -4,8 +4,10 @@
   import DetailFooter from '$lib/components/ui/detail-footer.svelte';
   import DetailHeader from '$lib/components/ui/detail-header.svelte';
   import Toc from '$lib/components/ui/toc.svelte';
+  import EditButton from '$lib/components/ui/edit-button.svelte';
   import { pokemonStore } from '$lib/state/pokemon-store.svelte';
   import { formatId } from '$lib/utils/pokemon';
+  import { Resource } from '$lib/types/auth';
   import type { Pokemon } from '$lib/types/pokemon';
   import type { TocItem } from '$lib/utils/toc';
 
@@ -56,7 +58,11 @@
   <DetailHeader
     title="{pokemon.name} {formatId(pokemon.id)}"
     closeHref={pokemonStore.getReturnHref('/pokemon')}
-  />
+  >
+    {#snippet actions()}
+      <EditButton resource={Resource.Pokemon} href="/pokemon/{pokemon.id}/edit" />
+    {/snippet}
+  </DetailHeader>
 
   <div class="flex-1 px-4 py-4 md:px-6 md:py-6">
     <div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">

@@ -4,7 +4,7 @@
 
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
-  import { ArrowRight, Clock, Database, FileText, Shield, Zap } from '@lucide/svelte';
+  import { ArrowRight, Clock, Database, FileText, Package, Shield } from '@lucide/svelte';
 
   const categories = [
     {
@@ -12,21 +12,21 @@
       icon: Database,
       href: '/pokemon',
       desc: 'Browse Cobblemon species, stats, abilities, and evolution chains.',
-      meta: '151 Species',
+      meta: 'Species',
     },
     {
       title: 'Articles & Guides',
       icon: FileText,
       href: '/articles',
       desc: 'Guides, tutorials, and tips for Cobblemon players.',
-      meta: '12 Articles',
+      meta: 'Articles',
     },
     {
-      title: 'Component Library',
-      icon: Zap,
-      href: '/demo',
-      desc: 'Reusable UI components and design system showcase.',
-      meta: '24 Components',
+      title: 'Items',
+      icon: Package,
+      href: '/items',
+      desc: 'Cobblemon items, crafting recipes, and drop sources.',
+      meta: 'Items & Recipes',
     },
     {
       title: 'Account',

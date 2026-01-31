@@ -7,11 +7,9 @@
   import { goto } from '$app/navigation';
   import { ArticleGrid, ArticleFilters } from '$lib/components/articles';
   import Pagination from '$lib/components/ui/pagination.svelte';
-  import { Button } from '$lib/components/ui/button';
-  import { Plus } from '@lucide/svelte';
+  import CreateButton from '$lib/components/ui/create-button.svelte';
   import { articleStore } from '$lib/state/article-store.svelte';
-  import { can } from '$lib/state/permissions.svelte';
-  import { Resource, Action } from '$lib/types/auth';
+  import { Resource } from '$lib/types/auth';
   import type { Article } from '$lib/types/article';
   import type { FilterOption } from '$lib/utils/filters';
   import type { Streamable } from '$lib/utils/streaming';
@@ -101,12 +99,7 @@
     <div class="flex-1">
       <ArticleFilters {categories} />
     </div>
-    {#if can(Resource.Article, Action.Create)}
-      <Button href="/articles/new">
-        <Plus class="mr-2 h-4 w-4" />
-        New Article
-      </Button>
-    {/if}
+    <CreateButton resource={Resource.Article} href="/articles/new" label="New Article" />
   </div>
 </div>
 

@@ -12,6 +12,8 @@
 
   let activeId = $state<string | null>(null);
 
+  const SCROLL_OFFSET = 80; // 5rem – matches sticky header height
+
   function scrollToId(id: string, behavior: ScrollBehavior = 'smooth') {
     const target = document.getElementById(id);
     if (!target) return;
@@ -21,11 +23,12 @@
       const targetRect = target.getBoundingClientRect();
       const viewportRect = viewport.getBoundingClientRect();
       viewport.scrollTo({
-        top: viewport.scrollTop + targetRect.top - viewportRect.top - 20,
+        top: viewport.scrollTop + targetRect.top - viewportRect.top - SCROLL_OFFSET,
         behavior,
       });
     } else {
-      target.scrollIntoView({ behavior });
+      const top = target.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET;
+      window.scrollTo({ top, behavior });
     }
   }
 

@@ -3,11 +3,9 @@
   import DetailFooter from '$lib/components/ui/detail-footer.svelte';
   import Toc from '$lib/components/ui/toc.svelte';
   import DetailHeader from '$lib/components/ui/detail-header.svelte';
-  import { Button } from '$lib/components/ui/button';
   import LoadingSpinner from '$lib/components/ui/loading-spinner.svelte';
-  import { Pencil } from '@lucide/svelte';
-  import { can } from '$lib/state/permissions.svelte';
-  import { Resource, Action } from '$lib/types/auth';
+  import EditButton from '$lib/components/ui/edit-button.svelte';
+  import { Resource } from '$lib/types/auth';
   import { articleStore } from '$lib/state/article-store.svelte';
   import type { Article } from '$lib/types/article';
   import type { TocItem } from '$lib/utils/toc';
@@ -40,16 +38,8 @@
     closeHref={articleStore.getReturnHref('/articles')}
   >
     {#snippet actions()}
-      {#if article && can(Resource.Article, Action.Update)}
-        <Button
-          variant="ghost"
-          size="sm"
-          href="/articles/{article.id}/edit"
-          data-sveltekit-preload-data="off"
-        >
-          <Pencil class="mr-2 h-4 w-4" />
-          Edit
-        </Button>
+      {#if article}
+        <EditButton resource={Resource.Article} href="/articles/{article.id}/edit" />
       {/if}
     {/snippet}
   </DetailHeader>

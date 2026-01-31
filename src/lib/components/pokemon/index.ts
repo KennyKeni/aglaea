@@ -5,3 +5,7 @@ export { default as PokemonContent } from './pokemon-content.svelte';
 export { default as PokemonMoves } from './pokemon-moves.svelte';
 export { default as PokemonDetailsTab } from './pokemon-details-tab.svelte';
 export { default as PokemonFilters } from './pokemon-filters.svelte';
+export { default as PokemonEditor } from './pokemon-editor.svelte';
+export { default as MovesEditor } from './moves-editor.svelte';
+export { default as SpawnsEditor } from './spawns-editor.svelte';
+export { default as DropsEditor } from './drops-editor.svelte';

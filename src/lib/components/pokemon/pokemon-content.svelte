@@ -9,6 +9,7 @@
   import { Maximize2 } from '@lucide/svelte';
   import { cn } from '$lib/utils';
   import type { Pokemon, FormMove } from '$lib/types/pokemon';
+  import { methodOrder } from '$lib/config/pokemon';
 
   export type ContentMode = 'peek' | 'full' | 'loading';
 
@@ -18,12 +19,14 @@
     mode = 'full',
     initialFormId,
     onExpand,
+    editing = false,
   }: {
     pokemon: Pokemon;
     fullPokemon?: Pokemon | null;
     mode?: ContentMode;
     initialFormId?: number | undefined;
     onExpand?: () => void;
+    editing?: boolean;
   } = $props();
 
   let formIndex = $state(0);
@@ -31,19 +34,21 @@
   const dataSource = $derived(fullPokemon ?? pokemon);
   const activeForm = $derived(dataSource.forms[formIndex] ?? null);
   const isLoading = $derived(mode === 'loading');
-  const isPeek = $derived(mode === 'peek');
+  const isPeek = $derived(mode === 'peek' && !editing);
 
   const moveGroups = $derived.by(() => {
     if (!activeForm) return [];
-    const map = new Map<string, { name: string; moves: FormMove[] }>();
+    const map = new Map<string, { slug: string; name: string; moves: FormMove[] }>();
     for (const mv of activeForm.moves) {
       const key = mv.method.slug;
       if (!map.has(key)) {
-        map.set(key, { name: mv.method.name, moves: [] });
+        map.set(key, { slug: key, name: mv.method.name, moves: [] });
       }
       map.get(key)!.moves.push(mv);
     }
-    return [...map.values()];
+    return [...map.values()].sort(
+      (a, b) => (methodOrder[a.slug] ?? 99) - (methodOrder[b.slug] ?? 99),
+    );
   });
 
   $effect(() => {
@@ -58,7 +63,7 @@
 </script>
 
 {#if activeForm}
-  {#if dataSource.forms.length > 1}
+  {#if dataSource.forms.length > 1 && !editing}
     <div class="mb-4 flex flex-wrap items-center gap-2">
       <span class="text-xs text-muted-foreground">Form:</span>
       {#each dataSource.forms as form, idx (`${dataSource.id}-form-${idx}`)}
@@ -78,7 +83,7 @@
   {/if}
 
   <div id="overview">
-    <PokemonDetail pokemon={dataSource} form={activeForm} loading={isLoading} />
+    <PokemonDetail pokemon={dataSource} form={activeForm} loading={isLoading} {editing} />
   </div>
 
   <div class="h-4"></div>
@@ -145,9 +150,9 @@
   {:else}
     <div class="space-y-4">
       {#each moveGroups as group (group.name)}
-        <PokemonMoves title={group.name} moves={group.moves} loading={isLoading} />
+        <PokemonMoves title={group.name} moves={group.moves} loading={isLoading} {editing} methodSlug={group.slug} />
       {/each}
-      <PokemonDetailsTab form={activeForm} pokemon={dataSource} loading={isLoading} />
+      <PokemonDetailsTab form={activeForm} pokemon={dataSource} loading={isLoading} {editing} />
     </div>
   {/if}
 {/if}

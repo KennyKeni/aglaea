@@ -13,10 +13,7 @@
   <div class="mx-auto max-w-2xl space-y-2">
     <p>Thanks for reading</p>
     <p class="text-xs">
-      Have feedback or found an issue?
-      <a href="/feedback" class="underline underline-offset-4 hover:text-foreground">
-        Let us know
-      </a>
+      Message Zmjjkk on Discord
     </p>
   </div>
 </footer>
