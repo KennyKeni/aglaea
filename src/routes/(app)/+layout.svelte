@@ -50,6 +50,15 @@
           ],
         };
       }
+      if (section.label === 'Items') {
+        return {
+          ...section,
+          children: [
+            { label: 'All', href: '/items' },
+            { label: 'Battle Items', href: '/items?tags=battle-items' },
+          ],
+        };
+      }
       return section;
     }),
   );

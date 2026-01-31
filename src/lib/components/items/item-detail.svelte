@@ -37,8 +37,8 @@
 						</span>
 					</div>
 
-					{#if item.desc}
-						<p class="text-sm text-muted-foreground">{item.desc}</p>
+					{#if item.desc || item.shortDesc}
+						<p class="text-sm text-muted-foreground">{item.desc || item.shortDesc}</p>
 					{/if}
 				</div>
 			</Card.Content>
