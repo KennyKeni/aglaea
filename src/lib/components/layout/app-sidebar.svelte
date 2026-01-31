@@ -7,7 +7,10 @@
   import * as Sidebar from '$lib/components/ui/sidebar';
   import * as Collapsible from '$lib/components/ui/collapsible';
   import type { Navigation, NavLink } from '$lib/types/navigation';
-  import { ChevronRight } from '@lucide/svelte';
+  import { ChevronRight, Search } from '@lucide/svelte';
+  import { createCommandPalette } from '$lib/state/command-palette.svelte';
+
+  const commandPalette = createCommandPalette();
 
   interface Props {
     navigation: Navigation;
@@ -75,6 +78,22 @@
   </Sidebar.Header>
 
   <Sidebar.Content>
+    <Sidebar.Group>
+      <Sidebar.GroupContent>
+        <Sidebar.Menu>
+          <Sidebar.MenuItem>
+            <Sidebar.MenuButton
+              tooltipContent="Search"
+              onclick={() => commandPalette.show()}
+            >
+              <Search class="size-4" />
+              <span>Search</span>
+            </Sidebar.MenuButton>
+          </Sidebar.MenuItem>
+        </Sidebar.Menu>
+      </Sidebar.GroupContent>
+    </Sidebar.Group>
+
     <Sidebar.Group>
       <Sidebar.GroupLabel>Entities</Sidebar.GroupLabel>
       <Sidebar.GroupContent>
