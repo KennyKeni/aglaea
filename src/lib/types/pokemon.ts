@@ -1,5 +1,10 @@
 import type { Ref, NamedRef } from './base';
 
+export interface ImageRef {
+  id: string;
+  url: string;
+}
+
 export type TypeRef = NamedRef;
 export type AbilityRef = NamedRef;
 export type MoveRef = NamedRef & {
@@ -134,6 +139,14 @@ export interface Spawn {
   conditions: SpawnCondition[];
 }
 
+export interface FormOverrides {
+  catchRate?: number;
+  baseFriendship?: number;
+  eggCycles?: number;
+  maleRatio?: number | null;
+  baseScale?: number | null;
+}
+
 export interface Form {
   id: number;
   name: string;
@@ -143,11 +156,7 @@ export interface Form {
   generation: number | null;
   height: number;
   weight: number;
-  catchRate: number;
-  baseFriendship: number;
-  eggCycles: number;
-  maleRatio: number | null;
-  baseScale: number | null;
+  overrides: FormOverrides | null;
   baseHp: number;
   baseAttack: number;
   baseDefence: number;
@@ -171,6 +180,7 @@ export interface Form {
   aspectCombos: AspectCombo[];
   behaviour: Behaviour | null;
   spawns: Spawn[];
+  image: ImageRef | null;
 }
 
 export interface ExperienceGroup {
@@ -186,6 +196,11 @@ export interface Pokemon {
   slug: string;
   description: string | null;
   generation: number;
+  catchRate: number;
+  baseFriendship: number;
+  eggCycles: number;
+  maleRatio: number | null;
+  baseScale: number | null;
   experienceGroup: ExperienceGroup | null;
   eggGroups: EggGroupRef[];
   hitbox: Hitbox | null;

@@ -72,7 +72,7 @@
 <Collapsible.Root bind:open={expanded}>
   <Card.Root id="moves" class="rounded-2xl">
     <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-    <Card.Header class="cursor-pointer pb-3" onclick={() => (expanded = !expanded)}>
+    <Card.Header class="cursor-pointer" onclick={() => (expanded = !expanded)}>
       <div class="flex items-center justify-between">
         <div>
           <Card.Title class="text-base">{title}</Card.Title>

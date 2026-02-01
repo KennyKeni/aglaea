@@ -41,7 +41,7 @@
 </script>
 
 <Card.Root id="spawn-locations" class="rounded-2xl">
-  <Card.Header class="pb-3">
+  <Card.Header>
     <Card.Title class="flex items-center gap-2 text-base">
       <MapPin class="h-4 w-4" />
       Spawn Locations

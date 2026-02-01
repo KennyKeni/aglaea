@@ -9,14 +9,18 @@
     | { mode: 'uploading'; fileName: string; progress: number; abortController: AbortController }
     | { mode: 'error'; message: string };
 
+  import { cn } from '$lib/utils';
+
   let {
     imageId = $bindable<string | null>(null),
     imageUrl = $bindable<string | null>(null),
     disabled = false,
+    class: className = '',
   }: {
     imageId: string | null;
     imageUrl: string | null;
     disabled?: boolean;
+    class?: string;
   } = $props();
 
   let uploadState: UploadState = $state({ mode: 'idle' });
@@ -88,11 +92,11 @@
 </script>
 
 {#if imageUrl && uploadState.mode === 'idle'}
-  <div class="relative overflow-hidden rounded-lg border">
+  <div class={cn('relative overflow-hidden rounded-lg border', className)}>
     <img
       src={imageUrl}
       alt="Cover"
-      class="aspect-video w-full object-cover"
+      class="h-full w-full object-contain"
     />
     <div class="absolute right-2 top-2">
       <Button
@@ -107,7 +111,7 @@
     </div>
   </div>
 {:else if uploadState.mode === 'uploading'}
-  <div class="flex flex-col gap-3 rounded-lg border p-4">
+  <div class={cn('flex flex-col gap-3 rounded-lg border p-4', className)}>
     <div class="flex items-center gap-2 text-sm text-muted-foreground">
       <ImageIcon class="size-4" />
       <span class="flex-1 truncate">Uploading {uploadState.fileName}...</span>
@@ -121,7 +125,7 @@
     </div>
   </div>
 {:else if uploadState.mode === 'error'}
-  <div class="flex flex-col items-center gap-3 rounded-lg border p-4">
+  <div class={cn('flex flex-col items-center gap-3 rounded-lg border p-4', className)}>
     <p class="text-sm text-destructive">{uploadState.message}</p>
     <Button variant="outline" size="sm" onclick={() => (uploadState = { mode: 'idle' })} type="button">
       Try again
@@ -130,9 +134,9 @@
 {:else}
   <button
     type="button"
-    class="flex w-full cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed p-6 transition-colors hover:border-primary/50 hover:bg-muted {isDragOver
+    class={cn('flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-6 transition-colors hover:border-primary/50 hover:bg-muted', isDragOver
       ? 'border-primary bg-primary/5'
-      : 'border-muted-foreground/25'}"
+      : 'border-muted-foreground/25', className)}
     ondrop={handleDrop}
     ondragover={(e) => { e.preventDefault(); isDragOver = true; }}
     ondragleave={(e) => { e.preventDefault(); isDragOver = false; }}

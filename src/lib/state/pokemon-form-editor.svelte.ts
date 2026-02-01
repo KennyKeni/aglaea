@@ -1,5 +1,4 @@
 import type {
-	Pokemon,
 	Form,
 	FormType,
 	FormAbility,
@@ -10,6 +9,7 @@ import type {
 	AbilitySlot,
 } from '$lib/types/pokemon';
 import type { SearchResult } from '$lib/types/search';
+import type { FormInput, FormOverridesInput } from '$lib/api/endpoints/pokemon';
 
 export interface BaseStats {
 	hp: number;
@@ -36,17 +36,26 @@ const ABILITY_SLOTS: AbilitySlot[] = [
 ];
 
 export class PokemonFormEditor {
-	// Species
-	speciesName = $state('');
-	speciesDescription = $state<string | null>(null);
-	speciesGeneration = $state(1);
-	speciesExperienceGroupId = $state<number | null>(null);
-	speciesEggGroupIds = $state<number[]>([]);
+	formId = $state<number | null>(null);
+	isNew = $state(false);
 
 	// Form identity
+	name = $state('');
 	formName = $state('');
 	formTypes = $state<FormType[]>([]);
 	formAbilities = $state<FormAbility[]>([]);
+
+	// Override toggles + values
+	overrideCatchRate = $state(false);
+	catchRate = $state(0);
+	overrideBaseFriendship = $state(false);
+	baseFriendship = $state(0);
+	overrideEggCycles = $state(false);
+	eggCycles = $state(0);
+	overrideMaleRatio = $state(false);
+	maleRatio = $state<number | null>(null);
+	overrideBaseScale = $state(false);
+	baseScale = $state<number | null>(null);
 
 	// Base stats
 	baseStats = $state<BaseStats>({
@@ -69,16 +78,15 @@ export class PokemonFormEditor {
 	});
 
 	// Training
-	catchRate = $state(0);
-	baseFriendship = $state(0);
 	baseExperienceYield = $state<number | null>(null);
-	eggCycles = $state(0);
-	maleRatio = $state<number | null>(null);
 
 	// Physical
 	height = $state(0);
 	weight = $state(0);
-	baseScale = $state<number | null>(null);
+
+	// Cover image
+	coverImageId = $state<string | null>(null);
+	coverImageUrl = $state<string | null>(null);
 
 	// Collections
 	formLabels = $state<LabelRef[]>([]);
@@ -137,14 +145,21 @@ export class PokemonFormEditor {
 		this.formLabels = this.formLabels.filter((_, i) => i !== index);
 	}
 
-	initFromPokemon(pokemon: Pokemon, form: Form) {
-		this.speciesName = pokemon.name;
-		this.speciesDescription = pokemon.description;
-		this.speciesGeneration = pokemon.generation;
-		this.speciesExperienceGroupId = pokemon.experienceGroup?.id ?? null;
-		this.speciesEggGroupIds = pokemon.eggGroups.map((g) => g.id);
+	initFromForm(
+		form: Form,
+		speciesDefaults: {
+			catchRate: number;
+			baseFriendship: number;
+			eggCycles: number;
+			maleRatio: number | null;
+			baseScale: number | null;
+		},
+	) {
+		this.formId = form.id;
+		this.isNew = false;
 
-		this.formName = form.name;
+		this.name = form.name;
+		this.formName = form.fullName;
 		this.formTypes = structuredClone(form.types);
 		this.formAbilities = structuredClone(form.abilities);
 		this.formMoves = structuredClone(form.moves);
@@ -170,14 +185,81 @@ export class PokemonFormEditor {
 			speed: form.evSpeed,
 		};
 
-		this.catchRate = form.catchRate;
-		this.baseFriendship = form.baseFriendship;
 		this.baseExperienceYield = form.baseExperienceYield;
-		this.eggCycles = form.eggCycles;
-		this.maleRatio = form.maleRatio;
 		this.height = form.height;
 		this.weight = form.weight;
-		this.baseScale = form.baseScale;
+
+		// Override toggles: on if override exists, value from override; otherwise from species default
+		const ov = form.overrides;
+		this.overrideCatchRate = ov?.catchRate !== undefined;
+		this.catchRate = ov?.catchRate ?? speciesDefaults.catchRate;
+		this.overrideBaseFriendship = ov?.baseFriendship !== undefined;
+		this.baseFriendship = ov?.baseFriendship ?? speciesDefaults.baseFriendship;
+		this.overrideEggCycles = ov?.eggCycles !== undefined;
+		this.eggCycles = ov?.eggCycles ?? speciesDefaults.eggCycles;
+		this.overrideMaleRatio = ov?.maleRatio !== undefined;
+		this.maleRatio = ov?.maleRatio !== undefined ? ov.maleRatio : speciesDefaults.maleRatio;
+		this.overrideBaseScale = ov?.baseScale !== undefined;
+		this.baseScale = ov?.baseScale !== undefined ? ov.baseScale : speciesDefaults.baseScale;
+
+		this.coverImageId = form.image?.id ?? null;
+		this.coverImageUrl = form.image?.url ?? null;
+	}
+
+	toFormInput(speciesId?: number): FormInput {
+		const overrides: FormOverridesInput = {};
+		let hasOverrides = false;
+
+		if (this.overrideCatchRate) {
+			overrides.catchRate = this.catchRate;
+			hasOverrides = true;
+		}
+		if (this.overrideBaseFriendship) {
+			overrides.baseFriendship = this.baseFriendship;
+			hasOverrides = true;
+		}
+		if (this.overrideEggCycles) {
+			overrides.eggCycles = this.eggCycles;
+			hasOverrides = true;
+		}
+		if (this.overrideMaleRatio) {
+			overrides.maleRatio = this.maleRatio;
+			hasOverrides = true;
+		}
+		if (this.overrideBaseScale) {
+			overrides.baseScale = this.baseScale;
+			hasOverrides = true;
+		}
+
+		return {
+			name: this.name,
+			formName: this.formName,
+			...(speciesId != null ? { speciesId } : {}),
+			height: this.height,
+			weight: this.weight,
+			baseExperienceYield: this.baseExperienceYield,
+			overrides: hasOverrides ? overrides : null,
+			baseHp: this.baseStats.hp,
+			baseAttack: this.baseStats.attack,
+			baseDefence: this.baseStats.defence,
+			baseSpecialAttack: this.baseStats.specialAttack,
+			baseSpecialDefence: this.baseStats.specialDefence,
+			baseSpeed: this.baseStats.speed,
+			evHp: this.evs.hp,
+			evAttack: this.evs.attack,
+			evDefence: this.evs.defence,
+			evSpecialAttack: this.evs.specialAttack,
+			evSpecialDefence: this.evs.specialDefence,
+			evSpeed: this.evs.speed,
+			types: this.formTypes.map((t) => ({ typeId: t.type.id, slot: t.slot })),
+			abilities: this.formAbilities.map((a) => ({ abilityId: a.ability.id, slotId: a.slot.id })),
+			moves: this.formMoves.map((m) => ({
+				moveId: m.move.id,
+				methodId: m.method.id,
+				level: m.level,
+			})),
+			labelIds: this.formLabels.map((l) => l.id),
+		};
 	}
 }
 

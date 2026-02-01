@@ -70,7 +70,7 @@
 </script>
 
 <Card.Root id="drops" class="rounded-2xl">
-  <Card.Header class="pb-3">
+  <Card.Header>
     <div class="flex items-center justify-between">
       <Card.Title class="flex items-center gap-2 text-base">
         <Droplets class="h-4 w-4" />

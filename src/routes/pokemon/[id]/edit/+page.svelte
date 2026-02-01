@@ -5,6 +5,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import DetailHeader from '$lib/components/ui/detail-header.svelte';
+  import FormActionBar from '$lib/components/ui/form-action-bar.svelte';
   import LoadingSpinner from '$lib/components/ui/loading-spinner.svelte';
   import type { Pokemon } from '$lib/types/pokemon';
   import { formatId } from '$lib/utils/pokemon';
@@ -23,6 +24,9 @@
     goto(`/pokemon/${data.pokemon.id}`);
   }
 
+  let isSaving = $state(false);
+  let save = $state(() => {});
+
   const editorPromise = import('$lib/components/pokemon/pokemon-editor.svelte');
 </script>
 
@@ -40,9 +44,16 @@
         <PokemonEditor
           pokemon={data.pokemon}
           onSave={handleSave}
-          onCancel={handleCancel}
+          bind:isSaving
+          bind:save
         />
       {/await}
     </div>
   </div>
+
+  <FormActionBar
+    onsave={save}
+    oncancel={handleCancel}
+    {isSaving}
+  />
 </div>

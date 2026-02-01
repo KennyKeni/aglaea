@@ -39,7 +39,7 @@
   <MovesEditor {title} {moves} bind:allMoves methodSlug={methodSlug ?? ''} {...initialMoveIds ? { initialMoveIds } : {}} />
 {:else}
   <Card.Root id="moves" class="rounded-2xl">
-    <Card.Header class="pb-3">
+    <Card.Header>
       <div>
         <Card.Title class="text-base">{title}</Card.Title>
         <div class="mt-1 text-sm text-muted-foreground">

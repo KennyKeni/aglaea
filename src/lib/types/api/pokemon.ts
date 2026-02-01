@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { RefSchema, NamedRefSchema } from './base';
 
+const ImageRefSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+});
+
 const AbilitySlotSchema = z.object({
   id: z.number(),
   slug: z.string(),
@@ -130,6 +135,14 @@ const SpawnSchema = z.object({
   conditions: z.array(SpawnConditionSchema),
 });
 
+const FormOverridesSchema = z.object({
+  catchRate: z.number().optional(),
+  baseFriendship: z.number().optional(),
+  eggCycles: z.number().optional(),
+  maleRatio: z.number().nullable().optional(),
+  baseScale: z.number().nullable().optional(),
+});
+
 export const FormSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -139,11 +152,7 @@ export const FormSchema = z.object({
   generation: z.number().nullable(),
   height: z.number(),
   weight: z.number(),
-  catchRate: z.number(),
-  baseFriendship: z.number(),
-  eggCycles: z.number(),
-  maleRatio: z.number().nullable(),
-  baseScale: z.number().nullable(),
+  overrides: FormOverridesSchema.nullable(),
   baseHp: z.number(),
   baseAttack: z.number(),
   baseDefence: z.number(),
@@ -167,6 +176,7 @@ export const FormSchema = z.object({
   aspectCombos: z.array(AspectComboSchema),
   behaviour: BehaviourSchema.nullable(),
   spawns: z.array(SpawnSchema),
+  image: ImageRefSchema.nullable(),
 });
 
 export const ExperienceGroupSchema = z.object({
@@ -182,6 +192,11 @@ export const PokemonSchema = z.object({
   slug: z.string(),
   description: z.string().nullable(),
   generation: z.number(),
+  catchRate: z.number(),
+  baseFriendship: z.number(),
+  eggCycles: z.number(),
+  maleRatio: z.number().nullable(),
+  baseScale: z.number().nullable(),
   experienceGroup: ExperienceGroupSchema.nullable(),
   eggGroups: z.array(NamedRefSchema),
   hitbox: HitboxSchema.nullable(),

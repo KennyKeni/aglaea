@@ -11,24 +11,35 @@ const MutationResponseSchema = z.object({
 type MutationResponse = z.infer<typeof MutationResponseSchema>;
 
 export interface SpeciesInput {
+	id?: number;
 	name?: string;
 	description?: string | null;
 	generation?: number;
+	catchRate?: number;
+	baseFriendship?: number;
+	eggCycles?: number;
+	maleRatio?: number | null;
+	baseScale?: number | null;
 	experienceGroupId?: number | null;
 	eggGroupIds?: number[];
 }
 
+export interface FormOverridesInput {
+	catchRate?: number | null;
+	baseFriendship?: number | null;
+	eggCycles?: number | null;
+	maleRatio?: number | null;
+	baseScale?: number | null;
+}
+
 export interface FormInput {
 	name?: string;
+	formName?: string;
 	speciesId?: number;
 	height?: number;
 	weight?: number;
-	baseScale?: number | null;
-	catchRate?: number;
-	baseFriendship?: number;
 	baseExperienceYield?: number | null;
-	eggCycles?: number;
-	maleRatio?: number | null;
+	overrides?: FormOverridesInput | null;
 	baseHp?: number;
 	baseAttack?: number;
 	baseDefence?: number;
@@ -103,6 +114,19 @@ export const pokemon = {
 
 	createForm: async (input: FormInput): Promise<ApiResponse<MutationResponse>> => {
 		const result = await client.post('/pokemon/forms', input);
+		return validate(result, MutationResponseSchema);
+	},
+
+	deleteForm: async (id: number | string): Promise<ApiResponse<MutationResponse>> => {
+		const result = await client.delete(`/pokemon/forms/${id}`);
+		return validate(result, MutationResponseSchema);
+	},
+
+	setFormImage: async (
+		id: number | string,
+		imageId: string | null,
+	): Promise<ApiResponse<MutationResponse>> => {
+		const result = await client.put(`/pokemon/forms/${id}/image`, { imageId });
 		return validate(result, MutationResponseSchema);
 	},
 };
