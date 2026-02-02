@@ -2,7 +2,8 @@
   import * as Card from '$lib/components/ui/card';
   import { Skeleton } from '$lib/components/ui/skeleton';
   import { cn } from '$lib/utils';
-  import { TYPE_COLORS, formatId, getArtworkUrl } from '$lib/utils/pokemon';
+  import { TYPE_COLORS, formatId } from '$lib/utils/pokemon';
+  import ImageOff from '@lucide/svelte/icons/image-off';
   import type { Pokemon } from '$lib/types/pokemon';
 
   let {
@@ -61,11 +62,18 @@
             </div>
           </div>
           <div class="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl bg-muted p-2">
-            <img
-              src={getArtworkUrl(pokemon.id)}
-              alt={pokemon.name}
-              class="max-h-full max-w-full object-contain"
-            />
+            {#if pokemon.image?.url}
+              <img
+                src={pokemon.image.url}
+                alt={pokemon.name}
+                class="max-h-full max-w-full object-contain"
+              />
+            {:else}
+              <div class="flex flex-col items-center justify-center gap-1 text-muted-foreground/40">
+                <ImageOff class="h-8 w-8" />
+                <span class="text-xs">No image</span>
+              </div>
+            {/if}
           </div>
         </div>
         <div class="mt-3 line-clamp-3 text-sm text-muted-foreground">

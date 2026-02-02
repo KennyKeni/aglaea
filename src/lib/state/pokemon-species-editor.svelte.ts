@@ -13,6 +13,8 @@ export class PokemonSpeciesEditor {
 	baseScale = $state<number | null>(null);
 	experienceGroupId = $state<number | null>(null);
 	eggGroupIds = $state<number[]>([]);
+	coverImageId = $state<string | null>(null);
+	coverImageUrl = $state<string | null>(null);
 
 	initFromPokemon(pokemon: Pokemon) {
 		this.id = pokemon.id;
@@ -26,6 +28,8 @@ export class PokemonSpeciesEditor {
 		this.baseScale = pokemon.baseScale;
 		this.experienceGroupId = pokemon.experienceGroup?.id ?? null;
 		this.eggGroupIds = pokemon.eggGroups.map((g) => g.id);
+		this.coverImageId = pokemon.image?.id ?? null;
+		this.coverImageUrl = pokemon.image?.url ?? null;
 	}
 
 	toCreateInput(): SpeciesInput {

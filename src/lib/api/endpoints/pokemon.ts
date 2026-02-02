@@ -129,4 +129,12 @@ export const pokemon = {
 		const result = await client.put(`/pokemon/forms/${id}/image`, { imageId });
 		return validate(result, MutationResponseSchema);
 	},
+
+	setSpeciesImage: async (
+		id: number | string,
+		imageId: string | null,
+	): Promise<ApiResponse<MutationResponse>> => {
+		const result = await client.put(`/pokemon/species/${id}/image`, { imageId });
+		return validate(result, MutationResponseSchema);
+	},
 };

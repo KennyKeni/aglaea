@@ -7,6 +7,7 @@
 	import { Plus, X } from '@lucide/svelte';
 	import { SearchPalette } from '$lib/components/search-palette';
 	import { getSearchSources } from '$lib/api/endpoints/search';
+	import ImageUpload from '$lib/components/ui/image-upload/image-upload.svelte';
 	import { pokemon as pokemonApi } from '$lib/api/endpoints/pokemon';
 	import type { Pokemon } from '$lib/types/pokemon';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -36,11 +37,13 @@
 	const speciesEditor: PokemonSpeciesEditor = createPokemonSpeciesEditor();
 	const formEditors = new SvelteMap<string, PokemonFormEditor>();
 	const initialImageIds = new SvelteMap<string, string | null>();
+	let initialSpeciesImageId: string | null = null;
 
 	let activeFormKey = $state<string>('');
 
 	untrack(() => {
 		speciesEditor.initFromPokemon(pokemon);
+		initialSpeciesImageId = pokemon.image?.id ?? null;
 
 		const speciesDefaults = {
 			catchRate: pokemon.catchRate,
@@ -144,6 +147,16 @@
 			return;
 		}
 
+		// Handle species image changes
+		if (speciesEditor.coverImageId !== initialSpeciesImageId) {
+			const imageResult = await pokemonApi.setSpeciesImage(pokemon.id, speciesEditor.coverImageId);
+			if (!imageResult.ok) {
+				error = imageResult.message;
+				isSaving = false;
+				return;
+			}
+		}
+
 		// Delete queued forms
 		for (const formId of pendingDeletes) {
 			const deleteResult = await pokemonApi.deleteForm(formId);
@@ -221,38 +234,53 @@
 			<Card.Title class="text-base">Species</Card.Title>
 		</Card.Header>
 		<Card.Content class="space-y-4">
-			<div class="grid gap-3 sm:grid-cols-2">
-				<label>
-					<span class="text-xs font-medium text-muted-foreground">Name</span>
-					<Input
-						value={speciesEditor.name}
-						oninput={(e) => (speciesEditor.name = (e.target as HTMLInputElement).value)}
-						class="mt-1"
-						placeholder="Pokemon name"
-					/>
-				</label>
-				<label>
-					<span class="text-xs font-medium text-muted-foreground">Generation</span>
-					<Input
-						type="number"
-						min="1"
-						value={String(speciesEditor.generation)}
-						oninput={handleNumberInput((v) => (speciesEditor.generation = v || 1))}
-						class="mt-1"
-					/>
-				</label>
+			<div class="grid gap-4 md:grid-cols-12">
+				<div class="self-stretch md:col-span-4">
+					<div class="flex h-full flex-col rounded-2xl bg-muted p-4">
+						<div class="flex h-52 w-full flex-1 items-center justify-center md:h-auto">
+							<ImageUpload
+								bind:imageId={speciesEditor.coverImageId}
+								bind:imageUrl={speciesEditor.coverImageUrl}
+								class="h-full"
+							/>
+						</div>
+					</div>
+				</div>
+				<div class="space-y-3 md:col-span-8">
+					<div class="grid gap-3 sm:grid-cols-2">
+						<label>
+							<span class="text-xs font-medium text-muted-foreground">Name</span>
+							<Input
+								value={speciesEditor.name}
+								oninput={(e) => (speciesEditor.name = (e.target as HTMLInputElement).value)}
+								class="mt-1"
+								placeholder="Pokemon name"
+							/>
+						</label>
+						<label>
+							<span class="text-xs font-medium text-muted-foreground">Generation</span>
+							<Input
+								type="number"
+								min="1"
+								value={String(speciesEditor.generation)}
+								oninput={handleNumberInput((v) => (speciesEditor.generation = v || 1))}
+								class="mt-1"
+							/>
+						</label>
+					</div>
+					<label>
+						<span class="text-xs font-medium text-muted-foreground">Description</span>
+						<textarea
+							value={speciesEditor.description ?? ''}
+							oninput={(e) =>
+								(speciesEditor.description = (e.target as HTMLTextAreaElement).value || null)}
+							class="mt-1 w-full rounded-md border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+							rows={3}
+							placeholder="Pokemon description"
+						></textarea>
+					</label>
+				</div>
 			</div>
-			<label>
-				<span class="text-xs font-medium text-muted-foreground">Description</span>
-				<textarea
-					value={speciesEditor.description ?? ''}
-					oninput={(e) =>
-						(speciesEditor.description = (e.target as HTMLTextAreaElement).value || null)}
-					class="mt-1 w-full rounded-md border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-					rows={3}
-					placeholder="Pokemon description"
-				></textarea>
-			</label>
 
 			<!-- Species defaults -->
 			<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -206,5 +206,6 @@ export interface Pokemon {
   hitbox: Hitbox | null;
   lighting: Lighting | null;
   riding: Riding | null;
+  image: ImageRef | null;
   forms: Form[];
 }

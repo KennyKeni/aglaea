@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
+	import ImageUpload from '$lib/components/ui/image-upload/image-upload.svelte';
 
 	import { pokemon as pokemonApi } from '$lib/api/endpoints/pokemon';
 	import {
@@ -38,6 +39,15 @@
 			return;
 		}
 
+		if (editor.coverImageId) {
+			const imageResult = await pokemonApi.setSpeciesImage(result.data.id, editor.coverImageId);
+			if (!imageResult.ok) {
+				error = imageResult.message;
+				isSaving = false;
+				return;
+			}
+		}
+
 		isSaving = false;
 		onSave(result.data.slug);
 	}
@@ -58,42 +68,57 @@
 			<Card.Title class="text-base">Identity</Card.Title>
 		</Card.Header>
 		<Card.Content class="space-y-3">
-			<div class="grid gap-3 sm:grid-cols-2">
-				<label>
-					<span class="text-xs font-medium text-muted-foreground">Name *</span>
-					<Input
-						value={editor.name}
-						oninput={(e) => (editor.name = (e.target as HTMLInputElement).value)}
-						class="mt-1"
-						placeholder="Pokemon name"
-					/>
-				</label>
-				<label>
-					<span class="text-xs font-medium text-muted-foreground">ID</span>
-					<Input
-						type="number"
-						min="1"
-						value={editor.id !== null ? String(editor.id) : ''}
-						oninput={(e) => {
-							const val = (e.target as HTMLInputElement).value;
-							editor.id = val ? Number(val) : null;
-						}}
-						class="mt-1"
-						placeholder="Auto-generate"
-					/>
-				</label>
+			<div class="grid gap-4 md:grid-cols-12">
+				<div class="self-stretch md:col-span-4">
+					<div class="flex h-full flex-col rounded-2xl bg-muted p-4">
+						<div class="flex h-52 w-full flex-1 items-center justify-center md:h-auto">
+							<ImageUpload
+								bind:imageId={editor.coverImageId}
+								bind:imageUrl={editor.coverImageUrl}
+								class="h-full"
+							/>
+						</div>
+					</div>
+				</div>
+				<div class="space-y-3 md:col-span-8">
+					<div class="grid gap-3 sm:grid-cols-2">
+						<label>
+							<span class="text-xs font-medium text-muted-foreground">Name *</span>
+							<Input
+								value={editor.name}
+								oninput={(e) => (editor.name = (e.target as HTMLInputElement).value)}
+								class="mt-1"
+								placeholder="Pokemon name"
+							/>
+						</label>
+						<label>
+							<span class="text-xs font-medium text-muted-foreground">ID</span>
+							<Input
+								type="number"
+								min="1"
+								value={editor.id !== null ? String(editor.id) : ''}
+								oninput={(e) => {
+									const val = (e.target as HTMLInputElement).value;
+									editor.id = val ? Number(val) : null;
+								}}
+								class="mt-1"
+								placeholder="Auto-generate"
+							/>
+						</label>
+					</div>
+					<label>
+						<span class="text-xs font-medium text-muted-foreground">Description</span>
+						<textarea
+							value={editor.description ?? ''}
+							oninput={(e) =>
+								(editor.description = (e.target as HTMLTextAreaElement).value || null)}
+							class="mt-1 w-full rounded-md border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+							rows={3}
+							placeholder="Pokemon description"
+						></textarea>
+					</label>
+				</div>
 			</div>
-			<label>
-				<span class="text-xs font-medium text-muted-foreground">Description</span>
-				<textarea
-					value={editor.description ?? ''}
-					oninput={(e) =>
-						(editor.description = (e.target as HTMLTextAreaElement).value || null)}
-					class="mt-1 w-full rounded-md border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-					rows={3}
-					placeholder="Pokemon description"
-				></textarea>
-			</label>
 		</Card.Content>
 	</Card.Root>
 

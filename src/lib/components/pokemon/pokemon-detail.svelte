@@ -3,7 +3,8 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Progress } from '$lib/components/ui/progress';
 	import { cn } from '$lib/utils';
-	import { TYPE_COLORS, formatId, getArtworkUrl, getStatTotal, clamp } from '$lib/utils/pokemon';
+	import { TYPE_COLORS, formatId, getStatTotal, clamp } from '$lib/utils/pokemon';
+	import ImageOff from '@lucide/svelte/icons/image-off';
 	import { abilityUrl } from '$lib/utils/url';
 	import type { Pokemon, Form } from '$lib/types/pokemon';
 
@@ -35,11 +36,18 @@
 			<div class="self-stretch md:col-span-4">
 				<div class="flex h-full flex-col rounded-2xl bg-muted p-4 md:p-5">
 					<div class="flex h-52 w-full flex-1 items-center justify-center md:h-auto">
-						<img
-							src={form.image?.url ?? getArtworkUrl(pokemon.id)}
-							alt={form.name}
-							class="h-full w-full object-contain"
-						/>
+						{#if form.image?.url}
+							<img
+								src={form.image.url}
+								alt={form.name}
+								class="h-full w-full object-contain"
+							/>
+						{:else}
+							<div class="flex flex-col items-center justify-center gap-1 text-muted-foreground/40">
+								<ImageOff class="h-12 w-12" />
+								<span class="text-xs">No image</span>
+							</div>
+						{/if}
 					</div>
 					<div class="mt-3 text-center">
 						<div class="text-base font-semibold">{form.name}</div>

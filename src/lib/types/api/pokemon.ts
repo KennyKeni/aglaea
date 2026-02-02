@@ -202,6 +202,7 @@ export const PokemonSchema = z.object({
   hitbox: HitboxSchema.nullable(),
   lighting: LightingSchema.nullable(),
   riding: RidingSchema.nullable(),
+  image: ImageRefSchema.nullable(),
   forms: z.array(FormSchema),
 });
 
