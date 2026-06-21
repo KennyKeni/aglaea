@@ -11,6 +11,10 @@
       "pattern": "cobblemonwiki.com",
       "custom_domain": true,
     },
+    {
+      "pattern": "www.cobblemonwiki.com",
+      "custom_domain": true,
+    },
   ],
   "assets": {
     "binding": "ASSETS",
