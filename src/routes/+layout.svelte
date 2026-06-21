@@ -1,19 +1,8 @@
 <script lang="ts">
-  import { permissions } from '$lib/state/permissions.svelte';
   import './layout.css';
   import favicon from '$lib/assets/favicon.svg';
 
-  let { data, children } = $props();
-
-  $effect(() => {
-    permissions.init(data.permissions);
-  });
-
-  $effect(() => {
-    if (!data.session) {
-      permissions.clear();
-    }
-  });
+  let { children } = $props();
 </script>
 
 <svelte:head>

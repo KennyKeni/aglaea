@@ -4,7 +4,6 @@ import { createServerClient } from '$lib/server/client';
 import {
   createPokemonEndpoint,
   type Pokemon,
-  type FilterOption,
   type PokemonSearchParams,
 } from '$lib/server/endpoints/pokemon';
 
@@ -22,24 +21,6 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
     return { pokemon: result.data.data ?? [], filteredCount: result.data.total ?? 0 };
   }
 
-  async function fetchTypes(): Promise<FilterOption[]> {
-    const result = await pokemonApi.getTypes();
-    if (!result.ok) return [];
-    return result.data.data ?? [];
-  }
-
-  async function fetchAbilities(): Promise<FilterOption[]> {
-    const result = await pokemonApi.getAbilities();
-    if (!result.ok) return [];
-    return result.data.data ?? [];
-  }
-
-  async function fetchMoves(): Promise<FilterOption[]> {
-    const result = await pokemonApi.getMoves();
-    if (!result.ok) return [];
-    return result.data.data ?? [];
-  }
-
   const pageParam = url.searchParams.get('page');
   const requestedPage = Math.max(1, parseInt(pageParam ?? '1', 10));
 
@@ -48,7 +29,15 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   const movesParam = url.searchParams.get('moves');
   const generationsParam = url.searchParams.get('generations');
 
-  const statParams = ['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed', 'totalStats'] as const;
+  const statParams = [
+    'hp',
+    'attack',
+    'defense',
+    'specialAttack',
+    'specialDefense',
+    'speed',
+    'totalStats',
+  ] as const;
 
   const offset = (requestedPage - 1) * PAGE_SIZE;
 
@@ -87,9 +76,6 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   }
 
   const pokemonPromise = fetchPokemonList(searchParams);
-  const typesPromise = fetchTypes();
-  const abilitiesPromise = fetchAbilities();
-  const movesPromise = fetchMoves();
 
   // Client navigation: return promises directly for streaming
   if (isDataRequest) {
@@ -98,19 +84,10 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
       filteredCount: pokemonPromise.then((r) => r.filteredCount),
       currentPage: requestedPage,
       pageSize: PAGE_SIZE,
-      types: typesPromise,
-      abilities: abilitiesPromise,
-      moves: movesPromise,
     };
   }
 
-  // SSR: await everything for full HTML
-  const [pokemonResult, types, abilities, moves] = await Promise.all([
-    pokemonPromise,
-    typesPromise,
-    abilitiesPromise,
-    movesPromise,
-  ]);
+  const pokemonResult = await pokemonPromise;
 
   // Page validation only on SSR
   const totalPages = Math.ceil(pokemonResult.filteredCount / PAGE_SIZE);
@@ -126,8 +103,5 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
     filteredCount: pokemonResult.filteredCount,
     currentPage: validPage,
     pageSize: PAGE_SIZE,
-    types,
-    abilities,
-    moves,
   };
 };

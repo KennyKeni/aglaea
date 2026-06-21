@@ -1,8 +1,5 @@
-import type { Handle, HandleFetch, HandleServerError } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { paraglideMiddleware } from '$lib/paraglide/server';
-import { env } from '$env/dynamic/private';
-import { UserPermissionsSchema, SessionSchema } from '$lib/types/api';
 
 const handleParaglide: Handle = ({ event, resolve }) =>
   paraglideMiddleware(event.request, ({ request, locale }) => {
@@ -13,53 +10,7 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     });
   });
 
-const handleAuth: Handle = async ({ event, resolve }) => {
-  event.locals.session = null;
-  event.locals.permissions = null;
-
-  const cookie = event.request.headers.get('cookie') || '';
-
-  try {
-    const sessionRes = await fetch(`${env.BACKEND_URL}/auth/get-session`, {
-      headers: { cookie },
-    });
-
-    if (sessionRes.ok) {
-      const sessionData = await sessionRes.json();
-      const parsed = SessionSchema.safeParse(sessionData);
-      if (parsed.success) {
-        event.locals.session = parsed.data;
-
-        const permRes = await fetch(`${env.BACKEND_URL}/auth/me/permissions`, {
-          headers: { cookie: event.request.headers.get('cookie') || '' },
-        });
-        if (permRes.ok) {
-          const permData = await permRes.json();
-          const permParsed = UserPermissionsSchema.safeParse(permData);
-          if (permParsed.success) {
-            event.locals.permissions = permParsed.data;
-          }
-        }
-      }
-    }
-  } catch (e) {
-    console.error('Failed to fetch session:', e);
-  }
-
-  return resolve(event);
-};
-
-export const handle: Handle = sequence(handleAuth, handleParaglide);
-
-export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
-  if (request.url.startsWith(env.BACKEND_URL)) {
-    const cookie = event.request.headers.get('cookie');
-    if (cookie) {
-      request.headers.set('cookie', cookie);
-    }
-  }
-  return fetch(request);
-};
+export const handle: Handle = handleParaglide;
 
 export const handleError = (({ error, status, message }) => {
   console.error('[error]', status, error);

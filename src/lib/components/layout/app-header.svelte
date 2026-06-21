@@ -1,18 +1,22 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { invalidateAll, goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { onDestroy } from 'svelte';
-  import { authClient } from '$lib/auth-client';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import * as Sidebar from '$lib/components/ui/sidebar';
-  import { LogIn, LogOut, Search, Sun, Moon } from '@lucide/svelte';
-  import type { Session } from '$lib/types/auth';
+  import { Search, Sun, Moon } from '@lucide/svelte';
+  import { SvelteURLSearchParams } from 'svelte/reactivity';
 
-  let { session }: { session: Session | null } = $props();
+  type SearchContext = {
+    entity: 'pokemon' | 'moves' | 'abilities' | 'items';
+    label: string;
+    route: '/pokemon' | '/moves' | '/abilities' | '/items';
+  };
 
-  let searchQuery = $state(page.url.searchParams.get('search') ?? '');
+  let searchQuery = $derived(page.url.searchParams.get('search') ?? '');
   let isDark = $state(browser ? document.documentElement.classList.contains('dark') : false);
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -22,18 +26,15 @@
     document.documentElement.classList.toggle('dark', isDark);
   }
 
-  const searchContext = $derived.by(() => {
+  const searchContext = $derived.by((): SearchContext | null => {
     const path = page.url.pathname;
-    if (path.startsWith('/pokemon')) return { entity: 'pokemon', label: 'Pokemon' };
-    if (path.startsWith('/articles')) return { entity: 'articles', label: 'Articles' };
-    if (path.startsWith('/moves')) return { entity: 'moves', label: 'Moves' };
-    if (path.startsWith('/abilities')) return { entity: 'abilities', label: 'Abilities' };
-    if (path.startsWith('/items')) return { entity: 'items', label: 'Items' };
+    if (path.startsWith('/pokemon'))
+      return { entity: 'pokemon', label: 'Pokemon', route: '/pokemon' };
+    if (path.startsWith('/moves')) return { entity: 'moves', label: 'Moves', route: '/moves' };
+    if (path.startsWith('/abilities'))
+      return { entity: 'abilities', label: 'Abilities', route: '/abilities' };
+    if (path.startsWith('/items')) return { entity: 'items', label: 'Items', route: '/items' };
     return null;
-  });
-
-  $effect(() => {
-    searchQuery = page.url.searchParams.get('search') ?? '';
   });
 
   function handleInput(e: Event) {
@@ -45,7 +46,7 @@
     if (debounceTimer) clearTimeout(debounceTimer);
 
     debounceTimer = setTimeout(() => {
-      const params = new URLSearchParams(page.url.searchParams);
+      const params = new SvelteURLSearchParams(page.url.searchParams);
       if (searchQuery.trim()) {
         params.set('search', searchQuery);
         params.delete('page');
@@ -53,7 +54,9 @@
         params.delete('search');
       }
       const queryString = params.toString();
-      const basePath = `/${searchContext.entity}`;
+      const basePath = resolve(searchContext.route);
+      // The path is resolved above, then the current query string is appended.
+      // eslint-disable-next-line svelte/no-navigation-without-resolve
       goto(queryString ? `${basePath}?${queryString}` : basePath, {
         replaceState: true,
         keepFocus: true,
@@ -65,11 +68,6 @@
   onDestroy(() => {
     if (debounceTimer) clearTimeout(debounceTimer);
   });
-
-  async function handleSignOut() {
-    await authClient.signOut();
-    invalidateAll();
-  }
 </script>
 
 <header
@@ -101,24 +99,5 @@
       {/if}
       <span class="sr-only">Toggle theme</span>
     </Button>
-
-    <div class="h-6 w-px bg-border"></div>
-
-    <div class="flex items-center gap-1">
-      {#if session}
-        <span class="hidden text-sm font-medium md:inline">
-          {session.user.name || session.user.email}
-        </span>
-        <Button variant="ghost" size="sm" onclick={handleSignOut}>
-          <LogOut class="h-4 w-4" />
-          <span class="sr-only">Sign out</span>
-        </Button>
-      {:else}
-        <Button variant="ghost" size="sm" href="/login">
-          <LogIn class="h-4 w-4" />
-          <span class="hidden md:inline">Sign in</span>
-        </Button>
-      {/if}
-    </div>
   </div>
 </header>

@@ -1,10 +1,15 @@
-<svelte:head>
-  <title>Aglaea | Cobblemon Species Database</title>
-</svelte:head>
-
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { Button } from '$lib/components/ui/button';
-  import { ArrowRight, Clock, Database, FileText, Package, Shield } from '@lucide/svelte';
+  import { ArrowRight, Clock, Database, Package, Sparkles, Swords } from '@lucide/svelte';
+
+  type DirectoryCategory = {
+    title: string;
+    icon: typeof Database;
+    href: '/pokemon' | '/items' | '/moves' | '/abilities';
+    desc: string;
+    meta: string;
+  };
 
   const categories = [
     {
@@ -15,13 +20,6 @@
       meta: 'Species',
     },
     {
-      title: 'Articles & Guides',
-      icon: FileText,
-      href: '/articles',
-      desc: 'Guides, tutorials, and tips for Cobblemon players.',
-      meta: 'Articles',
-    },
-    {
       title: 'Items',
       icon: Package,
       href: '/items',
@@ -29,16 +27,27 @@
       meta: 'Items & Recipes',
     },
     {
-      title: 'Account',
-      icon: Shield,
-      href: '/login',
-      desc: 'Sign in to save favorites and track your collection.',
-      meta: 'Sign In',
+      title: 'Moves',
+      icon: Swords,
+      href: '/moves',
+      desc: 'Review move power, accuracy, categories, and effects.',
+      meta: 'Move Data',
     },
-  ];
+    {
+      title: 'Abilities',
+      icon: Sparkles,
+      href: '/abilities',
+      desc: 'Look up Cobblemon abilities and related species.',
+      meta: 'Ability Data',
+    },
+  ] satisfies DirectoryCategory[];
 
   const updates: { label: string; title: string; date: string }[] = [];
 </script>
+
+<svelte:head>
+  <title>Aglaea | Cobblemon Species Database</title>
+</svelte:head>
 
 <div class="min-h-screen w-full pt-12 pb-20 text-foreground md:pt-20">
   <div class="mx-auto max-w-6xl px-4">
@@ -79,7 +88,7 @@
           <div class="grid gap-6 sm:grid-cols-2">
             {#each categories as category (category.href)}
               <a
-                href={category.href}
+                href={resolve(category.href)}
                 class="group relative flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
               >
                 <div class="mb-5 flex items-start justify-between">
