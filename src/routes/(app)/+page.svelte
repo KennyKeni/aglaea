@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { Button } from '$lib/components/ui/button';
+  import { AFFILIATION_DISCLAIMER, UNOFFICIAL_WIKI_NOTICE } from '$lib/config/disclaimers';
   import { ArrowRight, Clock, Database, Package, Sparkles, Swords } from '@lucide/svelte';
 
   type DirectoryCategory = {
@@ -71,7 +72,11 @@
       </h1>
 
       <p class="max-w-2xl text-lg text-muted-foreground sm:text-xl">
-        Species database and reference for the Cobblemon mod.
+        {UNOFFICIAL_WIKI_NOTICE}
+      </p>
+
+      <p class="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        Not affiliated with or endorsed by the Cobblemon mod project.
       </p>
     </header>
 
@@ -176,5 +181,11 @@
         </div>
       </aside>
     </div>
+
+    <footer
+      class="mt-16 border-t border-border/70 pt-6 text-xs leading-relaxed text-muted-foreground"
+    >
+      {AFFILIATION_DISCLAIMER}
+    </footer>
   </div>
 </div>
