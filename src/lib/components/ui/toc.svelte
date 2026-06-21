@@ -69,7 +69,9 @@
 </script>
 
 {#if toc.length > 0}
-  <nav class={cn('sticky top-24 max-h-[calc(100vh-8rem)] w-80 overflow-y-auto pl-6 pr-4', className)}>
+  <nav
+    class={cn('sticky top-24 max-h-[calc(100vh-8rem)] w-80 overflow-y-auto pl-6 pr-4', className)}
+  >
     {#if titleItem}
       {@const isActive = activeId === titleItem.id}
       <a

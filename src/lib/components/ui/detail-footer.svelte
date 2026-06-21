@@ -12,8 +12,6 @@
 >
   <div class="mx-auto max-w-2xl space-y-2">
     <p>Thanks for reading</p>
-    <p class="text-xs">
-      Message Zmjjkk on Discord
-    </p>
+    <p class="text-xs">Message Zmjjkk on Discord</p>
   </div>
 </footer>

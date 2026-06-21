@@ -8,7 +8,7 @@ type ScrollSpyOptions = {
 
 export function createScrollSpy(options: ScrollSpyOptions) {
   let observer: IntersectionObserver | null = null;
-  let visibleIds = new Set<string>();
+  const visibleIds = new Set<string>();
   let currentActiveId: string | null = null;
   let scrollContainer: Element | null = null;
   let allElements: Element[] = [];

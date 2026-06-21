@@ -1,18 +1,22 @@
 <script lang="ts">
-  import { Loader2 } from '@lucide/svelte';
+  import LoadingMosaic from './loading-mosaic.svelte';
+
+  type Size = 'sm' | 'default' | 'lg';
+  type MosaicSize = 'sm' | 'default' | 'lg';
 
   let {
     size = 'default',
     class: className = '',
-  }: { size?: 'sm' | 'default' | 'lg'; class?: string } = $props();
+    label = 'Loading',
+  }: { size?: Size; class?: string; label?: string } = $props();
 
-  const sizeClasses = {
-    sm: 'h-4 w-4',
-    default: 'h-8 w-8',
-    lg: 'h-12 w-12',
+  const sizeClasses: Record<Size, MosaicSize> = {
+    sm: 'sm',
+    default: 'default',
+    lg: 'lg',
   };
 </script>
 
 <div class="flex items-center justify-center {className}">
-  <Loader2 class="{sizeClasses[size]} animate-spin text-muted-foreground" />
+  <LoadingMosaic size={sizeClasses[size]} {label} />
 </div>

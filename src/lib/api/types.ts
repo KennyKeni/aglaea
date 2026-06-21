@@ -1,14 +1,14 @@
 export type FetchFn = typeof globalThis.fetch;
 
 export interface ApiSuccess<T> {
-	ok: true;
-	data: T;
+  ok: true;
+  data: T;
 }
 
 export interface ApiError {
-	ok: false;
-	status: number;
-	message: string;
+  ok: false;
+  status: number;
+  message: string;
 }
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;

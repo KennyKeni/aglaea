@@ -36,8 +36,6 @@
   }
 
   function handleSelect(result: SearchResult) {
-    // searchResultUrl returns resolve()-built app routes with optional query strings.
-    // eslint-disable-next-line svelte/no-navigation-without-resolve
     goto(searchResultUrl(result));
   }
 

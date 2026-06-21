@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
+import { getBackendUrl } from '$lib/server/backend-url';
 
 const HOP_BY_HOP = new Set([
   'authorization',
@@ -17,11 +17,7 @@ const HOP_BY_HOP = new Set([
 ]);
 
 const proxy: RequestHandler = async ({ request, params, url }) => {
-  if (!env.BACKEND_URL) {
-    error(500, 'Backend URL is not configured');
-  }
-
-  const targetUrl = `${env.BACKEND_URL}/${params.path}${url.search}`;
+  const targetUrl = `${getBackendUrl()}/${params.path}${url.search}`;
 
   const headers = new Headers();
   for (const [key, value] of request.headers) {

@@ -67,8 +67,6 @@
   function handlePageChange(newPage: number) {
     const params = new SvelteURLSearchParams(page.url.searchParams);
     params.set('page', String(newPage));
-    // The path is resolved before appending pagination query params.
-    // eslint-disable-next-line svelte/no-navigation-without-resolve
     goto(`${resolve('/pokemon')}?${params.toString()}`, { keepFocus: true });
   }
 
@@ -89,7 +87,7 @@
 <PokemonGrid
   pokemon={displayPokemon}
   isLoading={isLoading && !hasCachedItems}
-  isRefreshing={false}
+  isRefreshing={isLoading && hasCachedItems}
   skeletonCount={data.pageSize}
 />
 

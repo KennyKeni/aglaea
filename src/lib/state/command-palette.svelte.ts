@@ -1,21 +1,21 @@
 class CommandPalette {
-	open = $state(false);
+  open = $state(false);
 
-	toggle() {
-		this.open = !this.open;
-	}
+  toggle() {
+    this.open = !this.open;
+  }
 
-	show() {
-		this.open = true;
-	}
+  show() {
+    this.open = true;
+  }
 
-	hide() {
-		this.open = false;
-	}
+  hide() {
+    this.open = false;
+  }
 }
 
 const instance = new CommandPalette();
 
 export function createCommandPalette() {
-	return instance;
+  return instance;
 }

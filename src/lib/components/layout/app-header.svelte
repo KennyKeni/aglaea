@@ -55,8 +55,6 @@
       }
       const queryString = params.toString();
       const basePath = resolve(searchContext.route);
-      // The path is resolved above, then the current query string is appended.
-      // eslint-disable-next-line svelte/no-navigation-without-resolve
       goto(queryString ? `${basePath}?${queryString}` : basePath, {
         replaceState: true,
         keepFocus: true,

@@ -26,9 +26,7 @@
     }
 
     const hasSubItems = navigation.some(
-      (section) =>
-        section.children.length > 1 &&
-        section.children[0]?.href === href
+      (section) => section.children.length > 1 && section.children[0]?.href === href,
     );
     if (hasSubItems) {
       return page.url.pathname === href && page.url.search === '';
@@ -82,10 +80,7 @@
       <Sidebar.GroupContent>
         <Sidebar.Menu>
           <Sidebar.MenuItem>
-            <Sidebar.MenuButton
-              tooltipContent="Search"
-              onclick={() => commandPalette.show()}
-            >
+            <Sidebar.MenuButton tooltipContent="Search" onclick={() => commandPalette.show()}>
               <Search class="size-4" />
               <span>Search</span>
             </Sidebar.MenuButton>

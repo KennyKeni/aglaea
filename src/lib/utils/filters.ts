@@ -66,7 +66,11 @@ export interface StatRange {
   max: number;
 }
 
-export function getStatRange(paramName: string, defaultMin: number, defaultMax: number): [number, number] {
+export function getStatRange(
+  paramName: string,
+  defaultMin: number,
+  defaultMax: number,
+): [number, number] {
   const minParam = page.url.searchParams.get(`${paramName}Min`);
   const maxParam = page.url.searchParams.get(`${paramName}Max`);
 
@@ -85,7 +89,7 @@ export function setStatRange(
   min: number,
   max: number,
   defaultMin: number,
-  defaultMax: number
+  defaultMax: number,
 ) {
   const params = new URLSearchParams(page.url.searchParams);
 
@@ -107,7 +111,9 @@ export function setStatRange(
 }
 
 export function hasActiveStatFilter(paramName: string): boolean {
-  return page.url.searchParams.has(`${paramName}Min`) || page.url.searchParams.has(`${paramName}Max`);
+  return (
+    page.url.searchParams.has(`${paramName}Min`) || page.url.searchParams.has(`${paramName}Max`)
+  );
 }
 
 export function getActiveStatFilterCount(paramNames: string[]): number {
