@@ -311,20 +311,8 @@
         <article
           class={cn('flex w-full', message.role === 'user' ? 'justify-end' : 'justify-start')}
         >
-          <div
-            class={cn(
-              'max-w-[min(42rem,100%)] rounded-lg px-3 py-2',
-              message.role === 'user'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted/40 text-card-foreground',
-            )}
-          >
-            <div
-              class={cn(
-                'mb-1 text-xs font-medium',
-                message.role === 'user' ? 'text-primary-foreground/75' : 'text-muted-foreground',
-              )}
-            >
+          <div class="max-w-[min(42rem,100%)]">
+            <div class="mb-1 text-xs font-medium text-muted-foreground">
               {messageLabel(message)}
             </div>
 
