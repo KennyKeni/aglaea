@@ -21,6 +21,6 @@
     "head_sampling_rate": 1,
   },
   "vars": {
-    "BACKEND_URL": "https://herta.kennykeni.com",
+    "BACKEND_URL": "https://api.cobblemonwiki.com",
   },
 }
