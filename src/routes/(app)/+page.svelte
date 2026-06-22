@@ -90,7 +90,7 @@
             </span>
           </div>
 
-          <div class="grid gap-6 sm:grid-cols-2">
+          <div class="grid gap-6 grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))]">
             {#each categories as category (category.href)}
               <a
                 href={resolve(category.href)}

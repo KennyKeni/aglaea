@@ -40,7 +40,7 @@
     {/if}
 
     <div
-      class="grid gap-3 transition-opacity duration-150 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+      class="grid gap-3 transition-opacity duration-150 grid-cols-[repeat(auto-fill,minmax(min(240px,100%),1fr))]"
       class:opacity-60={isRefreshing}
     >
       {#if isLoading}
