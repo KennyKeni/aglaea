@@ -8,8 +8,7 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
   const abilityApi = createAbilityEndpoint(client);
 
   const result = await abilityApi.getById(params.id, {
-    includeFlags: true,
-    includeForms: true,
+    include: ['flags', 'forms'],
   });
 
   if (!result.ok) {

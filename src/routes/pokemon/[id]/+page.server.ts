@@ -8,14 +8,17 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
   const pokemonApi = createPokemonEndpoint(client);
 
   const result = await pokemonApi.getById(params.id, {
-    includeTypes: true,
-    includeAbilities: true,
-    includeMoves: true,
-    includeSpawns: true,
-    includeDrops: true,
-    includeLabels: true,
-    includeEggGroups: true,
-    includeExperienceGroup: true,
+    include: [
+      'forms',
+      'types',
+      'abilities',
+      'moves',
+      'spawns',
+      'drops',
+      'labels',
+      'eggGroups',
+      'experienceGroup',
+    ],
   });
 
   if (!result.ok) {

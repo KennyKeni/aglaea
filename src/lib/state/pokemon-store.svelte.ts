@@ -2,10 +2,9 @@ import type { Pokemon } from '$lib/types/pokemon';
 import { GridDataStateImpl } from './grid-data.svelte';
 
 const state = new GridDataStateImpl<Pokemon>([], 0, 1, {
-  apiEndpoint: '/api/pokemon',
+  apiEndpoint: '/api/pokemon/species',
   queryParams: {
-    includeTypes: true,
-    includeAbilities: true,
+    include: 'forms,types,abilities',
   },
 });
 

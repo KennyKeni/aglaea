@@ -26,13 +26,10 @@ export interface MoveSearchParams {
 }
 
 export interface MoveDetailParams {
-  includeFlags?: boolean;
-  includeBoosts?: boolean;
-  includeEffects?: boolean;
-  includeZData?: boolean;
-  includeGmaxSpecies?: boolean;
-  includeForms?: boolean;
+  include?: MoveInclude[];
 }
+
+type MoveInclude = 'flags' | 'boosts' | 'effects' | 'zData' | 'gmaxSpecies' | 'forms';
 
 function buildSearchQuery(params: MoveSearchParams): URLSearchParams {
   const q = new URLSearchParams();
@@ -49,12 +46,7 @@ function buildSearchQuery(params: MoveSearchParams): URLSearchParams {
 
 function buildDetailQuery(params: MoveDetailParams): URLSearchParams {
   const q = new URLSearchParams();
-  if (params.includeFlags) q.set('includeFlags', 'true');
-  if (params.includeBoosts) q.set('includeBoosts', 'true');
-  if (params.includeEffects) q.set('includeEffects', 'true');
-  if (params.includeZData) q.set('includeZData', 'true');
-  if (params.includeGmaxSpecies) q.set('includeGmaxSpecies', 'true');
-  if (params.includeForms) q.set('includeForms', 'true');
+  if (params.include?.length) q.set('include', params.include.join(','));
   return q;
 }
 

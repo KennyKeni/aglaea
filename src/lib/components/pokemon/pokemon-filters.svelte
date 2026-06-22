@@ -120,11 +120,7 @@
     if (term) params.set('name', term);
 
     if (kind === 'moves') {
-      params.set('includeFlags', 'false');
-      params.set('includeBoosts', 'false');
-      params.set('includeEffects', 'false');
-      params.set('includeGmaxSpecies', 'false');
-      params.set('includeForms', 'false');
+      params.set('include', '');
     }
 
     const response = await fetch(`/api/${kind}?${params}`, { signal });
