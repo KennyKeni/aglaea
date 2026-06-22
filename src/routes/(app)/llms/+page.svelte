@@ -363,7 +363,7 @@
         id="llm-message"
         bind:value={input}
         rows="4"
-        class="block min-h-24 w-full resize-none rounded-lg bg-transparent py-3 pr-16 pl-4 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        class="block min-h-24 w-full resize-none rounded-lg bg-transparent py-3 pr-16 pl-4 text-base outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
         placeholder="Ask Herta"
         disabled={isSending || isResetting}
         onkeydown={handleKeydown}></textarea>
