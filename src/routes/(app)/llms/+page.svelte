@@ -1,7 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { StreamProcessor, type StreamChunk, type UIMessage } from '@tanstack/ai/client';
-  import { Bot, LoaderCircle, RotateCcw, Send, Square } from '@lucide/svelte';
+  import { LoaderCircle, RotateCcw, Send, Square } from '@lucide/svelte';
   import { onDestroy, onMount, tick } from 'svelte';
   import { Streamdown } from 'svelte-streamdown';
   import { Button } from '$lib/components/ui/button';
@@ -25,7 +25,7 @@
   let intentionalAbort = false;
 
   const canSend = $derived(input.trim().length > 0 && !isSending && !isResetting);
-  const sessionLabel = $derived(sessionId ? sessionId.slice(0, 8) : 'New');
+  const sessionLabel = $derived(sessionId ? `Session ${sessionId.slice(0, 8)}` : 'New session');
   const markdownAllowedLinkPrefixes = ['https://', 'http://', 'mailto:'];
   const markdownAllowedImagePrefixes = ['https://'];
 
@@ -268,27 +268,30 @@
 </svelte:head>
 
 <div class="flex h-[calc(100vh-3.5rem)] min-h-[620px] flex-col bg-background">
-  <header class="border-b bg-background px-4 py-3 sm:px-6">
-    <div class="mx-auto flex w-full max-w-5xl items-center justify-between gap-4">
-      <div class="flex min-w-0 items-center gap-3">
-        <div class="flex size-10 shrink-0 items-center justify-center rounded-lg border bg-muted">
-          <Bot class="size-5 text-muted-foreground" />
-        </div>
-        <div class="min-w-0">
-          <h1 class="truncate text-lg font-semibold tracking-tight">Chat</h1>
-          <p class="truncate text-xs text-muted-foreground">Session {sessionLabel}</p>
-        </div>
+  <header class="border-b bg-background px-4 py-3">
+    <div class="flex w-full items-center justify-between gap-3">
+      <div class="flex min-w-0 items-center gap-2">
+        <h1 class="shrink-0 text-lg font-semibold tracking-tight">Chat</h1>
+        <span
+          class="truncate rounded-md border border-border/70 bg-muted/60 px-2 py-1 text-xs font-medium text-muted-foreground"
+        >
+          {sessionLabel}
+        </span>
       </div>
-
-      <div class="flex shrink-0 items-center gap-2">
+      <div class="flex shrink-0 items-center gap-1">
         {#if isSending}
-          <Button variant="outline" size="icon" aria-label="Stop streaming" onclick={stopStreaming}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Stop streaming"
+            onclick={stopStreaming}
+          >
             <Square class="size-4" />
           </Button>
         {/if}
         <Button
-          variant="outline"
-          size="icon"
+          variant="ghost"
+          size="icon-sm"
           aria-label="Reset session"
           disabled={isResetting}
           onclick={() => void resetConversation()}
