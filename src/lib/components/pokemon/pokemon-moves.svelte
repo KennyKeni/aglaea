@@ -34,7 +34,7 @@
     <h2 class="text-base font-semibold">{title}</h2>
     <div class="mt-1 text-sm text-muted-foreground">
       {#if loading}
-        Loading moves...
+        <Skeleton class="h-4 w-16" />
       {:else}
         {moves.length} moves
       {/if}

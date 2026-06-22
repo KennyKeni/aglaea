@@ -20,14 +20,11 @@
 </script>
 
 <div class="mx-auto max-w-6xl px-4 py-6">
-  {#if isLoading}
-    <div class="flex flex-col items-center justify-center gap-3 pt-2 pb-6">
-      <LoadingMosaic size="lg" label="Loading results" />
-      <p class="text-xs font-medium text-muted-foreground">Loading results</p>
-    </div>
-  {/if}
-
   <div class="relative" aria-busy={isLoading || isRefreshing}>
+    {#if isLoading}
+      <div class="sr-only" role="status">Loading results</div>
+    {/if}
+
     {#if isRefreshing}
       <div class="pointer-events-none absolute inset-x-0 -top-3 z-10 flex justify-center">
         <div
