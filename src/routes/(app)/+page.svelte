@@ -59,13 +59,6 @@
     <header
       class="mb-12 flex flex-col items-center text-center md:mb-16 md:items-start md:text-left"
     >
-      <div
-        class="mb-6 inline-flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground"
-      >
-        <span class="size-1.5 rounded-full bg-primary"></span>
-        <span>v1.0.0 Public Beta</span>
-      </div>
-
       <h1 class="mb-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">Aglaea Index</h1>
 
       <p class="max-w-2xl text-lg text-muted-foreground sm:text-xl">
@@ -86,32 +79,38 @@
           </span>
         </div>
 
-        <div class="grid gap-6 grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))]">
+        <ul class="border-t border-border">
           {#each categories as category (category.href)}
-            <a
-              href={resolve(category.href)}
-              class="group relative flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-primary/30 hover:bg-accent/40"
-            >
-              <div class="mb-5 flex items-start justify-between">
-                <category.icon class="size-5 text-muted-foreground" />
-                <ArrowRight
-                  class="size-5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+            <li class="border-b border-border">
+              <a
+                href={resolve(category.href)}
+                class="group flex items-center gap-4 px-2 py-5 transition-colors hover:bg-accent/40 sm:px-3"
+              >
+                <category.icon
+                  class="size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
                 />
-              </div>
 
-              <h3 class="mb-2 text-lg font-semibold tracking-tight text-foreground">
-                {category.title}
-              </h3>
-              <p class="mb-6 flex-1 text-sm leading-relaxed text-muted-foreground">
-                {category.desc}
-              </p>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-baseline gap-3">
+                    <h3 class="text-base font-semibold tracking-tight text-foreground">
+                      {category.title}
+                    </h3>
+                    <span class="hidden text-xs text-muted-foreground/70 sm:inline">
+                      {category.meta}
+                    </span>
+                  </div>
+                  <p class="mt-0.5 truncate text-sm text-muted-foreground">
+                    {category.desc}
+                  </p>
+                </div>
 
-              <div class="mt-auto flex items-center justify-between border-t border-border/50 pt-4">
-                <span class="text-xs font-medium text-muted-foreground">{category.meta}</span>
-              </div>
-            </a>
+                <ArrowRight
+                  class="size-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-foreground"
+                />
+              </a>
+            </li>
           {/each}
-        </div>
+        </ul>
       </section>
     </main>
 

@@ -350,24 +350,33 @@
     </div>
   </div>
 
-  <footer class="border-t bg-background px-4 py-4 sm:px-6">
-    <form class="mx-auto flex w-full max-w-5xl items-end gap-2" onsubmit={handleSubmit}>
+  <footer class="border-t bg-background px-3 py-3 sm:px-4">
+    <form class="mx-auto w-full max-w-5xl" onsubmit={handleSubmit}>
       <label for="llm-message" class="sr-only">Message</label>
-      <textarea
-        id="llm-message"
-        bind:value={input}
-        rows="2"
-        class="min-h-12 flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-        placeholder="Ask Herta"
-        disabled={isSending || isResetting}
-        onkeydown={handleKeydown}></textarea>
-      <Button type="submit" size="icon" disabled={!canSend} aria-label="Send message">
-        {#if isSending}
-          <LoaderCircle class="size-4 animate-spin" />
-        {:else}
-          <Send class="size-4" />
-        {/if}
-      </Button>
+      <div
+        class="flex items-stretch rounded-lg border border-input bg-background transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+      >
+        <textarea
+          id="llm-message"
+          bind:value={input}
+          rows="2"
+          class="min-h-12 flex-1 resize-none rounded-lg bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          placeholder="Ask Herta"
+          disabled={isSending || isResetting}
+          onkeydown={handleKeydown}></textarea>
+        <Button
+          type="submit"
+          disabled={!canSend}
+          aria-label="Send message"
+          class="m-0.5 aspect-square shrink-0 rounded-md"
+        >
+          {#if isSending}
+            <LoaderCircle class="size-4 animate-spin" />
+          {:else}
+            <Send class="size-4" />
+          {/if}
+        </Button>
+      </div>
     </form>
 
     {#if errorMessage}
