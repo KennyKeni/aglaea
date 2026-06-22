@@ -3,6 +3,7 @@
   import { StreamProcessor, type StreamChunk, type UIMessage } from '@tanstack/ai/client';
   import { Bot, LoaderCircle, RotateCcw, Send, Square } from '@lucide/svelte';
   import { onDestroy, onMount, tick } from 'svelte';
+  import { Streamdown } from 'svelte-streamdown';
   import { Button } from '$lib/components/ui/button';
   import { cn } from '$lib/utils';
 
@@ -25,6 +26,8 @@
 
   const canSend = $derived(input.trim().length > 0 && !isSending && !isResetting);
   const sessionLabel = $derived(sessionId ? sessionId.slice(0, 8) : 'New');
+  const markdownAllowedLinkPrefixes = ['https://', 'http://', 'mailto:'];
+  const markdownAllowedImagePrefixes = ['https://'];
 
   const processor = new StreamProcessor({
     events: {
@@ -300,65 +303,62 @@
     </div>
   </header>
 
-  <div bind:this={viewport} class="flex-1 overflow-y-auto px-4 py-6 sm:px-6" aria-live="polite">
-    <div class="mx-auto flex w-full max-w-5xl flex-col gap-4">
-      {#if messages.length === 0}
-        <div
-          class="flex min-h-[360px] items-center justify-center rounded-lg border border-dashed bg-muted/20 px-6 text-center"
+  <div bind:this={viewport} class="flex-1 overflow-y-auto px-3 py-4 sm:px-4" aria-live="polite">
+    <div class="mx-auto flex w-full max-w-5xl flex-col gap-3">
+      {#each messages as message (message.id)}
+        {@const text = messageText(message)}
+        {@const tools = toolSummaries(message)}
+        <article
+          class={cn('flex w-full', message.role === 'user' ? 'justify-end' : 'justify-start')}
         >
-          <div class="max-w-sm">
-            <Bot class="mx-auto mb-4 size-8 text-muted-foreground" />
-            <p class="text-sm text-muted-foreground">No messages yet.</p>
-          </div>
-        </div>
-      {:else}
-        {#each messages as message (message.id)}
-          {@const text = messageText(message)}
-          {@const tools = toolSummaries(message)}
-          <article
-            class={cn('flex w-full', message.role === 'user' ? 'justify-end' : 'justify-start')}
+          <div
+            class={cn(
+              'max-w-[min(42rem,100%)] rounded-lg px-3 py-2',
+              message.role === 'user'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted/40 text-card-foreground',
+            )}
           >
             <div
               class={cn(
-                'max-w-[min(42rem,100%)] rounded-lg border px-4 py-3 shadow-sm',
-                message.role === 'user'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-card text-card-foreground',
+                'mb-1 text-xs font-medium',
+                message.role === 'user' ? 'text-primary-foreground/75' : 'text-muted-foreground',
               )}
             >
-              <div
-                class={cn(
-                  'mb-2 text-xs font-medium',
-                  message.role === 'user' ? 'text-primary-foreground/75' : 'text-muted-foreground',
-                )}
-              >
-                {messageLabel(message)}
-              </div>
-
-              {#if text}
-                <p class="whitespace-pre-wrap break-words text-sm leading-6">{text}</p>
-              {:else if isSending && message.role === 'assistant'}
-                <div class="flex items-center gap-2 text-sm text-muted-foreground">
-                  <LoaderCircle class="size-4 animate-spin" />
-                  <span>Streaming</span>
-                </div>
-              {/if}
-
-              {#if tools.length > 0}
-                <div class="mt-3 flex flex-wrap gap-2">
-                  {#each tools as tool (tool)}
-                    <span
-                      class="rounded-md border bg-muted px-2 py-1 text-xs text-muted-foreground"
-                    >
-                      {tool}
-                    </span>
-                  {/each}
-                </div>
-              {/if}
+              {messageLabel(message)}
             </div>
-          </article>
-        {/each}
-      {/if}
+
+            {#if text}
+              {#if message.role === 'assistant'}
+                <Streamdown
+                  content={text}
+                  baseTheme="shadcn"
+                  allowedLinkPrefixes={markdownAllowedLinkPrefixes}
+                  allowedImagePrefixes={markdownAllowedImagePrefixes}
+                  class="break-words text-sm leading-6"
+                />
+              {:else}
+                <p class="whitespace-pre-wrap break-words text-sm leading-6">{text}</p>
+              {/if}
+            {:else if isSending && message.role === 'assistant'}
+              <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                <LoaderCircle class="size-4 animate-spin" />
+                <span>Streaming</span>
+              </div>
+            {/if}
+
+            {#if tools.length > 0}
+              <div class="mt-2 flex flex-wrap gap-2">
+                {#each tools as tool (tool)}
+                  <span class="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
+                    {tool}
+                  </span>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </article>
+      {/each}
     </div>
   </div>
 
