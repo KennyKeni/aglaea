@@ -264,7 +264,7 @@
 </script>
 
 <svelte:head>
-  <title>Aglaea | LLMs</title>
+  <title>Aglaea | Chat</title>
 </svelte:head>
 
 <div class="flex h-[calc(100vh-3.5rem)] min-h-[620px] flex-col bg-background">
@@ -275,7 +275,7 @@
           <Bot class="size-5 text-muted-foreground" />
         </div>
         <div class="min-w-0">
-          <h1 class="truncate text-lg font-semibold tracking-tight">LLMs</h1>
+          <h1 class="truncate text-lg font-semibold tracking-tight">Chat</h1>
           <p class="truncate text-xs text-muted-foreground">Session {sessionLabel}</p>
         </div>
       </div>
@@ -354,13 +354,13 @@
     <form class="mx-auto w-full max-w-5xl" onsubmit={handleSubmit}>
       <label for="llm-message" class="sr-only">Message</label>
       <div
-        class="flex items-end rounded-lg border border-input bg-background transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+        class="relative rounded-lg border border-input bg-background transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
       >
         <textarea
           id="llm-message"
           bind:value={input}
           rows="2"
-          class="min-h-12 flex-1 resize-none rounded-lg bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          class="block min-h-12 w-full resize-none rounded-lg bg-transparent py-2 pr-14 pl-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
           placeholder="Ask Herta"
           disabled={isSending || isResetting}
           onkeydown={handleKeydown}></textarea>
@@ -369,7 +369,7 @@
           disabled={!canSend}
           aria-label="Send message"
           size="icon"
-          class="m-1 shrink-0 rounded-md"
+          class="absolute right-1 bottom-1 rounded-md"
         >
           {#if isSending}
             <LoaderCircle class="size-4 animate-spin" />

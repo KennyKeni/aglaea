@@ -41,7 +41,7 @@
       meta: 'Ability Data',
     },
     {
-      title: 'LLMs',
+      title: 'Chat',
       icon: Bot,
       href: '/llms',
       desc: 'Query the Herta data tools through a chat session.',
