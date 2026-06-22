@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+  import { asset } from '$app/paths';
   import { page } from '$app/state';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import * as Collapsible from '$lib/components/ui/collapsible';
@@ -26,9 +27,7 @@
     }
 
     const hasSubItems = navigation.some(
-      (section) =>
-        section.children.length > 1 &&
-        section.children[0]?.href === href
+      (section) => section.children.length > 1 && section.children[0]?.href === href,
     );
     if (hasSubItems) {
       return page.url.pathname === href && page.url.search === '';
@@ -66,9 +65,14 @@
         <Sidebar.MenuButton size="lg">
           <a href="/" class="flex items-center gap-2">
             <div
-              class="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground"
+              class="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg bg-background"
             >
-              A
+              <img
+                src={asset('/cobblemon-logo.png')}
+                alt=""
+                class="size-7 object-contain"
+                aria-hidden="true"
+              />
             </div>
             <span class="truncate font-semibold">Aglaea</span>
           </a>
@@ -82,10 +86,7 @@
       <Sidebar.GroupContent>
         <Sidebar.Menu>
           <Sidebar.MenuItem>
-            <Sidebar.MenuButton
-              tooltipContent="Search"
-              onclick={() => commandPalette.show()}
-            >
+            <Sidebar.MenuButton tooltipContent="Search" onclick={() => commandPalette.show()}>
               <Search class="size-4" />
               <span>Search</span>
             </Sidebar.MenuButton>

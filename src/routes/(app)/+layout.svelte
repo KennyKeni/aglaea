@@ -1,11 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { AppSidebar, AppHeader, EmailVerificationBanner } from '$lib/components/layout';
+  import { resolve } from '$app/paths';
+  import { AppSidebar, AppHeader } from '$lib/components/layout';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import { SearchPalette } from '$lib/components/search-palette';
   import { allSearchSources } from '$lib/api/endpoints/search';
   import { createCommandPalette } from '$lib/state/command-palette.svelte';
-  import { entityUrl } from '$lib/utils/url';
   import { baseNavigation } from '$lib/config/navigation';
   import type { SearchResult } from '$lib/types/search';
 
@@ -20,8 +20,23 @@
     }
   }
 
+  function searchResultUrl(result: SearchResult): string {
+    switch (result.source) {
+      case 'pokemon':
+        return resolve('/pokemon/[id]', { id: String(result.id) });
+      case 'moves':
+        return resolve('/moves/[id]', { id: String(result.id) });
+      case 'abilities':
+        return resolve('/abilities/[id]', { id: String(result.id) });
+      case 'items':
+        return resolve('/items/[id]', { id: String(result.id) });
+      case 'types':
+        return `${resolve('/pokemon')}?types=${encodeURIComponent(result.slug)}`;
+    }
+  }
+
   function handleSelect(result: SearchResult) {
-    goto(entityUrl(result.source, result.id));
+    goto(searchResultUrl(result));
   }
 
   const navigation = $derived(
@@ -34,18 +49,6 @@
             ...data.moveCategories.map((cat: { name: string; slug: string }) => ({
               label: cat.name,
               href: `/moves?categories=${cat.slug}`,
-            })),
-          ],
-        };
-      }
-      if (section.label === 'Articles') {
-        return {
-          ...section,
-          children: [
-            { label: 'All', href: '/articles' },
-            ...data.articleCategories.map((cat: { name: string; slug: string }) => ({
-              label: cat.name,
-              href: `/articles?categories=${cat.slug}`,
             })),
           ],
         };
@@ -76,10 +79,7 @@
 <Sidebar.Provider>
   <AppSidebar {navigation} />
   <Sidebar.Inset>
-    <AppHeader session={data.session} />
-    {#if data.session && !data.session.user.emailVerified}
-      <EmailVerificationBanner email={data.session.user.email} />
-    {/if}
+    <AppHeader />
     <main class="flex flex-1 flex-col">
       {@render children()}
     </main>

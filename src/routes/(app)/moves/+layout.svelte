@@ -1,9 +1,10 @@
 <script lang="ts">
-	import EntityPageLayout from '$lib/components/ui/entity-page-layout.svelte';
+  import type { Snippet } from 'svelte';
+  import EntityPageLayout from '$lib/components/ui/entity-page-layout.svelte';
 
-	let { children }: { children: any } = $props();
+  let { children }: { children: Snippet } = $props();
 </script>
 
 <EntityPageLayout footerText="Move data from Smogon and Cobblemon.">
-	{@render children()}
+  {@render children()}
 </EntityPageLayout>

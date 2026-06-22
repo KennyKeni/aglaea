@@ -42,7 +42,7 @@
     <ChevronLeft />
   </Button>
 
-  {#each pages as page}
+  {#each pages as page, i (`${page}-${i}`)}
     {#if page === 'ellipsis'}
       <span class="px-2 text-muted-foreground">...</span>
     {:else}

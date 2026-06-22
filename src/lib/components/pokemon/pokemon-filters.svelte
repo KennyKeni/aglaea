@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Button, buttonVariants } from '$lib/components/ui/button';
+  import { SvelteURLSearchParams } from 'svelte/reactivity';
   import * as Collapsible from '$lib/components/ui/collapsible';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Popover from '$lib/components/ui/popover';
@@ -10,7 +11,6 @@
   import {
     type FilterOption,
     getSelectedSlugs,
-    getSelectedOptions,
     isOptionSelected,
     toggleFilterOption,
     removeFilterOption,
@@ -25,17 +25,25 @@
   } from '$lib/utils/filters';
   import StatRangeSlider from './stat-range-slider.svelte';
 
-  interface Props {
-    types: FilterOption[];
-    abilities: FilterOption[];
-    moves: FilterOption[];
-  }
+  type FilterKind = 'types' | 'abilities' | 'moves';
 
-  let { types, abilities, moves }: Props = $props();
+  interface FilterResponse {
+    data?: Array<Partial<FilterOption>>;
+  }
 
   const basePath = '/pokemon';
   const allParamNames = ['types', 'abilities', 'moves', 'generations'];
-  const statParamNames = ['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed', 'totalStats'];
+  const statParamNames = [
+    'hp',
+    'attack',
+    'defense',
+    'specialAttack',
+    'specialDefense',
+    'speed',
+    'totalStats',
+  ];
+  const FILTER_LIMIT = 50;
+  const FILTER_DEBOUNCE_MS = 250;
 
   const STAT_MIN = 1;
   const STAT_MAX = 255;
@@ -46,6 +54,15 @@
   let typeSearch = $state('');
   let abilitySearch = $state('');
   let moveSearch = $state('');
+  let types: FilterOption[] = $state([]);
+  let abilities: FilterOption[] = $state([]);
+  let moves: FilterOption[] = $state([]);
+  let typesLoading = $state(false);
+  let abilitiesLoading = $state(false);
+  let movesLoading = $state(false);
+  let typesError = $state('');
+  let abilitiesError = $state('');
+  let movesError = $state('');
 
   const statConfigs = [
     { key: 'hp', label: 'HP', min: STAT_MIN, max: STAT_MAX },
@@ -63,38 +80,161 @@
     name: `Gen ${i + 1}`,
   }));
 
-  const filteredTypes = $derived(
-    typeSearch ? types.filter((t) => t.name.toLowerCase().includes(typeSearch.toLowerCase())) : types
-  );
-
-  const filteredAbilities = $derived(
-    abilitySearch
-      ? abilities.filter((a) => a.name.toLowerCase().includes(abilitySearch.toLowerCase()))
-      : abilities
-  );
-
-  const filteredMoves = $derived(
-    moveSearch
-      ? moves.filter((m) => m.name.toLowerCase().includes(moveSearch.toLowerCase()))
-      : moves
-  );
+  const shouldLoadOptions = $derived(isOpen || hasActiveFilters(allParamNames));
+  const filteredTypes = $derived(types);
+  const filteredAbilities = $derived(abilities);
+  const filteredMoves = $derived(moves);
 
   const activeStatCount = $derived(getActiveStatFilterCount(statParamNames));
   const activeFilters = $derived(hasActiveFilters(allParamNames) || activeStatCount > 0);
   const activeCount = $derived(getTotalActiveCount(allParamNames) + activeStatCount);
 
+  function isFilterOption(item: Partial<FilterOption>): item is FilterOption {
+    return (
+      typeof item.id === 'number' && typeof item.slug === 'string' && typeof item.name === 'string'
+    );
+  }
+
+  function labelFromSlug(slug: string): string {
+    return slug
+      .split('-')
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
+  function getSelectedFilterOptions(paramName: string, options: FilterOption[]): FilterOption[] {
+    return getSelectedSlugs(paramName).map((slug, index) => {
+      const option = options.find((opt) => opt.slug === slug);
+      return option ?? { id: -(index + 1), slug, name: labelFromSlug(slug) };
+    });
+  }
+
+  async function fetchFilterOptions(
+    kind: FilterKind,
+    search: string,
+    signal: AbortSignal,
+  ): Promise<FilterOption[]> {
+    const params = new SvelteURLSearchParams({ limit: String(FILTER_LIMIT) });
+    const term = search.trim();
+    if (term) params.set('name', term);
+
+    if (kind === 'moves') {
+      params.set('includeFlags', 'false');
+      params.set('includeBoosts', 'false');
+      params.set('includeEffects', 'false');
+      params.set('includeGmaxSpecies', 'false');
+      params.set('includeForms', 'false');
+    }
+
+    const response = await fetch(`/api/${kind}?${params}`, { signal });
+    if (!response.ok) {
+      throw new Error(`Failed to load ${kind}`);
+    }
+
+    const body = (await response.json()) as FilterResponse;
+    return (body.data ?? [])
+      .filter(isFilterOption)
+      .map(({ id, slug, name }) => ({ id, slug, name }));
+  }
+
+  function isAbortError(error: unknown): boolean {
+    return error instanceof DOMException && error.name === 'AbortError';
+  }
+
+  $effect(() => {
+    if (!shouldLoadOptions) return;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      typesLoading = true;
+      typesError = '';
+      fetchFilterOptions('types', typeSearch, controller.signal)
+        .then((options) => {
+          types = options;
+        })
+        .catch((error) => {
+          if (isAbortError(error)) return;
+          typesError = 'Unable to load types.';
+          types = [];
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) typesLoading = false;
+        });
+    }, FILTER_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  });
+
+  $effect(() => {
+    if (!shouldLoadOptions) return;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      abilitiesLoading = true;
+      abilitiesError = '';
+      fetchFilterOptions('abilities', abilitySearch, controller.signal)
+        .then((options) => {
+          abilities = options;
+        })
+        .catch((error) => {
+          if (isAbortError(error)) return;
+          abilitiesError = 'Unable to load abilities.';
+          abilities = [];
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) abilitiesLoading = false;
+        });
+    }, FILTER_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  });
+
+  $effect(() => {
+    if (!shouldLoadOptions) return;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      movesLoading = true;
+      movesError = '';
+      fetchFilterOptions('moves', moveSearch, controller.signal)
+        .then((options) => {
+          moves = options;
+        })
+        .catch((error) => {
+          if (isAbortError(error)) return;
+          movesError = 'Unable to load moves.';
+          moves = [];
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) movesLoading = false;
+        });
+    }, FILTER_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  });
+
   function getAllSelectedOptions(): Array<{ option: FilterOption; paramName: string }> {
     const result: Array<{ option: FilterOption; paramName: string }> = [];
-    for (const opt of getSelectedOptions('types', types)) {
+    for (const opt of getSelectedFilterOptions('types', types)) {
       result.push({ option: opt, paramName: 'types' });
     }
-    for (const opt of getSelectedOptions('abilities', abilities)) {
+    for (const opt of getSelectedFilterOptions('abilities', abilities)) {
       result.push({ option: opt, paramName: 'abilities' });
     }
-    for (const opt of getSelectedOptions('moves', moves)) {
+    for (const opt of getSelectedFilterOptions('moves', moves)) {
       result.push({ option: opt, paramName: 'moves' });
     }
-    for (const opt of getSelectedOptions('generations', generations)) {
+    for (const opt of getSelectedFilterOptions('generations', generations)) {
       result.push({ option: opt, paramName: 'generations' });
     }
     return result;
@@ -114,7 +254,12 @@
     clearAllFilters(basePath, [...allParamNames, ...flatStatParams]);
   }
 
-  function handleStatChange(key: string, value: [number, number], defaultMin: number, defaultMax: number) {
+  function handleStatChange(
+    key: string,
+    value: [number, number],
+    defaultMin: number,
+    defaultMax: number,
+  ) {
     setStatRange(basePath, key, value[0], value[1], defaultMin, defaultMax);
   }
 </script>
@@ -176,12 +321,15 @@
   </div>
 
   <Collapsible.Content>
-    <div class="flex flex-wrap gap-2 pb-4 pt-2">
+    <div class="flex flex-wrap gap-2 pt-2 pb-4">
       <!-- Types -->
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>
           {#snippet child({ props })}
-            <button {...props} class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}>
+            <button
+              {...props}
+              class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}
+            >
               Types
               <Badge variant="secondary" class="h-5 w-6 justify-center tabular-nums">
                 {getSelectedSlugs('types').length}
@@ -200,14 +348,22 @@
             />
           </div>
           <div class="max-h-64 overflow-y-auto">
-            {#each filteredTypes as option (option.id)}
-              <DropdownMenu.CheckboxItem
-                checked={isOptionSelected('types', option.slug)}
-                onCheckedChange={() => toggleFilterOption(basePath, 'types', option.slug)}
-              >
-                {option.name}
-              </DropdownMenu.CheckboxItem>
-            {/each}
+            {#if typesLoading}
+              <div class="px-2 py-1.5 text-xs text-muted-foreground">Loading types...</div>
+            {:else if typesError}
+              <div class="px-2 py-1.5 text-xs text-destructive">{typesError}</div>
+            {:else if filteredTypes.length}
+              {#each filteredTypes as option (option.id)}
+                <DropdownMenu.CheckboxItem
+                  checked={isOptionSelected('types', option.slug)}
+                  onCheckedChange={() => toggleFilterOption(basePath, 'types', option.slug)}
+                >
+                  {option.name}
+                </DropdownMenu.CheckboxItem>
+              {/each}
+            {:else}
+              <div class="px-2 py-1.5 text-xs text-muted-foreground">No types found.</div>
+            {/if}
           </div>
         </DropdownMenu.Content>
       </DropdownMenu.Root>
@@ -216,7 +372,10 @@
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>
           {#snippet child({ props })}
-            <button {...props} class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}>
+            <button
+              {...props}
+              class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}
+            >
               Generation
               <Badge variant="secondary" class="h-5 w-6 justify-center tabular-nums">
                 {getSelectedSlugs('generations').length}
@@ -243,7 +402,10 @@
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>
           {#snippet child({ props })}
-            <button {...props} class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}>
+            <button
+              {...props}
+              class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}
+            >
               Abilities
               <Badge variant="secondary" class="h-5 w-6 justify-center tabular-nums">
                 {getSelectedSlugs('abilities').length}
@@ -262,18 +424,21 @@
             />
           </div>
           <div class="max-h-64 overflow-y-auto">
-            {#each filteredAbilities.slice(0, 50) as option (option.id)}
-              <DropdownMenu.CheckboxItem
-                checked={isOptionSelected('abilities', option.slug)}
-                onCheckedChange={() => toggleFilterOption(basePath, 'abilities', option.slug)}
-              >
-                {option.name}
-              </DropdownMenu.CheckboxItem>
-            {/each}
-            {#if filteredAbilities.length > 50}
-              <div class="px-2 py-1 text-xs text-muted-foreground">
-                +{filteredAbilities.length - 50} more, type to search...
-              </div>
+            {#if abilitiesLoading}
+              <div class="px-2 py-1.5 text-xs text-muted-foreground">Loading abilities...</div>
+            {:else if abilitiesError}
+              <div class="px-2 py-1.5 text-xs text-destructive">{abilitiesError}</div>
+            {:else if filteredAbilities.length}
+              {#each filteredAbilities as option (option.id)}
+                <DropdownMenu.CheckboxItem
+                  checked={isOptionSelected('abilities', option.slug)}
+                  onCheckedChange={() => toggleFilterOption(basePath, 'abilities', option.slug)}
+                >
+                  {option.name}
+                </DropdownMenu.CheckboxItem>
+              {/each}
+            {:else}
+              <div class="px-2 py-1.5 text-xs text-muted-foreground">No abilities found.</div>
             {/if}
           </div>
         </DropdownMenu.Content>
@@ -283,7 +448,10 @@
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>
           {#snippet child({ props })}
-            <button {...props} class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}>
+            <button
+              {...props}
+              class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}
+            >
               Moves
               <Badge variant="secondary" class="h-5 w-6 justify-center tabular-nums">
                 {getSelectedSlugs('moves').length}
@@ -302,18 +470,21 @@
             />
           </div>
           <div class="max-h-64 overflow-y-auto">
-            {#each filteredMoves.slice(0, 50) as option (option.id)}
-              <DropdownMenu.CheckboxItem
-                checked={isOptionSelected('moves', option.slug)}
-                onCheckedChange={() => toggleFilterOption(basePath, 'moves', option.slug)}
-              >
-                {option.name}
-              </DropdownMenu.CheckboxItem>
-            {/each}
-            {#if filteredMoves.length > 50}
-              <div class="px-2 py-1 text-xs text-muted-foreground">
-                +{filteredMoves.length - 50} more, type to search...
-              </div>
+            {#if movesLoading}
+              <div class="px-2 py-1.5 text-xs text-muted-foreground">Loading moves...</div>
+            {:else if movesError}
+              <div class="px-2 py-1.5 text-xs text-destructive">{movesError}</div>
+            {:else if filteredMoves.length}
+              {#each filteredMoves as option (option.id)}
+                <DropdownMenu.CheckboxItem
+                  checked={isOptionSelected('moves', option.slug)}
+                  onCheckedChange={() => toggleFilterOption(basePath, 'moves', option.slug)}
+                >
+                  {option.name}
+                </DropdownMenu.CheckboxItem>
+              {/each}
+            {:else}
+              <div class="px-2 py-1.5 text-xs text-muted-foreground">No moves found.</div>
             {/if}
           </div>
         </DropdownMenu.Content>
@@ -323,7 +494,10 @@
       <Popover.Root>
         <Popover.Trigger>
           {#snippet child({ props })}
-            <button {...props} class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}>
+            <button
+              {...props}
+              class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}
+            >
               Stats
               <Badge variant="secondary" class="h-5 w-6 justify-center tabular-nums">
                 {activeStatCount}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { AFFILIATION_DISCLAIMER } from '$lib/config/disclaimers';
   import { cn } from '$lib/utils';
 
   let { class: className = '' }: { class?: string } = $props();
@@ -12,8 +13,7 @@
 >
   <div class="mx-auto max-w-2xl space-y-2">
     <p>Thanks for reading</p>
-    <p class="text-xs">
-      Message Zmjjkk on Discord
-    </p>
+    <p class="text-xs">Message Zmjjkk on Discord</p>
+    <p class="text-xs leading-relaxed">{AFFILIATION_DISCLAIMER}</p>
   </div>
 </footer>

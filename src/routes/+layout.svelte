@@ -1,24 +1,14 @@
 <script lang="ts">
-  import { permissions } from '$lib/state/permissions.svelte';
+  import { asset } from '$app/paths';
   import './layout.css';
-  import favicon from '$lib/assets/favicon.svg';
 
-  let { data, children } = $props();
-
-  $effect(() => {
-    permissions.init(data.permissions);
-  });
-
-  $effect(() => {
-    if (!data.session) {
-      permissions.clear();
-    }
-  });
+  let { children } = $props();
 </script>
 
 <svelte:head>
-  <link rel="icon" href={favicon} />
-  <meta name="description" content="Cobblemon species database and Pokedex" />
+  <link rel="icon" href={asset('/favicon.ico')} sizes="any" type="image/x-icon" />
+  <link rel="icon" href={asset('/cobblemon-logo.png')} type="image/png" />
+  <meta name="description" content="Unofficial Cobblemon wiki and Pokedex reference" />
 </svelte:head>
 
 {@render children()}

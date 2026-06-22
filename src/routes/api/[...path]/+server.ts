@@ -1,19 +1,23 @@
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
+import { getBackendUrl } from '$lib/server/backend-url';
 
 const HOP_BY_HOP = new Set([
+  'authorization',
   'connection',
+  'cookie',
   'keep-alive',
+  'proxy-authenticate',
   'transfer-encoding',
   'te',
+  'set-cookie',
   'trailer',
   'upgrade',
   'proxy-authorization',
 ]);
 
 const proxy: RequestHandler = async ({ request, params, url }) => {
-  const targetUrl = `${env.BACKEND_URL}/${params.path}${url.search}`;
+  const targetUrl = `${getBackendUrl()}/${params.path}${url.search}`;
 
   const headers = new Headers();
   for (const [key, value] of request.headers) {
@@ -26,19 +30,12 @@ const proxy: RequestHandler = async ({ request, params, url }) => {
     const res = await fetch(targetUrl, {
       method: request.method,
       headers,
-      body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
-      // @ts-expect-error duplex is required for streaming request bodies
-      duplex: 'half',
     });
 
     const resHeaders = new Headers();
     for (const [key, value] of res.headers) {
       if (!HOP_BY_HOP.has(key.toLowerCase())) {
-        if (key.toLowerCase() === 'set-cookie') {
-          resHeaders.append(key, value);
-        } else {
-          resHeaders.set(key, value);
-        }
+        resHeaders.set(key, value);
       }
     }
 
@@ -53,7 +50,4 @@ const proxy: RequestHandler = async ({ request, params, url }) => {
 };
 
 export const GET = proxy;
-export const POST = proxy;
-export const PUT = proxy;
-export const PATCH = proxy;
-export const DELETE = proxy;
+export const HEAD = proxy;

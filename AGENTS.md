@@ -58,11 +58,13 @@ src/lib/
 ## Svelte 5 Patterns
 
 **Props to local state** — Choose pattern based on intent:
+
 - Initialize once (forms): Use `initialized` flag guard
 - Always sync (navigation): Sync in `$effect`, add template guard for first render
 - Dirty tracking: Sync only when `!dirty`
 
 **Cleanup** — Always clean up in `onDestroy` or return cleanup from `$effect`/`onMount`:
+
 - TipTap editors
 - Event listeners on window/document
 - Observers (Intersection, Resize, Mutation)

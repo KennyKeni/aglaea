@@ -46,7 +46,7 @@
 </script>
 
 <SheetPortal {...portalProps}>
-  <SheetOverlay {...(onOverlayClick && { onclick: onOverlayClick })} />
+  <SheetOverlay {...onOverlayClick && { onclick: onOverlayClick }} />
   <SheetPrimitive.Content
     bind:ref
     data-slot="sheet-content"

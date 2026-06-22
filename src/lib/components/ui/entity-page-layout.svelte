@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { AFFILIATION_DISCLAIMER } from '$lib/config/disclaimers';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -14,8 +15,9 @@
     {@render children()}
   </div>
   <div class="border-t bg-background">
-    <div class="mx-auto max-w-6xl px-4 py-6 text-xs text-muted-foreground">
-      {footerText}
+    <div class="mx-auto max-w-6xl space-y-2 px-4 py-6 text-xs text-muted-foreground">
+      <p>{footerText}</p>
+      <p class="leading-relaxed">{AFFILIATION_DISCLAIMER}</p>
     </div>
   </div>
 </div>

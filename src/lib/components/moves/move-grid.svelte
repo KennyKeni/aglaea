@@ -1,27 +1,27 @@
 <script lang="ts">
-	import MoveCard from './move-card.svelte';
-	import EntityGrid from '$lib/components/ui/entity-grid.svelte';
-	import type { Move } from '$lib/types/move';
-	import { moveUrl } from '$lib/utils/url';
+  import MoveCard from './move-card.svelte';
+  import EntityGrid from '$lib/components/ui/entity-grid.svelte';
+  import type { Move } from '$lib/types/move';
+  import { moveUrl } from '$lib/utils/url';
 
-	let {
-		moves,
-		isLoading = false,
-		isRefreshing = false,
-		skeletonCount = 8,
-	}: {
-		moves: Move[];
-		isLoading?: boolean;
-		isRefreshing?: boolean;
-		skeletonCount?: number;
-	} = $props();
+  let {
+    moves,
+    isLoading = false,
+    isRefreshing = false,
+    skeletonCount = 8,
+  }: {
+    moves: Move[];
+    isLoading?: boolean;
+    isRefreshing?: boolean;
+    skeletonCount?: number;
+  } = $props();
 </script>
 
 <EntityGrid items={moves} {isLoading} {isRefreshing} {skeletonCount}>
-	{#snippet card(move)}
-		<MoveCard {move} href={moveUrl(move.id)} />
-	{/snippet}
-	{#snippet skeleton()}
-		<MoveCard loading />
-	{/snippet}
+  {#snippet card(move)}
+    <MoveCard {move} href={moveUrl(move.id)} />
+  {/snippet}
+  {#snippet skeleton()}
+    <MoveCard loading />
+  {/snippet}
 </EntityGrid>

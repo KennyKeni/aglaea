@@ -4,10 +4,8 @@
   import DetailFooter from '$lib/components/ui/detail-footer.svelte';
   import DetailHeader from '$lib/components/ui/detail-header.svelte';
   import Toc from '$lib/components/ui/toc.svelte';
-  import EditButton from '$lib/components/ui/edit-button.svelte';
   import { pokemonStore } from '$lib/state/pokemon-store.svelte';
   import { formatId } from '$lib/utils/pokemon';
-  import { Resource } from '$lib/types/auth';
   import type { Pokemon } from '$lib/types/pokemon';
   import type { TocItem } from '$lib/utils/toc';
 
@@ -39,7 +37,10 @@
     if (activeForm?.spawns?.length) {
       items.push({ id: 'spawn-locations', text: 'Spawn Locations', level: 2 });
     }
-    if (activeForm?.drops && (activeForm.drops.percentages.length || activeForm.drops.ranges.length)) {
+    if (
+      activeForm?.drops &&
+      (activeForm.drops.percentages.length || activeForm.drops.ranges.length)
+    ) {
       items.push({ id: 'drops', text: 'Drops', level: 2 });
     }
     return items;
@@ -48,26 +49,19 @@
 
 <svelte:head>
   <title>{pokemon.name} | Pokedex</title>
-  <meta
-    name="description"
-    content={pokemon.description || `Details for ${pokemon.name}`}
-  />
+  <meta name="description" content={pokemon.description || `Details for ${pokemon.name}`} />
 </svelte:head>
 
 <div class="flex min-h-svh flex-col">
   <DetailHeader
     title="{pokemon.name} {formatId(pokemon.id)}"
     closeHref={pokemonStore.getReturnHref('/pokemon')}
-  >
-    {#snippet actions()}
-      <EditButton resource={Resource.Pokemon} href="/pokemon/{pokemon.id}/edit" />
-    {/snippet}
-  </DetailHeader>
+  />
 
   <div class="flex-1 px-4 py-4 md:px-6 md:py-6">
     <div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
       <div class="mx-auto max-w-5xl md:min-w-2xl">
-        <PokemonContent pokemon={pokemon} fullPokemon={pokemon} mode="full" {initialFormId} />
+        <PokemonContent {pokemon} fullPokemon={pokemon} mode="full" {initialFormId} />
       </div>
       {#if toc.length > 0}
         <aside class="hidden xl:block">
