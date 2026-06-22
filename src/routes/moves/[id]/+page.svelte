@@ -50,9 +50,9 @@
 <div class="flex min-h-svh flex-col">
   <DetailHeader title={move.name} closeHref={moveStore.getReturnHref('/moves')} />
 
-  <div class="flex-1 px-4 py-4 md:px-6 md:py-6">
+  <div class="flex-1 px-6 py-6 md:px-8 lg:px-12">
     <div class="xl:grid xl:grid-cols-[1fr_auto] xl:gap-8">
-      <div class="mx-auto max-w-5xl md:min-w-2xl">
+      <div class="mx-auto max-w-6xl md:min-w-2xl">
         <MoveDetail {move} />
       </div>
       {#if toc.length > 0}
