@@ -59,7 +59,7 @@
     <header
       class="mb-12 flex flex-col items-center text-center md:mb-16 md:items-start md:text-left"
     >
-      <h1 class="mb-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">Aglaea Index</h1>
+      <h1 class="mb-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">Aglaea</h1>
 
       <p class="max-w-2xl text-lg text-muted-foreground sm:text-xl">
         {UNOFFICIAL_WIKI_NOTICE}
@@ -68,6 +68,15 @@
       <p class="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         Not affiliated with or endorsed by the Cobblemon mod project.
       </p>
+
+      <a
+        class="mt-2 text-xs font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+        href="https://modrinth.com/server/cobblemon-delta-server"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Play Cobblemon Delta
+      </a>
     </header>
 
     <main class="space-y-10">
