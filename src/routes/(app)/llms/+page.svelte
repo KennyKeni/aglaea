@@ -353,38 +353,37 @@
     </div>
   </div>
 
-  <footer class="border-t bg-background px-3 py-3 sm:px-4">
-    <form class="mx-auto w-full max-w-5xl" onsubmit={handleSubmit}>
+  <footer class="bg-transparent px-4 pt-2 pb-4">
+    <form
+      class="relative w-full rounded-lg border border-input bg-background shadow-lg transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+      onsubmit={handleSubmit}
+    >
       <label for="llm-message" class="sr-only">Message</label>
-      <div
-        class="relative rounded-lg border border-input bg-background transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+      <textarea
+        id="llm-message"
+        bind:value={input}
+        rows="2"
+        class="block min-h-12 w-full resize-none rounded-lg bg-transparent py-2 pr-14 pl-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        placeholder="Ask Herta"
+        disabled={isSending || isResetting}
+        onkeydown={handleKeydown}></textarea>
+      <Button
+        type="submit"
+        disabled={!canSend}
+        aria-label="Send message"
+        size="icon"
+        class="absolute right-1 bottom-1 rounded-md"
       >
-        <textarea
-          id="llm-message"
-          bind:value={input}
-          rows="2"
-          class="block min-h-12 w-full resize-none rounded-lg bg-transparent py-2 pr-14 pl-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Ask Herta"
-          disabled={isSending || isResetting}
-          onkeydown={handleKeydown}></textarea>
-        <Button
-          type="submit"
-          disabled={!canSend}
-          aria-label="Send message"
-          size="icon"
-          class="absolute right-1 bottom-1 rounded-md"
-        >
-          {#if isSending}
-            <LoaderCircle class="size-4 animate-spin" />
-          {:else}
-            <Send class="size-4" />
-          {/if}
-        </Button>
-      </div>
+        {#if isSending}
+          <LoaderCircle class="size-4 animate-spin" />
+        {:else}
+          <Send class="size-4" />
+        {/if}
+      </Button>
     </form>
 
     {#if errorMessage}
-      <div class="mx-auto mt-3 max-w-5xl rounded-md border border-destructive/30 px-3 py-2">
+      <div class="mt-3 rounded-md border border-destructive/30 px-3 py-2">
         <p class="text-sm text-destructive">{errorMessage}</p>
       </div>
     {/if}
