@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Skeleton } from '$lib/components/ui/skeleton';
-  import { cn } from '$lib/utils';
-  import { TYPE_COLORS } from '$lib/utils/pokemon';
+  import TypeBadge from '$lib/components/pokemon/type-badge.svelte';
   import type { Move } from '$lib/types/move';
 
   let {
@@ -46,14 +45,7 @@
     <div class="space-y-2">
       <div class="truncate text-base font-semibold">{move.name}</div>
       <div class="flex flex-wrap gap-1.5">
-        <span
-          class={cn(
-            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-            TYPE_COLORS[move.type.slug] || 'bg-muted',
-          )}
-        >
-          {move.type.name}
-        </span>
+        <TypeBadge type={move.type} />
         <span
           class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium"
         >

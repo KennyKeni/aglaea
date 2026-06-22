@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Skeleton } from '$lib/components/ui/skeleton';
-  import { cn } from '$lib/utils';
-  import { TYPE_COLORS, formatId } from '$lib/utils/pokemon';
+  import TypeBadge from './type-badge.svelte';
+  import { formatId } from '$lib/utils/pokemon';
   import ImageOff from '@lucide/svelte/icons/image-off';
   import type { Pokemon } from '$lib/types/pokemon';
 
@@ -46,14 +46,7 @@
         </div>
         <div class="mt-2 flex flex-wrap gap-1.5">
           {#each defaultForm?.types ?? [] as { type } (type.id)}
-            <span
-              class={cn(
-                'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                TYPE_COLORS[type.slug] || 'bg-muted',
-              )}
-            >
-              {type.name}
-            </span>
+            <TypeBadge {type} />
           {/each}
         </div>
       </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { Skeleton } from '$lib/components/ui/skeleton';
+  import TypeBadge from './type-badge.svelte';
   import type { FormMove } from '$lib/types/pokemon';
 
   let {
@@ -57,9 +58,7 @@
                   href={resolve('/moves/[id]', { id: String(mv.move.id) })}
                   class="font-medium hover:underline">{mv.move.name}</a
                 >
-                <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium"
-                  >{mv.move.type.name}</span
-                >
+                <TypeBadge type={mv.move.type} />
                 <span class="text-xs text-muted-foreground">{mv.move.category.name}</span>
               </div>
               <div class="mt-1 flex flex-wrap items-center gap-3">

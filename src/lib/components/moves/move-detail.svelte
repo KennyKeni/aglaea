@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { cn } from '$lib/utils';
-  import { TYPE_COLORS } from '$lib/utils/pokemon';
+  import TypeBadge from '$lib/components/pokemon/type-badge.svelte';
   import type { Move } from '$lib/types/move';
+  import { cn } from '$lib/utils';
   import { pokemonUrl } from '$lib/utils/url';
 
   let { move }: { move: Move } = $props();
@@ -20,14 +20,7 @@
     <h2 class="text-lg font-semibold">Overview</h2>
     <div class="space-y-4">
       <div class="flex flex-wrap gap-2">
-        <span
-          class={cn(
-            'inline-flex items-center rounded-full px-3 py-1 text-sm font-medium',
-            TYPE_COLORS[move.type.slug] || 'bg-muted',
-          )}
-        >
-          {move.type.name}
-        </span>
+        <TypeBadge type={move.type} size="md" />
         <span class="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm font-medium">
           {move.category.name}
         </span>

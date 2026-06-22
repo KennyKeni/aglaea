@@ -6,6 +6,7 @@
   import * as Popover from '$lib/components/ui/popover';
   import { Badge } from '$lib/components/ui/badge';
   import { Input } from '$lib/components/ui/input';
+  import TypeBadge from './type-badge.svelte';
   import { ChevronDown, ChevronUp, Filter, X } from '@lucide/svelte';
   import { cn } from '$lib/utils';
   import {
@@ -284,17 +285,30 @@
     {#if activeFilters}
       <div class="flex flex-wrap items-center gap-2">
         {#each getAllSelectedOptions() as { option, paramName } (`${paramName}-${option.slug}`)}
-          <Badge variant="secondary" class="gap-1 pr-1">
-            {option.name}
-            <button
-              type="button"
-              class="ml-1 rounded-full hover:bg-muted"
-              onclick={() => removeFilterOption(basePath, paramName, option.slug)}
-            >
-              <X class="h-3 w-3" />
-              <span class="sr-only">Remove {option.name} filter</span>
-            </button>
-          </Badge>
+          {#if paramName === 'types'}
+            <TypeBadge type={option} class="gap-1 pr-1">
+              <button
+                type="button"
+                class="ml-1 rounded-full hover:bg-background/20"
+                onclick={() => removeFilterOption(basePath, paramName, option.slug)}
+              >
+                <X class="h-3 w-3" />
+                <span class="sr-only">Remove {option.name} filter</span>
+              </button>
+            </TypeBadge>
+          {:else}
+            <Badge variant="secondary" class="gap-1 pr-1">
+              {option.name}
+              <button
+                type="button"
+                class="ml-1 rounded-full hover:bg-muted"
+                onclick={() => removeFilterOption(basePath, paramName, option.slug)}
+              >
+                <X class="h-3 w-3" />
+                <span class="sr-only">Remove {option.name} filter</span>
+              </button>
+            </Badge>
+          {/if}
         {/each}
         {#each getActiveStats() as stat (stat.key)}
           <Badge variant="secondary" class="gap-1 pr-1">
