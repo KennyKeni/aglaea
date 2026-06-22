@@ -1,4 +1,4 @@
-import { Cat, Swords, Package, Sparkles } from '@lucide/svelte';
+import { Bot, Cat, Swords, Package, Sparkles } from '@lucide/svelte';
 import type { Navigation } from '$lib/types/navigation';
 
 export const baseNavigation: Navigation = [
@@ -21,5 +21,10 @@ export const baseNavigation: Navigation = [
     label: 'Abilities',
     icon: Sparkles,
     children: [{ label: 'All', href: '/abilities' }],
+  },
+  {
+    label: 'LLMs',
+    icon: Bot,
+    children: [{ label: 'Chat', href: '/llms' }],
   },
 ];

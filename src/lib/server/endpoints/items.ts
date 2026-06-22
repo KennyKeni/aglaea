@@ -20,11 +20,10 @@ export interface ItemSearchParams {
 }
 
 export interface ItemDetailParams {
-  includeBoosts?: boolean;
-  includeFlags?: boolean;
-  includeTags?: boolean;
-  includeRecipes?: boolean;
+  include?: ItemInclude[];
 }
+
+type ItemInclude = 'boosts' | 'flags' | 'tags' | 'recipes';
 
 function buildSearchQuery(params: ItemSearchParams): URLSearchParams {
   const q = new URLSearchParams();
@@ -39,10 +38,7 @@ function buildSearchQuery(params: ItemSearchParams): URLSearchParams {
 
 function buildDetailQuery(params: ItemDetailParams): URLSearchParams {
   const q = new URLSearchParams();
-  if (params.includeBoosts) q.set('includeBoosts', 'true');
-  if (params.includeFlags) q.set('includeFlags', 'true');
-  if (params.includeTags) q.set('includeTags', 'true');
-  if (params.includeRecipes) q.set('includeRecipes', 'true');
+  if (params.include?.length) q.set('include', params.include.join(','));
   return q;
 }
 

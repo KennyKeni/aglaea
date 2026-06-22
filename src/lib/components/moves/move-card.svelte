@@ -13,6 +13,13 @@
     loading?: boolean;
     href?: string;
   } = $props();
+
+  function formatAccuracy(accuracy: Move['accuracy']) {
+    if (accuracy === true) return 'Always';
+    if (accuracy === false) return 'Never';
+    if (accuracy == null) return null;
+    return `${accuracy}%`;
+  }
 </script>
 
 {#if loading}
@@ -59,8 +66,8 @@
       {#if move.power}
         <span>Power: <strong class="text-foreground">{move.power}</strong></span>
       {/if}
-      {#if move.accuracy}
-        <span>Acc: <strong class="text-foreground">{move.accuracy}%</strong></span>
+      {#if move.accuracy != null}
+        <span>Acc: <strong class="text-foreground">{formatAccuracy(move.accuracy)}</strong></span>
       {/if}
       <span>PP: <strong class="text-foreground">{move.pp}</strong></span>
     </div>

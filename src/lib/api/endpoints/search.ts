@@ -15,12 +15,16 @@ async function fetchResults(
   query: string,
   limit: number,
   source: SearchSourceKind,
-  extra?: string,
+  extra?: Record<string, string>,
 ): Promise<SearchResult[]> {
   const params = new URLSearchParams();
   params.set(queryParam, query);
   params.set('limit', String(limit));
-  if (extra) params.set(extra, 'true');
+  if (extra) {
+    for (const [key, value] of Object.entries(extra)) {
+      params.set(key, value);
+    }
+  }
 
   const result = await client.get<Paginated<PaginatedItem>>(`${path}?${params}`);
   if (!result.ok) return [];
@@ -35,7 +39,9 @@ async function fetchResults(
 }
 
 export function searchPokemon(query: string, limit: number): Promise<SearchResult[]> {
-  return fetchResults('/pokemon', 'name', query, limit, 'pokemon', 'includeTypes');
+  return fetchResults('/pokemon/species', 'name', query, limit, 'pokemon', {
+    include: 'forms,types',
+  });
 }
 
 export function searchMoves(query: string, limit: number): Promise<SearchResult[]> {

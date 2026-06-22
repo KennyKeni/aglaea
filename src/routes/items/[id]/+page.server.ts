@@ -8,10 +8,7 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
   const itemApi = createItemEndpoint(client);
 
   const result = await itemApi.getById(params.id, {
-    includeBoosts: true,
-    includeFlags: true,
-    includeTags: true,
-    includeRecipes: true,
+    include: ['boosts', 'flags', 'tags', 'recipes'],
   });
 
   if (!result.ok) {

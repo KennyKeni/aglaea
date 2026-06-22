@@ -2,12 +2,12 @@
   import { resolve } from '$app/paths';
   import { Button } from '$lib/components/ui/button';
   import { AFFILIATION_DISCLAIMER, UNOFFICIAL_WIKI_NOTICE } from '$lib/config/disclaimers';
-  import { ArrowRight, Clock, Database, Package, Sparkles, Swords } from '@lucide/svelte';
+  import { ArrowRight, Bot, Clock, Database, Package, Sparkles, Swords } from '@lucide/svelte';
 
   type DirectoryCategory = {
     title: string;
     icon: typeof Database;
-    href: '/pokemon' | '/items' | '/moves' | '/abilities';
+    href: '/pokemon' | '/items' | '/moves' | '/abilities' | '/llms';
     desc: string;
     meta: string;
   };
@@ -40,6 +40,13 @@
       href: '/abilities',
       desc: 'Look up Cobblemon abilities and related species.',
       meta: 'Ability Data',
+    },
+    {
+      title: 'LLMs',
+      icon: Bot,
+      href: '/llms',
+      desc: 'Query the Herta data tools through a chat session.',
+      meta: 'Chat',
     },
   ] satisfies DirectoryCategory[];
 

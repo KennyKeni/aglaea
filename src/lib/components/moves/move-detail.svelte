@@ -5,6 +5,13 @@
   import { pokemonUrl } from '$lib/utils/url';
 
   let { move }: { move: Move } = $props();
+
+  function formatAccuracy(accuracy: Move['accuracy']) {
+    if (accuracy === true) return 'Always';
+    if (accuracy === false) return 'Never';
+    if (accuracy == null) return '—';
+    return `${accuracy}%`;
+  }
 </script>
 
 <div class="space-y-8">
@@ -21,9 +28,7 @@
         >
           {move.type.name}
         </span>
-        <span
-          class="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm font-medium"
-        >
+        <span class="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm font-medium">
           {move.category.name}
         </span>
         {#if move.target}
@@ -46,9 +51,7 @@
         </div>
         <div>
           <div class="text-xs text-muted-foreground">Accuracy</div>
-          <div class="text-lg font-semibold">
-            {move.accuracy ? `${move.accuracy}%` : '—'}
-          </div>
+          <div class="text-lg font-semibold">{formatAccuracy(move.accuracy)}</div>
         </div>
         <div>
           <div class="text-xs text-muted-foreground">PP</div>

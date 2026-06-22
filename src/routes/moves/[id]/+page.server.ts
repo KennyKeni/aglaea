@@ -8,12 +8,7 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
   const moveApi = createMoveEndpoint(client);
 
   const result = await moveApi.getById(params.id, {
-    includeFlags: true,
-    includeBoosts: true,
-    includeEffects: true,
-    includeZData: true,
-    includeGmaxSpecies: true,
-    includeForms: true,
+    include: ['flags', 'boosts', 'effects', 'zData', 'gmaxSpecies', 'forms'],
   });
 
   if (!result.ok) {

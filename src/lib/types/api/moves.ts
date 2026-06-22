@@ -72,7 +72,7 @@ export const MoveSchema = z.object({
   category: MoveCategorySchema,
   target: MoveTargetSchema.nullable(),
   power: z.number().nullable(),
-  accuracy: z.number().nullable(),
+  accuracy: z.union([z.number(), z.boolean()]).nullable(),
   pp: z.number(),
   priority: z.number(),
   critRatio: z.number().nullable(),

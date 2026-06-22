@@ -71,7 +71,7 @@ export interface Move {
   category: MoveCategory;
   target: MoveTarget | null;
   power: number | null;
-  accuracy: number | null;
+  accuracy: number | boolean | null;
   pp: number;
   priority: number;
   critRatio: number | null;

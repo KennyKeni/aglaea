@@ -44,8 +44,7 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
   const searchTerm = url.searchParams.get('search');
 
   const searchParams: PokemonSearchParams = {
-    includeTypes: true,
-    includeAbilities: true,
+    include: ['forms', 'types', 'abilities'],
     limit: PAGE_SIZE,
     offset,
     ...(searchTerm && { name: searchTerm }),

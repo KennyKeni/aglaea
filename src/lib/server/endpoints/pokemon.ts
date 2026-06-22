@@ -24,8 +24,7 @@ export interface PokemonSearchParams {
   abilitySlugs?: string[];
   moveSlugs?: string[];
   generations?: string[];
-  includeTypes?: boolean;
-  includeAbilities?: boolean;
+  include?: PokemonInclude[];
   hpMin?: number;
   hpMax?: number;
   attackMin?: number;
@@ -43,14 +42,22 @@ export interface PokemonSearchParams {
 }
 
 export interface PokemonDetailParams {
-  includeTypes?: boolean;
-  includeAbilities?: boolean;
-  includeMoves?: boolean;
-  includeSpawns?: boolean;
-  includeDrops?: boolean;
-  includeLabels?: boolean;
-  includeEggGroups?: boolean;
-  includeExperienceGroup?: boolean;
+  include?: PokemonInclude[];
+}
+
+type PokemonInclude =
+  | 'forms'
+  | 'types'
+  | 'abilities'
+  | 'moves'
+  | 'spawns'
+  | 'drops'
+  | 'labels'
+  | 'eggGroups'
+  | 'experienceGroup';
+
+function setInclude(q: URLSearchParams, values: PokemonInclude[] | undefined): void {
+  if (values?.length) q.set('include', values.join(','));
 }
 
 function buildSearchQuery(params: PokemonSearchParams): URLSearchParams {
@@ -58,12 +65,11 @@ function buildSearchQuery(params: PokemonSearchParams): URLSearchParams {
   if (params.name) q.set('name', params.name);
   if (params.limit) q.set('limit', String(params.limit));
   if (params.offset) q.set('offset', String(params.offset));
-  if (params.includeTypes) q.set('includeTypes', 'true');
-  if (params.includeAbilities) q.set('includeAbilities', 'true');
+  setInclude(q, params.include);
 
-  params.typeSlugs?.forEach((s) => q.append('typeSlugs', s));
-  params.abilitySlugs?.forEach((s) => q.append('abilitySlugs', s));
-  params.moveSlugs?.forEach((s) => q.append('moveSlugs', s));
+  params.typeSlugs?.forEach((s) => q.append('hasForm.typeSlugs', s));
+  params.abilitySlugs?.forEach((s) => q.append('hasForm.abilitySlugs', s));
+  params.moveSlugs?.forEach((s) => q.append('hasForm.moveSlugs', s));
   params.generations?.forEach((g) => q.append('generations', g));
 
   const statParams = [
@@ -92,14 +98,7 @@ function buildSearchQuery(params: PokemonSearchParams): URLSearchParams {
 
 function buildDetailQuery(params: PokemonDetailParams): URLSearchParams {
   const q = new URLSearchParams();
-  if (params.includeTypes) q.set('includeTypes', 'true');
-  if (params.includeAbilities) q.set('includeAbilities', 'true');
-  if (params.includeMoves) q.set('includeMoves', 'true');
-  if (params.includeSpawns) q.set('includeSpawns', 'true');
-  if (params.includeDrops) q.set('includeDrops', 'true');
-  if (params.includeLabels) q.set('includeLabels', 'true');
-  if (params.includeEggGroups) q.set('includeEggGroups', 'true');
-  if (params.includeExperienceGroup) q.set('includeExperienceGroup', 'true');
+  setInclude(q, params.include);
   return q;
 }
 
@@ -110,7 +109,7 @@ export type FilterOption = z.infer<typeof NamedRefSchema>;
 export function createPokemonEndpoint(client: ServerClient) {
   return {
     search: async (params: PokemonSearchParams = {}): Promise<ApiResponse<PaginatedPokemon>> => {
-      const result = await client.get('/pokemon', buildSearchQuery(params));
+      const result = await client.get('/pokemon/species', buildSearchQuery(params));
       return validate(result, PaginatedSchema(PokemonSchema));
     },
 
@@ -118,7 +117,7 @@ export function createPokemonEndpoint(client: ServerClient) {
       id: string | number,
       params: PokemonDetailParams = {},
     ): Promise<ApiResponse<Pokemon>> => {
-      const result = await client.get(`/pokemon/${id}`, buildDetailQuery(params));
+      const result = await client.get(`/pokemon/species/${id}`, buildDetailQuery(params));
       return validate(result, PokemonSchema);
     },
 
