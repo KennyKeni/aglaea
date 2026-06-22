@@ -65,29 +65,29 @@
     {#if loading || !form}
       <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
         {#each skeletonCells as skeletonIndex (skeletonIndex)}
-          <Skeleton class="h-16 w-full rounded-xl" />
+          <Skeleton class="h-16 w-full rounded-lg" />
         {/each}
       </div>
     {:else}
       <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">EV Yield</div>
           <div class="mt-1 font-semibold">{getEvYield(form)}</div>
         </div>
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">Catch Rate</div>
           <div class="mt-1 font-semibold">{resolvedCatchRate}</div>
         </div>
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">Base Friendship</div>
           <div class="mt-1 font-semibold">{resolvedBaseFriendship}</div>
         </div>
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">Base Experience</div>
           <div class="mt-1 font-semibold">{form.baseExperienceYield ?? '—'}</div>
         </div>
         {#if pokemon?.experienceGroup}
-          <div class="rounded-xl bg-muted p-3">
+          <div class="border-b border-border/50 pb-2">
             <div class="text-xs font-medium text-muted-foreground">Growth Rate</div>
             <div class="mt-1 font-semibold">{pokemon.experienceGroup.name}</div>
           </div>
@@ -101,16 +101,16 @@
     {#if loading || !form}
       <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
         {#each breedingSkeletonCells as skeletonIndex (skeletonIndex)}
-          <Skeleton class="h-16 w-full rounded-xl" />
+          <Skeleton class="h-16 w-full rounded-lg" />
         {/each}
       </div>
     {:else}
       <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">Egg Cycles</div>
           <div class="mt-1 font-semibold">{resolvedEggCycles}</div>
         </div>
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">Gender Ratio</div>
           <div class="mt-1 font-semibold">
             {#if resolvedMaleRatio === null}
@@ -124,7 +124,7 @@
           </div>
         </div>
         {#if pokemon?.eggGroups?.length}
-          <div class="rounded-xl bg-muted p-3">
+          <div class="border-b border-border/50 pb-2">
             <div class="text-xs font-medium text-muted-foreground">Egg Groups</div>
             <div class="mt-1 font-semibold">
               {pokemon.eggGroups.map((g) => g.name).join(', ')}
@@ -140,21 +140,21 @@
     {#if loading || !form}
       <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
         {#each breedingSkeletonCells as skeletonIndex (skeletonIndex)}
-          <Skeleton class="h-16 w-full rounded-xl" />
+          <Skeleton class="h-16 w-full rounded-lg" />
         {/each}
       </div>
     {:else}
       <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">Height</div>
           <div class="mt-1 font-semibold">{(form.height / 10).toFixed(1)}m</div>
         </div>
-        <div class="rounded-xl bg-muted p-3">
+        <div class="border-b border-border/50 pb-2">
           <div class="text-xs font-medium text-muted-foreground">Weight</div>
           <div class="mt-1 font-semibold">{(form.weight / 10).toFixed(1)}kg</div>
         </div>
         {#if resolvedBaseScale}
-          <div class="rounded-xl bg-muted p-3">
+          <div class="border-b border-border/50 pb-2">
             <div class="text-xs font-medium text-muted-foreground">Base Scale</div>
             <div class="mt-1 font-semibold">{resolvedBaseScale.toFixed(2)}x</div>
           </div>
@@ -188,7 +188,7 @@
       <div class="space-y-3">
         {#each form.spawns as spawn (spawn.id)}
           {@const conditions = formatSpawnConditions(spawn)}
-          <div class="rounded-xl bg-muted p-3">
+          <div class="rounded-lg bg-muted/50 p-3">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <Badge variant="outline" class="rounded-full text-xs">{spawn.bucket.name}</Badge>
@@ -218,13 +218,13 @@
       <p class="text-xs text-muted-foreground">Drops {form.drops.amount} item(s) when defeated</p>
       <div class="space-y-2">
         {#each form.drops.percentages as drop, i (`percentage-${i}-${drop.item.id}`)}
-          <div class="flex items-center justify-between rounded-xl bg-muted p-3">
+          <div class="flex items-center justify-between rounded-lg bg-muted/50 p-3">
             <span class="font-medium">{drop.item.name}</span>
             <span class="text-sm text-muted-foreground">{drop.percentage}%</span>
           </div>
         {/each}
         {#each form.drops.ranges as drop, i (`range-${i}-${drop.item.id}`)}
-          <div class="flex items-center justify-between rounded-xl bg-muted p-3">
+          <div class="flex items-center justify-between rounded-lg bg-muted/50 p-3">
             <span class="font-medium">{drop.item.name}</span>
             <span class="text-sm text-muted-foreground">
               {drop.quantityMin}–{drop.quantityMax}

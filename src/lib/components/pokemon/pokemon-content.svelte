@@ -86,13 +86,13 @@
 
   {#if isPeek}
     <Tabs.Root value="moves" class="w-full">
-      <Tabs.List class="grid w-full grid-cols-2 rounded-2xl">
+      <Tabs.List class="grid w-full grid-cols-2 rounded-lg">
         <Tabs.Trigger value="moves">Moves</Tabs.Trigger>
         <Tabs.Trigger value="details">Details</Tabs.Trigger>
       </Tabs.List>
 
       <Tabs.Content value="moves" class="mt-4">
-        <div class="rounded-2xl border bg-card p-4">
+        <div class="rounded-lg border bg-card p-4">
           <div class="mb-3 flex items-start justify-between gap-3">
             <div>
               <h2 class="text-base font-semibold">Moves</h2>
@@ -107,14 +107,14 @@
           </div>
           <div class="space-y-2">
             {#each { length: 4 }, i (i)}
-              <Skeleton class="h-14 w-full rounded-xl" />
+              <Skeleton class="h-14 w-full rounded-lg" />
             {/each}
           </div>
         </div>
       </Tabs.Content>
 
       <Tabs.Content value="details" class="mt-4">
-        <div class="rounded-2xl border bg-card p-4">
+        <div class="rounded-lg border bg-card p-4">
           <div class="mb-3 flex items-start justify-between gap-3">
             <div>
               <h2 class="text-base font-semibold">Details</h2>
@@ -129,7 +129,7 @@
           </div>
           <div class="grid gap-3 sm:grid-cols-2">
             {#each { length: 4 }, i (i)}
-              <Skeleton class="h-20 w-full rounded-xl" />
+              <Skeleton class="h-20 w-full rounded-lg" />
             {/each}
           </div>
         </div>

@@ -46,7 +46,7 @@
       <h2 class="text-lg font-semibold">Recipes</h2>
       <div class="space-y-4">
         {#each item.recipes as recipe (recipe.id)}
-          <div class="rounded-xl border bg-background p-4">
+          <div class="rounded-lg border bg-background p-4">
             <RecipeDisplay
               {recipe}
               resultItem={{ name: item.name }}

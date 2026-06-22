@@ -27,10 +27,10 @@
   const statTotal = $derived(getStatTotal(form));
 </script>
 
-<div class="rounded-2xl border bg-card p-4 md:p-6">
+<div class="rounded-lg border bg-card p-4 md:p-6">
     <div class="grid gap-4 md:grid-cols-12">
       <div class="self-stretch md:col-span-4">
-        <div class="flex h-full flex-col rounded-2xl bg-muted p-4 md:p-5">
+        <div class="flex h-full flex-col rounded-lg bg-muted p-4">
           <div class="flex h-52 w-full flex-1 items-center justify-center md:h-auto">
             {#if form.image?.url}
               <img src={form.image.url} alt={form.name} class="h-full w-full object-contain" />
@@ -84,7 +84,7 @@
           </div>
         {/if}
 
-        <div class="rounded-2xl border bg-background p-4">
+        <div class="pt-3 mt-3 border-t border-border/50">
           <div class="mb-2 flex items-center justify-between">
             <div class="text-xs font-medium text-muted-foreground">Base stats</div>
             <div class="text-xs text-muted-foreground tabular-nums">
@@ -107,9 +107,9 @@
         </div>
 
         {#if pokemon.description}
-          <div class="rounded-2xl border bg-background p-4 text-sm text-muted-foreground">
+          <p class="pt-3 mt-3 border-t border-border/50 text-sm text-muted-foreground">
             {pokemon.description}
-          </div>
+          </p>
         {/if}
       </div>
     </div>
