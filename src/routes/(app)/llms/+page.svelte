@@ -362,8 +362,8 @@
       <textarea
         id="llm-message"
         bind:value={input}
-        rows="2"
-        class="block min-h-12 w-full resize-none rounded-lg bg-transparent py-2 pr-14 pl-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        rows="3"
+        class="block min-h-20 w-full resize-none rounded-lg bg-transparent py-3 pr-16 pl-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         placeholder="Ask Herta"
         disabled={isSending || isResetting}
         onkeydown={handleKeydown}></textarea>
@@ -372,7 +372,7 @@
         disabled={!canSend}
         aria-label="Send message"
         size="icon"
-        class="absolute right-1 bottom-1 rounded-md"
+        class="absolute right-2 bottom-2 rounded-md"
       >
         {#if isSending}
           <LoaderCircle class="size-4 animate-spin" />
