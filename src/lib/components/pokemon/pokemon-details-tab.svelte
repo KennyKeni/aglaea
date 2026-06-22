@@ -1,5 +1,4 @@
 <script lang="ts">
-  import * as Card from '$lib/components/ui/card';
   import { Badge } from '$lib/components/ui/badge';
   import { Skeleton } from '$lib/components/ui/skeleton';
   import { MapPin, Droplets, Sparkles } from '@lucide/svelte';
@@ -60,151 +59,133 @@
   const breedingSkeletonCells = Array.from({ length: 3 }, (_, index) => index);
 </script>
 
-<div class="space-y-4">
-  <Card.Root id="training" class="rounded-2xl">
-    <Card.Header>
-      <Card.Title class="text-base">Training</Card.Title>
-    </Card.Header>
-    <Card.Content>
-      {#if loading || !form}
-        <div class="grid gap-3 sm:grid-cols-2">
-          {#each skeletonCells as skeletonIndex (skeletonIndex)}
-            <Skeleton class="h-16 w-full rounded-xl" />
-          {/each}
+<div class="space-y-8">
+  <section id="training" class="space-y-3">
+    <h2 class="text-base font-semibold">Training</h2>
+    {#if loading || !form}
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
+        {#each skeletonCells as skeletonIndex (skeletonIndex)}
+          <Skeleton class="h-16 w-full rounded-xl" />
+        {/each}
+      </div>
+    {:else}
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">EV Yield</div>
+          <div class="mt-1 font-semibold">{getEvYield(form)}</div>
         </div>
-      {:else}
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">EV Yield</div>
-            <div class="mt-1 font-semibold">{getEvYield(form)}</div>
-          </div>
-          <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">Catch Rate</div>
-            <div class="mt-1 font-semibold">{resolvedCatchRate}</div>
-          </div>
-          <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">Base Friendship</div>
-            <div class="mt-1 font-semibold">{resolvedBaseFriendship}</div>
-          </div>
-          <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">Base Experience</div>
-            <div class="mt-1 font-semibold">{form.baseExperienceYield ?? '—'}</div>
-          </div>
-          {#if pokemon?.experienceGroup}
-            <div class="rounded-xl bg-muted p-3">
-              <div class="text-xs font-medium text-muted-foreground">Growth Rate</div>
-              <div class="mt-1 font-semibold">{pokemon.experienceGroup.name}</div>
-            </div>
-          {/if}
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">Catch Rate</div>
+          <div class="mt-1 font-semibold">{resolvedCatchRate}</div>
         </div>
-      {/if}
-    </Card.Content>
-  </Card.Root>
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">Base Friendship</div>
+          <div class="mt-1 font-semibold">{resolvedBaseFriendship}</div>
+        </div>
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">Base Experience</div>
+          <div class="mt-1 font-semibold">{form.baseExperienceYield ?? '—'}</div>
+        </div>
+        {#if pokemon?.experienceGroup}
+          <div class="rounded-xl bg-muted p-3">
+            <div class="text-xs font-medium text-muted-foreground">Growth Rate</div>
+            <div class="mt-1 font-semibold">{pokemon.experienceGroup.name}</div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </section>
 
-  <Card.Root id="breeding" class="rounded-2xl">
-    <Card.Header>
-      <Card.Title class="text-base">Breeding</Card.Title>
-    </Card.Header>
-    <Card.Content>
-      {#if loading || !form}
-        <div class="grid gap-3 sm:grid-cols-2">
-          {#each breedingSkeletonCells as skeletonIndex (skeletonIndex)}
-            <Skeleton class="h-16 w-full rounded-xl" />
-          {/each}
+  <section id="breeding" class="space-y-3">
+    <h2 class="text-base font-semibold">Breeding</h2>
+    {#if loading || !form}
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
+        {#each breedingSkeletonCells as skeletonIndex (skeletonIndex)}
+          <Skeleton class="h-16 w-full rounded-xl" />
+        {/each}
+      </div>
+    {:else}
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">Egg Cycles</div>
+          <div class="mt-1 font-semibold">{resolvedEggCycles}</div>
         </div>
-      {:else}
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">Egg Cycles</div>
-            <div class="mt-1 font-semibold">{resolvedEggCycles}</div>
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">Gender Ratio</div>
+          <div class="mt-1 font-semibold">
+            {#if resolvedMaleRatio === null}
+              Genderless
+            {:else}
+              {(resolvedMaleRatio * 100).toFixed(0)}% M / {(
+                (1 - resolvedMaleRatio) *
+                100
+              ).toFixed(0)}% F
+            {/if}
           </div>
+        </div>
+        {#if pokemon?.eggGroups?.length}
           <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">Gender Ratio</div>
+            <div class="text-xs font-medium text-muted-foreground">Egg Groups</div>
             <div class="mt-1 font-semibold">
-              {#if resolvedMaleRatio === null}
-                Genderless
-              {:else}
-                {(resolvedMaleRatio * 100).toFixed(0)}% M / {(
-                  (1 - resolvedMaleRatio) *
-                  100
-                ).toFixed(0)}% F
-              {/if}
+              {pokemon.eggGroups.map((g) => g.name).join(', ')}
             </div>
           </div>
-          {#if pokemon?.eggGroups?.length}
-            <div class="rounded-xl bg-muted p-3">
-              <div class="text-xs font-medium text-muted-foreground">Egg Groups</div>
-              <div class="mt-1 font-semibold">
-                {pokemon.eggGroups.map((g) => g.name).join(', ')}
-              </div>
-            </div>
-          {/if}
-        </div>
-      {/if}
-    </Card.Content>
-  </Card.Root>
+        {/if}
+      </div>
+    {/if}
+  </section>
 
-  <Card.Root id="physical" class="rounded-2xl">
-    <Card.Header>
-      <Card.Title class="text-base">Physical</Card.Title>
-    </Card.Header>
-    <Card.Content>
-      {#if loading || !form}
-        <div class="grid gap-3 sm:grid-cols-3">
-          {#each breedingSkeletonCells as skeletonIndex (skeletonIndex)}
-            <Skeleton class="h-16 w-full rounded-xl" />
-          {/each}
+  <section id="physical" class="space-y-3">
+    <h2 class="text-base font-semibold">Physical</h2>
+    {#if loading || !form}
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
+        {#each breedingSkeletonCells as skeletonIndex (skeletonIndex)}
+          <Skeleton class="h-16 w-full rounded-xl" />
+        {/each}
+      </div>
+    {:else}
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(160px,100%),1fr))]">
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">Height</div>
+          <div class="mt-1 font-semibold">{(form.height / 10).toFixed(1)}m</div>
         </div>
-      {:else}
-        <div class="grid gap-3 sm:grid-cols-3">
-          <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">Height</div>
-            <div class="mt-1 font-semibold">{(form.height / 10).toFixed(1)}m</div>
-          </div>
-          <div class="rounded-xl bg-muted p-3">
-            <div class="text-xs font-medium text-muted-foreground">Weight</div>
-            <div class="mt-1 font-semibold">{(form.weight / 10).toFixed(1)}kg</div>
-          </div>
-          {#if resolvedBaseScale}
-            <div class="rounded-xl bg-muted p-3">
-              <div class="text-xs font-medium text-muted-foreground">Base Scale</div>
-              <div class="mt-1 font-semibold">{resolvedBaseScale.toFixed(2)}x</div>
-            </div>
-          {/if}
+        <div class="rounded-xl bg-muted p-3">
+          <div class="text-xs font-medium text-muted-foreground">Weight</div>
+          <div class="mt-1 font-semibold">{(form.weight / 10).toFixed(1)}kg</div>
         </div>
-      {/if}
-    </Card.Content>
-  </Card.Root>
+        {#if resolvedBaseScale}
+          <div class="rounded-xl bg-muted p-3">
+            <div class="text-xs font-medium text-muted-foreground">Base Scale</div>
+            <div class="mt-1 font-semibold">{resolvedBaseScale.toFixed(2)}x</div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </section>
 
   {#if form?.labels?.length}
-    <Card.Root id="labels" class="rounded-2xl">
-      <Card.Header>
-        <Card.Title class="flex items-center gap-2 text-base">
-          <Sparkles class="h-4 w-4" />
-          Labels
-        </Card.Title>
-      </Card.Header>
-      <Card.Content>
-        <div class="flex flex-wrap gap-2">
-          {#each form.labels as label (label.id)}
-            <Badge variant="secondary" class="rounded-full">
-              {label.name}
-            </Badge>
-          {/each}
-        </div>
-      </Card.Content>
-    </Card.Root>
+    <section id="labels" class="space-y-3">
+      <h2 class="flex items-center gap-2 text-base font-semibold">
+        <Sparkles class="h-4 w-4" />
+        Labels
+      </h2>
+      <div class="flex flex-wrap gap-2">
+        {#each form.labels as label (label.id)}
+          <Badge variant="secondary" class="rounded-full">
+            {label.name}
+          </Badge>
+        {/each}
+      </div>
+    </section>
   {/if}
 
   {#if form?.spawns?.length}
-    <Card.Root id="spawn-locations" class="rounded-2xl">
-      <Card.Header>
-        <Card.Title class="flex items-center gap-2 text-base">
-          <MapPin class="h-4 w-4" />
-          Spawn Locations
-        </Card.Title>
-      </Card.Header>
-      <Card.Content class="space-y-3">
+    <section id="spawn-locations" class="space-y-3">
+      <h2 class="flex items-center gap-2 text-base font-semibold">
+        <MapPin class="h-4 w-4" />
+        Spawn Locations
+      </h2>
+      <div class="space-y-3">
         {#each form.spawns as spawn (spawn.id)}
           {@const conditions = formatSpawnConditions(spawn)}
           <div class="rounded-xl bg-muted p-3">
@@ -224,37 +205,33 @@
             {/if}
           </div>
         {/each}
-      </Card.Content>
-    </Card.Root>
+      </div>
+    </section>
   {/if}
 
   {#if form?.drops && (form.drops.percentages.length || form.drops.ranges.length)}
-    <Card.Root id="drops" class="rounded-2xl">
-      <Card.Header>
-        <Card.Title class="flex items-center gap-2 text-base">
-          <Droplets class="h-4 w-4" />
-          Drops
-        </Card.Title>
-        <p class="text-xs text-muted-foreground">Drops {form.drops.amount} item(s) when defeated</p>
-      </Card.Header>
-      <Card.Content>
-        <div class="space-y-2">
-          {#each form.drops.percentages as drop, i (`percentage-${i}-${drop.item.id}`)}
-            <div class="flex items-center justify-between rounded-xl bg-muted p-3">
-              <span class="font-medium">{drop.item.name}</span>
-              <span class="text-sm text-muted-foreground">{drop.percentage}%</span>
-            </div>
-          {/each}
-          {#each form.drops.ranges as drop, i (`range-${i}-${drop.item.id}`)}
-            <div class="flex items-center justify-between rounded-xl bg-muted p-3">
-              <span class="font-medium">{drop.item.name}</span>
-              <span class="text-sm text-muted-foreground">
-                {drop.quantityMin}–{drop.quantityMax}
-              </span>
-            </div>
-          {/each}
-        </div>
-      </Card.Content>
-    </Card.Root>
+    <section id="drops" class="space-y-3">
+      <h2 class="flex items-center gap-2 text-base font-semibold">
+        <Droplets class="h-4 w-4" />
+        Drops
+      </h2>
+      <p class="text-xs text-muted-foreground">Drops {form.drops.amount} item(s) when defeated</p>
+      <div class="space-y-2">
+        {#each form.drops.percentages as drop, i (`percentage-${i}-${drop.item.id}`)}
+          <div class="flex items-center justify-between rounded-xl bg-muted p-3">
+            <span class="font-medium">{drop.item.name}</span>
+            <span class="text-sm text-muted-foreground">{drop.percentage}%</span>
+          </div>
+        {/each}
+        {#each form.drops.ranges as drop, i (`range-${i}-${drop.item.id}`)}
+          <div class="flex items-center justify-between rounded-xl bg-muted p-3">
+            <span class="font-medium">{drop.item.name}</span>
+            <span class="text-sm text-muted-foreground">
+              {drop.quantityMin}–{drop.quantityMax}
+            </span>
+          </div>
+        {/each}
+      </div>
+    </section>
   {/if}
 </div>

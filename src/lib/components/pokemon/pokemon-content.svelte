@@ -2,7 +2,6 @@
   import PokemonDetail from './pokemon-detail.svelte';
   import PokemonMoves from './pokemon-moves.svelte';
   import PokemonDetailsTab from './pokemon-details-tab.svelte';
-  import * as Card from '$lib/components/ui/card';
   import * as Tabs from '$lib/components/ui/tabs';
   import { Button } from '$lib/components/ui/button';
   import { Skeleton } from '$lib/components/ui/skeleton';
@@ -93,59 +92,51 @@
       </Tabs.List>
 
       <Tabs.Content value="moves" class="mt-4">
-        <Card.Root class="rounded-2xl">
-          <Card.Header>
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <Card.Title class="text-base">Moves</Card.Title>
-                <div class="mt-1 text-sm text-muted-foreground">Expand for full list</div>
-              </div>
-              {#if onExpand}
-                <Button variant="outline" size="sm" onclick={onExpand}>
-                  <Maximize2 class="mr-2 h-4 w-4" />
-                  Expand
-                </Button>
-              {/if}
+        <div class="rounded-2xl border bg-card p-4">
+          <div class="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <h2 class="text-base font-semibold">Moves</h2>
+              <div class="mt-1 text-sm text-muted-foreground">Expand for full list</div>
             </div>
-          </Card.Header>
-          <Card.Content>
-            <div class="space-y-2">
-              {#each { length: 4 }, i (i)}
-                <Skeleton class="h-14 w-full rounded-xl" />
-              {/each}
-            </div>
-          </Card.Content>
-        </Card.Root>
+            {#if onExpand}
+              <Button variant="outline" size="sm" onclick={onExpand}>
+                <Maximize2 class="mr-2 h-4 w-4" />
+                Expand
+              </Button>
+            {/if}
+          </div>
+          <div class="space-y-2">
+            {#each { length: 4 }, i (i)}
+              <Skeleton class="h-14 w-full rounded-xl" />
+            {/each}
+          </div>
+        </div>
       </Tabs.Content>
 
       <Tabs.Content value="details" class="mt-4">
-        <Card.Root class="rounded-2xl">
-          <Card.Header>
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <Card.Title class="text-base">Details</Card.Title>
-                <div class="mt-1 text-sm text-muted-foreground">Expand for full info</div>
-              </div>
-              {#if onExpand}
-                <Button variant="outline" size="sm" onclick={onExpand}>
-                  <Maximize2 class="mr-2 h-4 w-4" />
-                  Expand
-                </Button>
-              {/if}
+        <div class="rounded-2xl border bg-card p-4">
+          <div class="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <h2 class="text-base font-semibold">Details</h2>
+              <div class="mt-1 text-sm text-muted-foreground">Expand for full info</div>
             </div>
-          </Card.Header>
-          <Card.Content>
-            <div class="grid gap-3 sm:grid-cols-2">
-              {#each { length: 4 }, i (i)}
-                <Skeleton class="h-20 w-full rounded-xl" />
-              {/each}
-            </div>
-          </Card.Content>
-        </Card.Root>
+            {#if onExpand}
+              <Button variant="outline" size="sm" onclick={onExpand}>
+                <Maximize2 class="mr-2 h-4 w-4" />
+                Expand
+              </Button>
+            {/if}
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {#each { length: 4 }, i (i)}
+              <Skeleton class="h-20 w-full rounded-xl" />
+            {/each}
+          </div>
+        </div>
       </Tabs.Content>
     </Tabs.Root>
   {:else}
-    <div class="space-y-4">
+    <div class="space-y-8">
       {#each moveGroups as group (group.name)}
         <PokemonMoves
           title={group.name}

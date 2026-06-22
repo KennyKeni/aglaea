@@ -1,5 +1,4 @@
 <script lang="ts">
-  import * as Card from '$lib/components/ui/card';
   import { Badge } from '$lib/components/ui/badge';
   import { Progress } from '$lib/components/ui/progress';
   import { cn } from '$lib/utils';
@@ -28,8 +27,7 @@
   const statTotal = $derived(getStatTotal(form));
 </script>
 
-<Card.Root class="rounded-2xl">
-  <Card.Content class="p-4 md:p-6">
+<div class="rounded-2xl border bg-card p-4 md:p-6">
     <div class="grid gap-4 md:grid-cols-12">
       <div class="self-stretch md:col-span-4">
         <div class="flex h-full flex-col rounded-2xl bg-muted p-4 md:p-5">
@@ -115,5 +113,4 @@
         {/if}
       </div>
     </div>
-  </Card.Content>
-</Card.Root>
+</div>
