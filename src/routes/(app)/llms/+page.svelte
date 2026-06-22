@@ -354,7 +354,7 @@
     <form class="mx-auto w-full max-w-5xl" onsubmit={handleSubmit}>
       <label for="llm-message" class="sr-only">Message</label>
       <div
-        class="flex items-stretch rounded-lg border border-input bg-background transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+        class="flex items-end rounded-lg border border-input bg-background transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
       >
         <textarea
           id="llm-message"
@@ -368,7 +368,8 @@
           type="submit"
           disabled={!canSend}
           aria-label="Send message"
-          class="m-0.5 aspect-square shrink-0 rounded-md"
+          size="icon"
+          class="m-1 shrink-0 rounded-md"
         >
           {#if isSending}
             <LoaderCircle class="size-4 animate-spin" />
