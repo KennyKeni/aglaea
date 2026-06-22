@@ -16,7 +16,7 @@
 </script>
 
 {#if loading}
-  <div class="flex min-h-[200px] flex-col rounded-2xl border bg-card p-4">
+  <div class="flex min-h-[200px] flex-col rounded-2xl border border-border p-4">
     <div class="space-y-2">
       <Skeleton class="h-5 w-24" />
       <div class="flex gap-1.5">
@@ -34,7 +34,7 @@
 {:else if move}
   <a
     {href}
-    class="group flex h-full w-full flex-col rounded-2xl border bg-card p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+    class="group flex h-full w-full flex-col rounded-2xl border border-border p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
   >
     <div class="space-y-2">
       <div class="truncate text-base font-semibold">{move.name}</div>

@@ -40,9 +40,9 @@
   {#if ability.forms.length > 0}
     <section id="forms" class="space-y-3">
       <h2 class="text-lg font-semibold">Forms</h2>
-      <div class="space-y-2">
+      <div class="divide-y divide-border">
         {#each ability.forms as form (form.id)}
-          <div class="rounded-xl border bg-background p-3">
+          <div class="py-3 first:pt-0 last:pb-0">
             <a href={pokemonUrl(form.speciesId, form.id)} class="font-medium hover:underline">
               {form.name}
             </a>

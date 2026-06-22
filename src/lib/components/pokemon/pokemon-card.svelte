@@ -19,7 +19,7 @@
 </script>
 
 {#if loading}
-  <div class="flex min-h-[200px] flex-col rounded-2xl border bg-card p-4">
+  <div class="flex min-h-[200px] flex-col rounded-2xl border border-border p-4">
     <div class="grid flex-1 grid-cols-[1fr_auto] gap-3">
       <div class="space-y-2">
         <Skeleton class="h-3 w-12" />
@@ -36,7 +36,7 @@
 {:else if pokemon}
   <a
     {href}
-    class="group flex h-full w-full flex-col rounded-2xl border bg-card p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+    class="group flex h-full w-full flex-col rounded-2xl border border-border p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
   >
     <div class="grid flex-1 grid-cols-[1fr_auto] gap-3">
       <div class="flex min-w-0 flex-col justify-between">

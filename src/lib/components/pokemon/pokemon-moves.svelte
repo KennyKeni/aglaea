@@ -40,14 +40,16 @@
       {/if}
     </div>
   </div>
-  <div class="space-y-2">
-    {#if loading}
+  {#if loading}
+    <div class="space-y-2">
       {#each skeletonRows as skeletonIndex (skeletonIndex)}
         <Skeleton class="h-14 w-full rounded-xl" />
       {/each}
-    {:else if moves.length}
+    </div>
+  {:else if moves.length}
+    <div class="divide-y divide-border">
       {#each sorted as mv, i (`move-${i}-${mv.move.id}`)}
-        <div class="rounded-xl border bg-background p-3">
+        <div class="py-3 first:pt-0 last:pb-0">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
@@ -78,8 +80,8 @@
           </div>
         </div>
       {/each}
-    {:else}
-      <div class="text-sm text-muted-foreground">No moves data.</div>
-    {/if}
-  </div>
+    </div>
+  {:else}
+    <div class="text-sm text-muted-foreground">No moves data.</div>
+  {/if}
 </section>
