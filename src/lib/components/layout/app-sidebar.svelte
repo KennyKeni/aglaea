@@ -27,7 +27,8 @@
     }
 
     const hasSubItems = navigation.some(
-      (section) => section.children.length > 1 && section.children[0]?.href === href,
+      (section) =>
+        'children' in section && section.children.length > 1 && section.children[0]?.href === href,
     );
     if (hasSubItems) {
       return page.url.pathname === href && page.url.search === '';
@@ -101,39 +102,52 @@
         <Sidebar.Menu>
           {#each navigation as item (item.label)}
             <Sidebar.MenuItem>
-              <Collapsible.Root
-                open={isExpanded(item.label, item.children)}
-                onOpenChange={(open) => toggleExpanded(item.label, open)}
-                class="group/collapsible"
-              >
-                <Collapsible.Trigger>
+              {#if 'href' in item}
+                <Sidebar.MenuButton isActive={isActive(item.href)} tooltipContent={item.label}>
                   {#snippet child({ props })}
-                    <Sidebar.MenuButton {...props} tooltipContent={item.label}>
+                    <a href={item.href} {...props}>
                       {#if item.icon}
                         <item.icon class="size-4" />
                       {/if}
                       <span>{item.label}</span>
-                      <ChevronRight
-                        class="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
-                      />
-                    </Sidebar.MenuButton>
+                    </a>
                   {/snippet}
-                </Collapsible.Trigger>
-                <Collapsible.Content>
-                  <Sidebar.MenuSub>
-                    {#each item.children as subItem (subItem.label)}
-                      <Sidebar.MenuSubItem>
-                        <Sidebar.MenuSubButton
-                          href={subItem.href}
-                          isActive={isActive(subItem.href)}
-                        >
-                          <span>{subItem.label}</span>
-                        </Sidebar.MenuSubButton>
-                      </Sidebar.MenuSubItem>
-                    {/each}
-                  </Sidebar.MenuSub>
-                </Collapsible.Content>
-              </Collapsible.Root>
+                </Sidebar.MenuButton>
+              {:else}
+                <Collapsible.Root
+                  open={isExpanded(item.label, item.children)}
+                  onOpenChange={(open) => toggleExpanded(item.label, open)}
+                  class="group/collapsible"
+                >
+                  <Collapsible.Trigger>
+                    {#snippet child({ props })}
+                      <Sidebar.MenuButton {...props} tooltipContent={item.label}>
+                        {#if item.icon}
+                          <item.icon class="size-4" />
+                        {/if}
+                        <span>{item.label}</span>
+                        <ChevronRight
+                          class="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+                        />
+                      </Sidebar.MenuButton>
+                    {/snippet}
+                  </Collapsible.Trigger>
+                  <Collapsible.Content>
+                    <Sidebar.MenuSub>
+                      {#each item.children as subItem (subItem.label)}
+                        <Sidebar.MenuSubItem>
+                          <Sidebar.MenuSubButton
+                            href={subItem.href}
+                            isActive={isActive(subItem.href)}
+                          >
+                            <span>{subItem.label}</span>
+                          </Sidebar.MenuSubButton>
+                        </Sidebar.MenuSubItem>
+                      {/each}
+                    </Sidebar.MenuSub>
+                  </Collapsible.Content>
+                </Collapsible.Root>
+              {/if}
             </Sidebar.MenuItem>
           {/each}
         </Sidebar.Menu>

@@ -25,6 +25,6 @@ export const baseNavigation: Navigation = [
   {
     label: 'LLMs',
     icon: Bot,
-    children: [{ label: 'Chat', href: '/llms' }],
+    href: '/llms',
   },
 ];

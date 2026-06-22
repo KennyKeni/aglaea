@@ -5,10 +5,18 @@ export interface NavLink {
   href: string;
 }
 
-export interface NavSection {
+export interface NavGroup {
   label: string;
   icon?: Component<{ class?: string }>;
   children: NavLink[];
 }
 
-export type Navigation = NavSection[];
+export interface NavDirectLink {
+  label: string;
+  icon?: Component<{ class?: string }>;
+  href: string;
+}
+
+export type NavItem = NavGroup | NavDirectLink;
+
+export type Navigation = NavItem[];

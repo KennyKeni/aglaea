@@ -41,6 +41,8 @@
 
   const navigation = $derived(
     baseNavigation.map((section) => {
+      if ('href' in section) return section;
+
       if (section.label === 'Moves') {
         return {
           ...section,
