@@ -84,7 +84,7 @@
             <li class="border-b border-border">
               <a
                 href={resolve(category.href)}
-                class="group flex items-center gap-4 px-2 py-5 transition-colors hover:bg-accent/40 sm:px-3"
+                class="group flex items-center gap-4 px-2 py-5 transition-colors hover:bg-muted/50 sm:px-3"
               >
                 <category.icon
                   class="size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"

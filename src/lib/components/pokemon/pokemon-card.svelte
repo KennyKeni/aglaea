@@ -36,7 +36,7 @@
 {:else if pokemon}
   <a
     {href}
-    class="group flex h-full w-full flex-col rounded-lg border border-border p-4 text-left transition-colors hover:border-primary/30 hover:bg-accent/40"
+    class="group flex h-full w-full flex-col rounded-lg border border-border p-4 text-left transition-colors hover:border-primary/30 hover:bg-muted/50"
   >
     <div class="grid flex-1 grid-cols-[1fr_auto] gap-3">
       <div class="flex min-w-0 flex-col justify-between">
