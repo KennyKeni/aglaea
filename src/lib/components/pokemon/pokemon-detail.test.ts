@@ -735,6 +735,11 @@ describe('PokemonDetailsTab spawns', () => {
       spawns: [
         {
           id: 42,
+          spawnKey: 'bulbasaur-1',
+          spawnPool: {
+            path: 'spawn_pool_world/0001_bulbasaur',
+            resourceKind: 'spawn_pool_world',
+          },
           bucket: { id: 3, name: 'Ultra Rare', slug: 'ultra-rare' },
           positionType: { id: 2, name: 'Grounded', slug: 'grounded' },
           weight: 6,
@@ -765,6 +770,8 @@ describe('PokemonDetailsTab spawns', () => {
     }).body;
 
     expect(html).toContain('Spawn Locations');
+    expect(html).toContain('bulbasaur-1');
+    expect(html).toContain('spawn_pool_world/0001_bulbasaur');
     expect(html).toContain('Ultra Rare');
     expect(html).toContain('Grounded');
     expect(html).toContain('Lv. 5–16');

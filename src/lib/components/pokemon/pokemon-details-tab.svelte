@@ -503,7 +503,13 @@
         {#each form.spawns as spawn (spawn.id)}
           {@const conditions = formatSpawnConditions(spawn)}
           <div class="rounded-lg bg-muted/50 p-3">
-            <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="font-semibold break-words">{spawn.spawnKey}</div>
+              <div class="mt-0.5 break-words text-xs text-muted-foreground">
+                {spawn.spawnPool.path}
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <Badge variant="outline" class="rounded-full text-xs">{spawn.bucket.name}</Badge>
                 <span class="text-xs text-muted-foreground">{spawn.positionType.name}</span>
