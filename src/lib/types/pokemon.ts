@@ -1,211 +1,69 @@
-import type { Ref, NamedRef } from './base';
+import type {
+  PokemonImageRef,
+  PokemonTypeRef,
+  PokemonAbilityRef,
+  PokemonMoveRef,
+  PokemonAspectRef,
+  PokemonFormType,
+  PokemonAbilitySlotRef,
+  PokemonFormAbility,
+  PokemonMoveLearnMethodRef,
+  PokemonFormMove,
+  PokemonLabel,
+  PokemonItemRef,
+  PokemonDropPercentage,
+  PokemonDropRange,
+  PokemonFormDrops,
+  PokemonFormHitbox,
+  PokemonFormAspectCombo,
+  PokemonAspectChoiceRef,
+  PokemonBehaviour,
+  PokemonSpeciesLighting,
+  PokemonSpeciesRiding,
+  PokemonFormOverrides,
+  PokemonForm,
+  PokemonExperienceGroup,
+  PokemonEggGroup,
+  PokemonSpeciesWithForms,
+  PokemonSpawnConditionWeather,
+  PokemonSpawnConditionSky,
+  PokemonSpawnConditionPosition,
+  PokemonSpawnConditionLure,
+  PokemonSpawnCondition,
+  PokemonSpawn,
+} from '@aglaea/contract';
 
-export interface ImageRef {
-  id: string;
-  url: string;
-}
-
-export type TypeRef = NamedRef;
-export type AbilityRef = NamedRef;
-export type MoveRef = NamedRef & {
-  type: NamedRef;
-  category: NamedRef;
-  power: number | null;
-  accuracy: number | null;
-  pp: number | null;
+export type {
+  PokemonImageRef as ImageRef,
+  PokemonTypeRef as TypeRef,
+  PokemonAbilityRef as AbilityRef,
+  PokemonMoveRef as MoveRef,
+  PokemonAspectRef as AspectRef,
+  PokemonLabel as LabelRef,
+  PokemonEggGroup as EggGroupRef,
+  PokemonFormType as FormType,
+  PokemonAbilitySlotRef as AbilitySlot,
+  PokemonFormAbility as FormAbility,
+  PokemonMoveLearnMethodRef as MoveMethod,
+  PokemonFormMove as FormMove,
+  PokemonFormHitbox as Hitbox,
+  PokemonSpeciesLighting as Lighting,
+  PokemonSpeciesRiding as Riding,
+  PokemonBehaviour as Behaviour,
+  PokemonAspectChoiceRef as AspectChoice,
+  PokemonFormAspectCombo as AspectCombo,
+  PokemonItemRef as ItemRef,
+  PokemonDropPercentage as DropPercentage,
+  PokemonDropRange as DropRange,
+  PokemonFormDrops as Drops,
+  PokemonSpawnConditionWeather as SpawnWeather,
+  PokemonSpawnConditionSky as SpawnSky,
+  PokemonSpawnConditionPosition as SpawnPosition,
+  PokemonSpawnConditionLure as SpawnLure,
+  PokemonSpawnCondition as SpawnCondition,
+  PokemonSpawn as Spawn,
+  PokemonFormOverrides as FormOverrides,
+  PokemonForm as Form,
+  PokemonExperienceGroup as ExperienceGroup,
+  PokemonSpeciesWithForms as Pokemon,
 };
-export type LabelRef = NamedRef;
-export type EggGroupRef = NamedRef;
-export type AspectRef = NamedRef;
-
-export interface FormType {
-  type: TypeRef;
-  slot: number;
-}
-
-export interface AbilitySlot {
-  id: number;
-  slug: string;
-  name: string;
-}
-
-export interface FormAbility {
-  ability: AbilityRef;
-  slot: AbilitySlot;
-}
-
-export interface MoveMethod {
-  id: number;
-  slug: string;
-  name: string;
-}
-
-export interface FormMove {
-  move: MoveRef;
-  method: MoveMethod;
-  level: number | null;
-}
-
-export interface Hitbox {
-  width: number;
-  height: number;
-  fixed: boolean;
-}
-
-export interface Lighting {
-  lightLevel: number;
-  liquidGlowMode: string | null;
-}
-
-export interface Riding {
-  data: unknown;
-}
-
-export interface Behaviour {
-  data: unknown;
-}
-
-export interface AspectChoice {
-  id: number;
-  slug: string;
-  name: string;
-  value: string;
-}
-
-export interface AspectCombo {
-  comboIndex: number;
-  aspects: AspectRef[];
-}
-
-export interface DropPercentage {
-  item: Ref;
-  percentage: number;
-}
-
-export interface DropRange {
-  item: Ref;
-  quantityMin: number;
-  quantityMax: number;
-}
-
-export interface Drops {
-  amount: number;
-  percentages: DropPercentage[];
-  ranges: DropRange[];
-}
-
-export interface SpawnWeather {
-  isRaining: boolean | null;
-  isThundering: boolean | null;
-}
-
-export interface SpawnSky {
-  canSeeSky: boolean | null;
-  minSkyLight: number | null;
-  maxSkyLight: number | null;
-}
-
-export interface SpawnPosition {
-  minY: number | null;
-  maxY: number | null;
-}
-
-export interface SpawnLure {
-  minLureLevel: number | null;
-  maxLureLevel: number | null;
-}
-
-export interface SpawnCondition {
-  id: number;
-  type: string;
-  multiplier: number | null;
-  biomes: Ref[];
-  biomeTags: Ref[];
-  timeRanges: Ref[];
-  moonPhases: Ref[];
-  weather: SpawnWeather | null;
-  sky: SpawnSky | null;
-  position: SpawnPosition | null;
-  lure: SpawnLure | null;
-}
-
-export interface Spawn {
-  id: number;
-  bucket: Ref;
-  positionType: Ref;
-  weight: number;
-  levelMin: number;
-  levelMax: number;
-  conditions: SpawnCondition[];
-}
-
-export interface FormOverrides {
-  catchRate?: number;
-  baseFriendship?: number;
-  eggCycles?: number;
-  maleRatio?: number | null;
-  baseScale?: number | null;
-}
-
-export interface Form {
-  id: number;
-  name: string;
-  fullName: string;
-  slug: string;
-  description: string | null;
-  generation: number | null;
-  height: number;
-  weight: number;
-  overrides: FormOverrides | null;
-  baseHp: number;
-  baseAttack: number;
-  baseDefence: number;
-  baseSpecialAttack: number;
-  baseSpecialDefence: number;
-  baseSpeed: number;
-  baseExperienceYield: number | null;
-  evHp: number;
-  evAttack: number;
-  evDefence: number;
-  evSpecialAttack: number;
-  evSpecialDefence: number;
-  evSpeed: number;
-  labels: LabelRef[];
-  aspectChoices: AspectChoice[];
-  types: FormType[];
-  abilities: FormAbility[];
-  moves: FormMove[];
-  hitbox: Hitbox | null;
-  drops: Drops | null;
-  aspectCombos: AspectCombo[];
-  behaviour: Behaviour | null;
-  spawns: Spawn[];
-  image: ImageRef | null;
-}
-
-export interface ExperienceGroup {
-  id: number;
-  slug: string;
-  name: string;
-  formula: string;
-}
-
-export interface Pokemon {
-  id: number;
-  name: string;
-  slug: string;
-  description: string | null;
-  generation: number;
-  catchRate: number;
-  baseFriendship: number;
-  eggCycles: number;
-  maleRatio: number | null;
-  baseScale: number | null;
-  experienceGroup: ExperienceGroup | null;
-  eggGroups: EggGroupRef[];
-  hitbox: Hitbox | null;
-  lighting: Lighting | null;
-  riding: Riding | null;
-  image: ImageRef | null;
-  forms: Form[];
-}
