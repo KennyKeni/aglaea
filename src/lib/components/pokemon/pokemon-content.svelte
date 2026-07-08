@@ -9,6 +9,7 @@
   import { cn } from '$lib/utils';
   import type { Pokemon, FormMove } from '$lib/types/pokemon';
   import { methodOrder } from '$lib/config/pokemon';
+  import { resolvePokemonFormIndex } from '$lib/utils/pokemon-detail';
 
   export type ContentMode = 'peek' | 'full' | 'loading';
 
@@ -26,35 +27,25 @@
     onExpand?: () => void;
   } = $props();
 
-  let formIndex = $state(0);
-
   const dataSource = $derived(fullPokemon ?? pokemon);
+  let formIndex = $derived(resolvePokemonFormIndex(dataSource.forms, initialFormId));
   const activeForm = $derived(dataSource.forms[formIndex] ?? null);
   const isLoading = $derived(mode === 'loading');
   const isPeek = $derived(mode === 'peek');
 
   const moveGroups = $derived.by(() => {
     if (!activeForm) return [];
-    const map = new Map<string, { slug: string; name: string; moves: FormMove[] }>();
+    const groups: { slug: string; name: string; moves: FormMove[] }[] = [];
     for (const mv of activeForm.moves) {
       const key = mv.method.slug;
-      if (!map.has(key)) {
-        map.set(key, { slug: key, name: mv.method.name, moves: [] });
+      let group = groups.find((candidate) => candidate.slug === key);
+      if (!group) {
+        group = { slug: key, name: mv.method.name, moves: [] };
+        groups.push(group);
       }
-      map.get(key)!.moves.push(mv);
+      group.moves.push(mv);
     }
-    return [...map.values()].sort(
-      (a, b) => (methodOrder[a.slug] ?? 99) - (methodOrder[b.slug] ?? 99),
-    );
-  });
-
-  $effect(() => {
-    if (initialFormId != null) {
-      const idx = dataSource.forms.findIndex((f) => f.id === initialFormId);
-      formIndex = idx >= 0 ? idx : 0;
-    } else {
-      formIndex = 0;
-    }
+    return groups.sort((a, b) => (methodOrder[a.slug] ?? 99) - (methodOrder[b.slug] ?? 99));
   });
 </script>
 
@@ -62,7 +53,7 @@
   {#if dataSource.forms.length > 1}
     <div class="mb-4 flex flex-wrap items-center gap-2">
       <span class="text-xs text-muted-foreground">Form:</span>
-      {#each dataSource.forms as form, idx (`${dataSource.id}-form-${idx}`)}
+      {#each dataSource.forms as form, idx (form.id)}
         <button
           onclick={() => (formIndex = idx)}
           class={cn(

@@ -6,8 +6,8 @@
   import Toc from '$lib/components/ui/toc.svelte';
   import { pokemonStore } from '$lib/state/pokemon-store.svelte';
   import { formatId } from '$lib/utils/pokemon';
+  import { buildPokemonDetailToc, resolvePokemonForm } from '$lib/utils/pokemon-detail';
   import type { Pokemon } from '$lib/types/pokemon';
-  import type { TocItem } from '$lib/utils/toc';
 
   interface PageData {
     pokemon: Pokemon;
@@ -16,35 +16,12 @@
   let { data }: { data: PageData } = $props();
 
   const pokemon = $derived(data.pokemon);
-  const activeForm = $derived(pokemon.forms[0] ?? null);
   const initialFormId = $derived.by(() => {
     const raw = page.url.searchParams.get('form');
     return raw ? Number(raw) : undefined;
   });
-
-  const toc = $derived.by(() => {
-    const items: TocItem[] = [
-      { id: 'pokemon-title', text: pokemon.name, level: 0 },
-      { id: 'overview', text: 'Overview', level: 2 },
-      { id: 'moves', text: 'Moves', level: 2 },
-      { id: 'training', text: 'Training', level: 2 },
-      { id: 'breeding', text: 'Breeding', level: 2 },
-      { id: 'physical', text: 'Physical', level: 2 },
-    ];
-    if (activeForm?.labels?.length) {
-      items.push({ id: 'labels', text: 'Labels', level: 2 });
-    }
-    if (activeForm?.spawns?.length) {
-      items.push({ id: 'spawn-locations', text: 'Spawn Locations', level: 2 });
-    }
-    if (
-      activeForm?.drops &&
-      (activeForm.drops.percentages.length || activeForm.drops.ranges.length)
-    ) {
-      items.push({ id: 'drops', text: 'Drops', level: 2 });
-    }
-    return items;
-  });
+  const activeForm = $derived(resolvePokemonForm(pokemon.forms, initialFormId));
+  const toc = $derived(buildPokemonDetailToc(pokemon, activeForm));
 </script>
 
 <svelte:head>
