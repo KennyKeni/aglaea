@@ -11,8 +11,8 @@ export function entityUrl(kind: string, id: number | string): string {
   return base ? `${base}/${id}` : `/${kind}/${id}`;
 }
 
-export function pokemonUrl(id: number, formId?: number): string {
-  const base = entityUrl('pokemon', id);
+export function pokemonUrl(identifier: number | string, formId?: number): string {
+  const base = entityUrl('pokemon', identifier);
   return formId ? `${base}?form=${formId}` : base;
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPokemonEndpoint } from './pokemon';
+import { createPokemonEndpoint, buildSearchQuery } from './pokemon';
 import type { ApiResponse } from '$lib/api/types';
 import type { ServerClient } from '../client';
 
@@ -184,5 +184,55 @@ describe('createPokemonEndpoint', () => {
         expect(result.message).toContain('Pokemon species detail');
       }
     });
+  });
+});
+
+describe('buildSearchQuery', () => {
+  it('serializes include as a comma-list', () => {
+    const q = buildSearchQuery({ include: ['forms', 'types', 'abilities'] });
+    expect(q.get('include')).toBe('forms,types,abilities');
+  });
+
+  it('serializes name, limit, and offset', () => {
+    const q = buildSearchQuery({ name: 'pika', limit: 24, offset: 48 });
+    expect(q.get('name')).toBe('pika');
+    expect(q.get('limit')).toBe('24');
+    expect(q.get('offset')).toBe('48');
+  });
+
+  it('repeats hasForm.typeSlugs for each type', () => {
+    const q = buildSearchQuery({ typeSlugs: ['grass', 'poison'] });
+    expect(q.getAll('hasForm.typeSlugs')).toEqual(['grass', 'poison']);
+  });
+
+  it('repeats hasForm.abilitySlugs for each ability', () => {
+    const q = buildSearchQuery({ abilitySlugs: ['overgrow', 'chlorophyll'] });
+    expect(q.getAll('hasForm.abilitySlugs')).toEqual(['overgrow', 'chlorophyll']);
+  });
+
+  it('repeats hasForm.moveSlugs for each move', () => {
+    const q = buildSearchQuery({ moveSlugs: ['tackle', 'growl'] });
+    expect(q.getAll('hasForm.moveSlugs')).toEqual(['tackle', 'growl']);
+  });
+
+  it('repeats generations for each generation', () => {
+    const q = buildSearchQuery({ generations: ['1', '2'] });
+    expect(q.getAll('generations')).toEqual(['1', '2']);
+  });
+
+  it('serializes representative stat bounds', () => {
+    const q = buildSearchQuery({ hpMin: 40, hpMax: 80, totalStatsMin: 300, totalStatsMax: 600 });
+    expect(q.get('hpMin')).toBe('40');
+    expect(q.get('hpMax')).toBe('80');
+    expect(q.get('totalStatsMin')).toBe('300');
+    expect(q.get('totalStatsMax')).toBe('600');
+  });
+
+  it('omits unset optional params', () => {
+    const q = buildSearchQuery({ limit: 24 });
+    expect(q.has('include')).toBe(false);
+    expect(q.has('name')).toBe(false);
+    expect(q.has('hasForm.typeSlugs')).toBe(false);
+    expect(q.has('hpMin')).toBe(false);
   });
 });
