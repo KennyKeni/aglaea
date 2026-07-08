@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Badge } from '$lib/components/ui/badge';
   import { Skeleton } from '$lib/components/ui/skeleton';
-  import { MapPin, Droplets, Sparkles } from '@lucide/svelte';
+  import { Bike, Box, Brain, Droplets, MapPin, Sparkles, Sun } from '@lucide/svelte';
   import type { Form, Pokemon, Spawn } from '$lib/types/pokemon';
 
   let {
@@ -41,6 +41,24 @@
     return parts;
   }
 
+  function formatGlowMode(mode: string | null): string {
+    if (mode === 'land') return 'Land glow';
+    if (mode === 'underwater') return 'Underwater glow';
+    if (mode === 'both') return 'Land and underwater glow';
+    return 'No liquid glow';
+  }
+
+  function hasGameplayVisuals(form: Form | null | undefined, pokemon: Pokemon | null | undefined) {
+    return Boolean(
+      form?.hitbox ||
+      form?.lighting ||
+      pokemon?.lighting ||
+      pokemon?.riding ||
+      form?.aspectChoices.length ||
+      form?.behaviour,
+    );
+  }
+
   // Resolve override values: form override takes precedence over species default
   const resolvedCatchRate = $derived(form?.overrides?.catchRate ?? pokemon?.catchRate ?? 0);
   const resolvedBaseFriendship = $derived(
@@ -57,6 +75,7 @@
   });
   const skeletonCells = Array.from({ length: 6 }, (_, index) => index);
   const breedingSkeletonCells = Array.from({ length: 3 }, (_, index) => index);
+  const visualSkeletonCells = Array.from({ length: 4 }, (_, index) => index);
 </script>
 
 <div class="space-y-8">
@@ -116,10 +135,9 @@
             {#if resolvedMaleRatio === null}
               Genderless
             {:else}
-              {(resolvedMaleRatio * 100).toFixed(0)}% M / {(
-                (1 - resolvedMaleRatio) *
-                100
-              ).toFixed(0)}% F
+              {(resolvedMaleRatio * 100).toFixed(0)}% M / {((1 - resolvedMaleRatio) * 100).toFixed(
+                0,
+              )}% F
             {/if}
           </div>
         </div>
@@ -162,6 +180,87 @@
       </div>
     {/if}
   </section>
+
+  {#if loading}
+    <section id="gameplay-visuals" class="space-y-3">
+      <h2 class="text-base font-semibold">Gameplay & Visuals</h2>
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(180px,100%),1fr))]">
+        {#each visualSkeletonCells as skeletonIndex (skeletonIndex)}
+          <Skeleton class="h-20 w-full rounded-lg" />
+        {/each}
+      </div>
+    </section>
+  {:else if form && hasGameplayVisuals(form, pokemon)}
+    <section id="gameplay-visuals" class="space-y-3">
+      <h2 class="flex items-center gap-2 text-base font-semibold">
+        <Sparkles class="h-4 w-4" />
+        Gameplay & Visuals
+      </h2>
+      <div class="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(180px,100%),1fr))]">
+        {#if form.hitbox}
+          <div class="border-b border-border/50 pb-2">
+            <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Box class="h-3.5 w-3.5" />
+              Hitbox
+            </div>
+            <div class="mt-1 font-semibold">
+              {form.hitbox.width.toFixed(1)}w x {form.hitbox.height.toFixed(1)}h
+            </div>
+            <div class="mt-0.5 text-xs text-muted-foreground">
+              {form.hitbox.fixed ? 'Fixed size' : 'Dynamic size'}
+            </div>
+          </div>
+        {/if}
+
+        {#if form.lighting ?? pokemon?.lighting}
+          {@const lighting = form.lighting ?? pokemon?.lighting}
+          <div class="border-b border-border/50 pb-2">
+            <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Sun class="h-3.5 w-3.5" />
+              {form.lighting ? 'Form Lighting' : 'Species Lighting'}
+            </div>
+            {#if lighting}
+              <div class="mt-1 font-semibold">Light {lighting.lightLevel}</div>
+              <div class="mt-0.5 text-xs text-muted-foreground">
+                {formatGlowMode(lighting.liquidGlowMode)}
+              </div>
+            {/if}
+          </div>
+        {/if}
+
+        {#if pokemon?.riding}
+          <div class="border-b border-border/50 pb-2">
+            <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Bike class="h-3.5 w-3.5" />
+              Riding profile
+            </div>
+            <div class="mt-1 font-semibold">Available</div>
+          </div>
+        {/if}
+
+        {#if form.aspectChoices.length}
+          <div class="border-b border-border/50 pb-2">
+            <div class="text-xs font-medium text-muted-foreground">Aspects</div>
+            <div class="mt-2 flex flex-wrap gap-1">
+              {#each form.aspectChoices as aspect (aspect.id)}
+                <Badge variant="outline" class="rounded-full text-xs">{aspect.name}</Badge>
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        {#if form.behaviour}
+          <div class="border-b border-border/50 pb-2">
+            <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Brain class="h-3.5 w-3.5" />
+              Behaviour profile
+            </div>
+            <div class="mt-1 font-semibold">Available</div>
+          </div>
+        {/if}
+      </div>
+    </section>
+  {/if}
 
   {#if form?.labels?.length}
     <section id="labels" class="space-y-3">
@@ -227,7 +326,7 @@
           <div class="flex items-center justify-between rounded-lg bg-muted/50 p-3">
             <span class="font-medium">{drop.item.name}</span>
             <span class="text-sm text-muted-foreground">
-              {drop.quantityMin}–{drop.quantityMax}
+              {drop.percentage}% · {drop.quantityMin}–{drop.quantityMax}
             </span>
           </div>
         {/each}

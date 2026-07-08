@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { createServerClient } from '$lib/server/client';
 import {
@@ -17,7 +17,9 @@ export const load: PageServerLoad = async ({ fetch, url, isDataRequest }) => {
     params: PokemonSearchParams,
   ): Promise<{ pokemon: Pokemon[]; filteredCount: number }> {
     const result = await pokemonApi.search(params);
-    if (!result.ok) return { pokemon: [], filteredCount: 0 };
+    if (!result.ok) {
+      error(result.status, result.message);
+    }
     return { pokemon: result.data.data ?? [], filteredCount: result.data.total ?? 0 };
   }
 

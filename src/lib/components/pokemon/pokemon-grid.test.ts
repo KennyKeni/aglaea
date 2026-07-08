@@ -35,6 +35,7 @@ function makeForm(overrides: Record<string, unknown> = {}) {
     abilities: [],
     moves: [],
     hitbox: null,
+    lighting: null,
     drops: null,
     aspectCombos: [],
     behaviour: null,
@@ -99,6 +100,25 @@ describe('PokemonGrid', () => {
     expect(html).toContain('alt="Pikachu"');
   });
 
+  it('prefers the default form image for species cards', () => {
+    const html = renderGrid([
+      makeSpecies({
+        name: 'Charizard',
+        image: { id: 'charizard-species', url: 'https://example.com/charizard.png' },
+        forms: [
+          makeForm({
+            name: 'Mega X',
+            image: { id: 'charizard-mega-x', url: 'https://example.com/charizard-mega-x.png' },
+          }),
+        ],
+      }),
+    ]);
+
+    expect(html).toContain('src="https://example.com/charizard-mega-x.png"');
+    expect(html).toContain('alt="Charizard Mega X"');
+    expect(html).not.toContain('https://example.com/charizard.png');
+  });
+
   it('links species cards by slug while preserving canonical ID display', () => {
     const pokemon = makeSpecies({ id: 1, slug: 'bulbasaur' });
     const html = renderGrid([pokemon]);
@@ -108,8 +128,13 @@ describe('PokemonGrid', () => {
     expect(html).not.toContain('href="/pokemon/1"');
   });
 
-  it('renders a graceful fallback when the species image is absent', () => {
-    const html = renderGrid([makeSpecies({ image: null })]);
+  it('renders a graceful fallback when neither species nor default form image is present', () => {
+    const html = renderGrid([
+      makeSpecies({
+        image: null,
+        forms: [makeForm({ image: null })],
+      }),
+    ]);
 
     expect(html).toContain('No image');
     expect(html).not.toContain('<img');

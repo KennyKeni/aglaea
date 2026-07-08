@@ -24,6 +24,10 @@
     { label: 'Spe', value: form.baseSpeed },
   ]);
 
+  const formImage = $derived(form.image);
+  const activeImage = $derived(formImage ?? pokemon.image);
+  const activeImageAlt = $derived(formImage ? `${pokemon.name} ${form.name}` : pokemon.name);
+  const activeDescription = $derived(form.description ?? pokemon.description);
   const statTotal = $derived(getStatTotal(form));
 </script>
 
@@ -32,8 +36,8 @@
     <div class="self-stretch md:col-span-4">
       <div class="flex h-full flex-col rounded-lg bg-muted p-4">
         <div class="flex h-52 w-full flex-1 items-center justify-center md:h-auto">
-          {#if pokemon.image?.url}
-            <img src={pokemon.image.url} alt={pokemon.name} class="h-full w-full object-contain" />
+          {#if activeImage?.url}
+            <img src={activeImage.url} alt={activeImageAlt} class="h-full w-full object-contain" />
           {:else}
             <div class="flex flex-col items-center justify-center gap-1 text-muted-foreground/40">
               <ImageOff class="h-12 w-12" />
@@ -99,9 +103,9 @@
         </div>
       </div>
 
-      {#if pokemon.description}
+      {#if activeDescription}
         <p class="pt-3 mt-3 border-t border-border/50 text-sm text-muted-foreground">
-          {pokemon.description}
+          {activeDescription}
         </p>
       {/if}
     </div>
