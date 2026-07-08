@@ -4,6 +4,7 @@
   import { Bike, Box, Brain, Droplets, MapPin, Sparkles, Sun } from '@lucide/svelte';
   import type { Form, Pokemon, Spawn } from '$lib/types/pokemon';
   import {
+    detailRidingData,
     resolveRiding,
     summarizeBehaviourData,
     summarizeRidingData,
@@ -115,6 +116,7 @@
 
   const resolvedRiding = $derived(resolveRiding(form, pokemon));
   const ridingSummary = $derived(resolvedRiding ? summarizeRidingData(resolvedRiding.data) : null);
+  const ridingDetails = $derived(resolvedRiding ? detailRidingData(resolvedRiding.data) : null);
   const behaviourSummary = $derived(
     form?.behaviour ? summarizeBehaviourData(form.behaviour.data) : null,
   );
@@ -403,6 +405,76 @@
         {/if}
       </div>
     </section>
+
+    {#if ridingDetails}
+      <section id="riding-details" class="space-y-3">
+        <h2 class="flex items-center gap-2 text-base font-semibold">
+          <Bike class="h-4 w-4" />
+          Riding Details
+        </h2>
+        <div class="space-y-4">
+          {#each ridingDetails.behaviours as behaviour, behaviourIndex (`riding-behaviour-${behaviourIndex}-${behaviour.style ?? 'style'}-${behaviour.key ?? 'key'}`)}
+            <div class="min-w-0 space-y-1 border-b border-border/50 pb-3">
+              {#if behaviour.style}
+                <div class="font-semibold">{behaviour.style}</div>
+              {/if}
+              {#if behaviour.key}
+                <div class="break-words text-xs text-muted-foreground">{behaviour.key}</div>
+              {/if}
+              {#if behaviour.compositeRole}
+                <div class="text-xs text-muted-foreground">{behaviour.compositeRole}</div>
+              {/if}
+              {#if behaviour.transitionStrategy}
+                <div class="text-xs text-muted-foreground">{behaviour.transitionStrategy}</div>
+              {/if}
+              {#each behaviour.stats as stat, statIndex (`riding-stat-${behaviourIndex}-${statIndex}-${stat.label}`)}
+                <div class="text-xs text-muted-foreground">{stat.label}</div>
+                {#if stat.description}
+                  <div class="text-xs text-muted-foreground">{stat.description}</div>
+                {/if}
+              {/each}
+              {#each behaviour.values as value, valueIndex (`riding-value-${behaviourIndex}-${valueIndex}-${value}`)}
+                <div class="break-words text-xs text-muted-foreground">{value}</div>
+              {/each}
+              {#if behaviour.settingProfile}
+                {#if behaviour.settingProfile.label}
+                  <div class="text-xs text-muted-foreground">{behaviour.settingProfile.label}</div>
+                {/if}
+                {#if behaviour.settingProfile.resource}
+                  <div class="break-words text-xs text-muted-foreground">
+                    {behaviour.settingProfile.resource}
+                  </div>
+                {/if}
+                {#each behaviour.settingProfile.values as settingValue, settingIndex (`riding-setting-${behaviourIndex}-${settingIndex}-${settingValue}`)}
+                  <div class="break-words text-xs text-muted-foreground">{settingValue}</div>
+                {/each}
+              {/if}
+              {#each behaviour.rideSounds as sound, soundIndex (`riding-sound-${behaviourIndex}-${soundIndex}-${sound.location}`)}
+                <div class="break-words text-xs text-muted-foreground">{sound.location}</div>
+                {#each sound.facts as fact, factIndex (`riding-sound-fact-${behaviourIndex}-${soundIndex}-${factIndex}-${fact}`)}
+                  <div class="break-words text-xs text-muted-foreground">{fact}</div>
+                {/each}
+              {/each}
+              {#if behaviour.inheritance}
+                <div class="text-xs text-muted-foreground">{behaviour.inheritance}</div>
+              {/if}
+            </div>
+          {/each}
+
+          {#each ridingDetails.seats as seat, seatIndex (`riding-seat-${seatIndex}-${seat.label}`)}
+            <div class="min-w-0 space-y-1 border-b border-border/50 pb-3">
+              <div class="font-semibold">{seat.label}</div>
+              {#if seat.offset}
+                <div class="break-words text-xs text-muted-foreground">{seat.offset}</div>
+              {/if}
+              {#each seat.poseOffsets as poseOffset, poseIndex (`riding-pose-${seatIndex}-${poseIndex}-${poseOffset}`)}
+                <div class="break-words text-xs text-muted-foreground">{poseOffset}</div>
+              {/each}
+            </div>
+          {/each}
+        </div>
+      </section>
+    {/if}
   {/if}
 
   {#if form?.labels?.length}
