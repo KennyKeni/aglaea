@@ -1,8 +1,14 @@
 import type { ServerClient } from '../client';
 import type { ApiResponse } from '$lib/api/types';
-import { validate } from '$lib/api/validate';
-import { PokemonSchema, PaginatedSchema, NamedRefSchema } from '$lib/types/api';
+import { validate, validateTypeBox } from '$lib/api/validate';
 import { z } from 'zod';
+import {
+  PokemonSpeciesListResponseSchema,
+  PokemonSpeciesDetailResponseSchema,
+  type PokemonIncludeName,
+  type PokemonSpeciesListResponse,
+  type PokemonSpeciesDetailResponse,
+} from '@aglaea/contract';
 
 const FilterItemSchema = z
   .object({
@@ -24,7 +30,7 @@ export interface PokemonSearchParams {
   abilitySlugs?: string[];
   moveSlugs?: string[];
   generations?: string[];
-  include?: PokemonInclude[];
+  include?: PokemonIncludeName[];
   hpMin?: number;
   hpMax?: number;
   attackMin?: number;
@@ -42,21 +48,10 @@ export interface PokemonSearchParams {
 }
 
 export interface PokemonDetailParams {
-  include?: PokemonInclude[];
+  include?: PokemonIncludeName[];
 }
 
-type PokemonInclude =
-  | 'forms'
-  | 'types'
-  | 'abilities'
-  | 'moves'
-  | 'spawns'
-  | 'drops'
-  | 'labels'
-  | 'eggGroups'
-  | 'experienceGroup';
-
-function setInclude(q: URLSearchParams, values: PokemonInclude[] | undefined): void {
+function setInclude(q: URLSearchParams, values: PokemonIncludeName[] | undefined): void {
   if (values?.length) q.set('include', values.join(','));
 }
 
@@ -102,15 +97,17 @@ function buildDetailQuery(params: PokemonDetailParams): URLSearchParams {
   return q;
 }
 
-export type Pokemon = z.infer<typeof PokemonSchema>;
-export type PaginatedPokemon = z.infer<ReturnType<typeof PaginatedSchema<typeof PokemonSchema>>>;
-export type FilterOption = z.infer<typeof NamedRefSchema>;
+export type PaginatedPokemon = PokemonSpeciesListResponse;
+export type Pokemon = PokemonSpeciesDetailResponse;
+export type FilterOption = z.infer<typeof FilterItemSchema>;
 
-export function createPokemonEndpoint(client: ServerClient) {
+export type { PokemonIncludeName } from '@aglaea/contract';
+
+export function createPokemonEndpoint(client: Pick<ServerClient, 'get'>) {
   return {
     search: async (params: PokemonSearchParams = {}): Promise<ApiResponse<PaginatedPokemon>> => {
       const result = await client.get('/pokemon/species', buildSearchQuery(params));
-      return validate(result, PaginatedSchema(PokemonSchema));
+      return validateTypeBox(result, PokemonSpeciesListResponseSchema, 'Pokemon species list');
     },
 
     getById: async (
@@ -118,7 +115,7 @@ export function createPokemonEndpoint(client: ServerClient) {
       params: PokemonDetailParams = {},
     ): Promise<ApiResponse<Pokemon>> => {
       const result = await client.get(`/pokemon/species/${id}`, buildDetailQuery(params));
-      return validate(result, PokemonSchema);
+      return validateTypeBox(result, PokemonSpeciesDetailResponseSchema, 'Pokemon species detail');
     },
 
     getTypes: async (limit = 9999): Promise<ApiResponse<{ data: FilterOption[] }>> => {
