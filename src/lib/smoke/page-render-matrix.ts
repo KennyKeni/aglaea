@@ -60,6 +60,8 @@ export const PAGE_RENDER_MATRIX: readonly PageRenderExpectation[] = [
       'Walk 0.35',
       'Rest normal',
       'Spawn Locations',
+      'bulbasaur-1',
+      'spawn_pool_world/0001_bulbasaur',
       'Ultra Rare',
       'Grounded',
       'Weight 6',
