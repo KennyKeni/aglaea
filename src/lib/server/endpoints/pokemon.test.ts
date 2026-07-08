@@ -65,6 +65,7 @@ function makeForm(overrides: Record<string, unknown> = {}) {
     },
     aspectCombos: [],
     behaviour: null,
+    gameplay: null,
     spawns: [],
     ...overrides,
   };
@@ -88,6 +89,7 @@ function makeSpeciesDetail() {
     hitbox: { width: 1.0, height: 1.0, fixed: true },
     lighting: { lightLevel: 15, liquidGlowMode: null },
     riding: null,
+    gameplay: { battleOnly: null, dynamaxBlocked: true },
     forms: [makeForm()],
   };
 }
@@ -112,6 +114,7 @@ function makeSpeciesList() {
         hitbox: null,
         lighting: null,
         riding: null,
+        gameplay: null,
         forms: [makeForm()],
       },
     ],
@@ -190,8 +193,8 @@ describe('createPokemonEndpoint', () => {
 
 describe('buildSearchQuery', () => {
   it('serializes include as a comma-list', () => {
-    const q = buildSearchQuery({ include: ['forms', 'types', 'abilities'] });
-    expect(q.get('include')).toBe('forms,types,abilities');
+    const q = buildSearchQuery({ include: ['forms', 'types', 'abilities', 'gameplay'] });
+    expect(q.get('include')).toBe('forms,types,abilities,gameplay');
   });
 
   it('serializes name, limit, and offset', () => {

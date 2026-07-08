@@ -45,6 +45,7 @@ function makeForm(overrides: Record<string, unknown> = {}): Form {
     drops: null,
     aspectCombos: [],
     behaviour: null,
+    gameplay: null,
     spawns: [],
     ...overrides,
   } as unknown as Form;
@@ -68,6 +69,7 @@ function makeSpecies(overrides: Record<string, unknown> = {}): Pokemon {
     hitbox: null,
     lighting: null,
     riding: null,
+    gameplay: null,
     forms: [makeForm()],
     ...overrides,
   } as unknown as Pokemon;
@@ -265,10 +267,12 @@ describe('PokemonContent', () => {
       lighting: { lightLevel: 14, liquidGlowMode: 'land' },
       aspectChoices: [{ id: 10, name: 'Blue Pattern', slug: 'blue-pattern', value: 'blue' }],
       behaviour: { data: { moving: { fly: { canFly: true } } } },
+      gameplay: { dynamaxBlocked: true },
     });
     const pokemon = makeSpecies({
       forms: [standardForm, chargedForm],
       riding: { data: { mount: { enabled: true } } },
+      gameplay: { battleOnly: null, dynamaxBlocked: true },
     });
 
     const html = render(PokemonContent, {
@@ -295,6 +299,10 @@ describe('PokemonContent', () => {
     expect(html).toContain('Light 14');
     expect(html).toContain('Land glow');
     expect(html).toContain('Riding profile');
+    expect(html).toContain('Species Gameplay');
+    expect(html).toContain('Form Gameplay');
+    expect(html).toContain('Battle only: Unspecified');
+    expect(html).toContain('Dynamax blocked: Yes');
     expect(html).toContain('Blue Pattern');
     expect(html).toContain('Behaviour profile');
     expect(html).not.toContain('Torrent');
@@ -375,6 +383,7 @@ describe('Pokemon detail TOC', () => {
       lighting: null,
       aspectChoices: [],
       behaviour: null,
+      gameplay: null,
     });
     const visualForm = makeForm({
       id: 2,
@@ -382,12 +391,25 @@ describe('Pokemon detail TOC', () => {
       lighting: { lightLevel: 11, liquidGlowMode: null },
       aspectChoices: [],
       behaviour: null,
+      gameplay: null,
+    });
+    const gameplayForm = makeForm({
+      id: 3,
+      hitbox: null,
+      lighting: null,
+      aspectChoices: [],
+      behaviour: null,
+      gameplay: { dynamaxBlocked: false },
     });
     const pokemon = makeSpecies({
-      forms: [baseForm, visualForm],
+      forms: [baseForm, visualForm, gameplayForm],
     });
     const ridingPokemon = makeSpecies({
       riding: { data: { mount: { enabled: true } } },
+      forms: [baseForm],
+    });
+    const speciesGameplayPokemon = makeSpecies({
+      gameplay: { battleOnly: null, dynamaxBlocked: true },
       forms: [baseForm],
     });
 
@@ -397,8 +419,14 @@ describe('Pokemon detail TOC', () => {
     expect(buildPokemonDetailToc(pokemon, visualForm).map((item) => item.id)).toContain(
       'gameplay-visuals',
     );
+    expect(buildPokemonDetailToc(pokemon, gameplayForm).map((item) => item.id)).toContain(
+      'gameplay-visuals',
+    );
     expect(buildPokemonDetailToc(ridingPokemon, baseForm).map((item) => item.id)).toContain(
       'gameplay-visuals',
     );
+    expect(
+      buildPokemonDetailToc(speciesGameplayPokemon, baseForm).map((item) => item.id),
+    ).toContain('gameplay-visuals');
   });
 });
