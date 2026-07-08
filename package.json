@@ -17,7 +17,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "smoke:retained-routes": "bun run scripts/retained-routes.ts"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.2.1",
