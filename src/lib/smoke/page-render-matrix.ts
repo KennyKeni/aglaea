@@ -57,6 +57,8 @@ export const PAGE_RENDER_MATRIX: readonly PageRenderExpectation[] = [
       'Gameplay & Visuals',
       'Hitbox',
       'Behaviour profile',
+      'Walk 0.35',
+      'Rest normal',
       'Spawn Locations',
       'Ultra Rare',
       'Grounded',

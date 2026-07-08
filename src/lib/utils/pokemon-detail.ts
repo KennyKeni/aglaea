@@ -171,3 +171,111 @@ export function summarizeRidingData(data: unknown): RidingSummary {
     inheritance,
   };
 }
+
+export interface BehaviourSummary {
+  facts: string[];
+  inheritance: string | null;
+}
+
+function emptyBehaviourSummary(): BehaviourSummary {
+  return { facts: [], inheritance: null };
+}
+
+function speedText(speed: unknown): string | null {
+  const record = asRecord(speed);
+  if (!record) return null;
+  if (typeof record.text === 'string' && record.text.length > 0) return record.text;
+  if (typeof record.value === 'number' && Number.isFinite(record.value))
+    return String(record.value);
+  return null;
+}
+
+function movementFact(
+  label: string,
+  section: unknown,
+  canKey: string,
+  speedKey = 'speed',
+): string | null {
+  const record = asRecord(section);
+  if (!record) return null;
+  const can = record[canKey];
+  if (can === false) return `${label} No`;
+  if (can !== true) return null;
+  const speed = speedText(record[speedKey]);
+  return speed ? `${label} ${speed}` : label;
+}
+
+function formatLightRange(min: unknown, max: unknown): string | null {
+  if (typeof min !== 'number' || typeof max !== 'number') return null;
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return null;
+  return `Light ${min}-${max}`;
+}
+
+function formatFollowRange(min: unknown, max: unknown): string | null {
+  if (typeof min !== 'number' || typeof max !== 'number') return null;
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return null;
+  return `Follow ${min}-${max}`;
+}
+
+export function summarizeBehaviourData(data: unknown): BehaviourSummary {
+  const record = asRecord(data);
+  if (!record) return emptyBehaviourSummary();
+
+  const facts: string[] = [];
+
+  const walk = movementFact('Walk', record.walk, 'canWalk');
+  if (walk) facts.push(walk);
+
+  const swim = movementFact('Swim', record.swim, 'canSwimInWater');
+  if (swim) facts.push(swim);
+
+  const fly = movementFact('Fly', record.fly, 'canFly', 'speedHorizontal');
+  if (fly) facts.push(fly);
+
+  const walkRecord = asRecord(record.walk);
+  if (walkRecord?.avoidsLand === true) facts.push('Avoids land');
+
+  const swimRecord = asRecord(record.swim);
+  if (swimRecord?.avoidsWater === true) facts.push('Avoids water');
+  if (swimRecord?.canSwimInLava === true) facts.push('Swims in lava');
+
+  const rest = asRecord(record.rest);
+  if (rest) {
+    if (typeof rest.depth === 'string' && rest.depth.length > 0) {
+      facts.push(`Rest ${rest.depth}`);
+    }
+    const light = formatLightRange(rest.lightMin, rest.lightMax);
+    if (light) facts.push(light);
+    if (rest.willSleepOnBed === true) facts.push('Sleeps on bed');
+    if (rest.canSleep === false) facts.push('Cannot sleep');
+  }
+
+  const combat = asRecord(record.combat);
+  if (combat) {
+    if (combat.willFlee === true) facts.push('Flees');
+    if (combat.fightsMelee === true) facts.push('Melee');
+    if (combat.willDefendSelf === true) facts.push('Defends self');
+    if (combat.willDefendOwner === true) facts.push('Defends owner');
+  }
+
+  const herd = asRecord(record.herd);
+  if (herd) {
+    if (typeof herd.maxSize === 'number' && Number.isFinite(herd.maxSize)) {
+      facts.push(`Herd ${herd.maxSize}`);
+    }
+    const follow = formatFollowRange(herd.followDistanceMin, herd.followDistanceMax);
+    if (follow) facts.push(follow);
+  }
+
+  if (record.fireImmune === true) facts.push('Fire immune');
+  if (record.freezeImmune === true) facts.push('Freeze immune');
+
+  const inheritance =
+    record.behaviorInheritedFromSpecies === true
+      ? 'Inherited from species'
+      : record.behaviorInheritedFromSpecies === false
+        ? 'Form-specific'
+        : null;
+
+  return { facts, inheritance };
+}

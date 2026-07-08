@@ -556,6 +556,74 @@ describe('PokemonDetailsTab riding', () => {
   });
 });
 
+describe('PokemonDetailsTab behaviour', () => {
+  it('renders useful movement, rest, combat, and herd facts from behaviour data', () => {
+    const form = makeForm({
+      id: 1,
+      behaviour: {
+        data: {
+          walk: {
+            canWalk: true,
+            avoidsLand: false,
+            speed: { text: '0.35', value: 0.35 },
+          },
+          swim: {
+            canSwimInWater: true,
+            avoidsWater: true,
+            canSwimInLava: false,
+            speed: { text: '0.3', value: 0.3 },
+          },
+          fly: {
+            canFly: false,
+            speedHorizontal: { text: '0.3', value: 0.3 },
+          },
+          rest: {
+            depth: 'normal',
+            canSleep: true,
+            lightMin: 0,
+            lightMax: 4,
+            willSleepOnBed: true,
+          },
+          combat: {
+            willFlee: true,
+            fightsMelee: true,
+            willDefendSelf: false,
+            willDefendOwner: true,
+          },
+          herd: {
+            maxSize: 4,
+            followDistanceMin: 4,
+            followDistanceMax: 8,
+          },
+          fireImmune: false,
+          freezeImmune: false,
+          sourceBehaviorPresent: true,
+          behaviorInheritedFromSpecies: false,
+        },
+      },
+    });
+    const pokemon = makeSpecies({ forms: [form] });
+
+    const html = render(PokemonDetailsTab, {
+      props: { form, pokemon, loading: false },
+    }).body;
+
+    expect(html).toContain('Behaviour profile');
+    expect(html).toContain('Walk 0.35');
+    expect(html).toContain('Swim 0.3');
+    expect(html).toContain('Fly No');
+    expect(html).toContain('Avoids water');
+    expect(html).toContain('Rest normal');
+    expect(html).toContain('Light 0-4');
+    expect(html).toContain('Sleeps on bed');
+    expect(html).toContain('Flees');
+    expect(html).toContain('Defends owner');
+    expect(html).toContain('Herd 4');
+    expect(html).toContain('Follow 4-8');
+    expect(html).toContain('Form-specific');
+  });
+});
+
 describe('PokemonDetailsTab spawns', () => {
   it('renders represented spawn condition facts from the contract payload', () => {
     const form = makeForm({

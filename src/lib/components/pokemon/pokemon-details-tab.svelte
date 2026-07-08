@@ -3,7 +3,11 @@
   import { Skeleton } from '$lib/components/ui/skeleton';
   import { Bike, Box, Brain, Droplets, MapPin, Sparkles, Sun } from '@lucide/svelte';
   import type { Form, Pokemon, Spawn } from '$lib/types/pokemon';
-  import { resolveRiding, summarizeRidingData } from '$lib/utils/pokemon-detail';
+  import {
+    resolveRiding,
+    summarizeBehaviourData,
+    summarizeRidingData,
+  } from '$lib/utils/pokemon-detail';
 
   let {
     form,
@@ -111,6 +115,9 @@
 
   const resolvedRiding = $derived(resolveRiding(form, pokemon));
   const ridingSummary = $derived(resolvedRiding ? summarizeRidingData(resolvedRiding.data) : null);
+  const behaviourSummary = $derived(
+    form?.behaviour ? summarizeBehaviourData(form.behaviour.data) : null,
+  );
 
   // Resolve override values: form override takes precedence over species default
   const resolvedCatchRate = $derived(form?.overrides?.catchRate ?? pokemon?.catchRate ?? 0);
@@ -372,7 +379,26 @@
               <Brain class="h-3.5 w-3.5" />
               Behaviour profile
             </div>
-            <div class="mt-1 font-semibold">Available</div>
+            {#if behaviourSummary && (behaviourSummary.facts.length || behaviourSummary.inheritance)}
+              {#if behaviourSummary.facts.length}
+                {#each behaviourSummary.facts as fact, index (`behaviour-fact-${index}-${fact}`)}
+                  <div
+                    class={index === 0
+                      ? 'mt-1 font-semibold'
+                      : 'mt-0.5 text-xs text-muted-foreground'}
+                  >
+                    {fact}
+                  </div>
+                {/each}
+              {/if}
+              {#if behaviourSummary.inheritance}
+                <div class="mt-0.5 text-xs text-muted-foreground">
+                  {behaviourSummary.inheritance}
+                </div>
+              {/if}
+            {:else}
+              <div class="mt-1 font-semibold">Available</div>
+            {/if}
           </div>
         {/if}
       </div>
