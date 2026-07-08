@@ -2,7 +2,7 @@
 
 - **Runtime**: Bun
 - **Frontend**: SvelteKit (Svelte 5), shadcn-svelte
-- **Backend**: Elysia (separate repo at `/Users/klin344/Projects/herta`)
+- **Backend**: Elysia (separate repo at `/Users/keni/Projects/cobblemon/herta-rewrite`)
 - **API**: herta.kennykeni.com
 
 # Svelte MCP Server
@@ -73,3 +73,19 @@ src/lib/
 # Verification
 
 - Run `bun check` after code changes to verify TypeScript compiles
+
+## Agent skills
+
+This repo keeps agent-owned support files in `.local/`, which is intentionally gitignored.
+
+### Issue tracker
+
+Issues, PRDs, triage, QA reports, and refactor plans live in GitHub Issues for `KennyKeni/aglaea`. See `.local/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the repo's configured issue-tracker labels. See `.local/agents/triage-labels.md`.
+
+### Domain docs
+
+Local-only domain context and ADRs live under `.local/context/` and `.local/adr/`. See `.local/agents/domain.md`.
