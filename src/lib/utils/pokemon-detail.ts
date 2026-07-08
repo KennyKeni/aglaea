@@ -32,6 +32,8 @@ export function buildPokemonDetailToc(pokemon: Pokemon, activeForm: Form | null)
     activeForm?.lighting ||
     pokemon.lighting ||
     pokemon.riding ||
+    pokemon.gameplay ||
+    activeForm?.gameplay ||
     activeForm?.aspectChoices.length ||
     activeForm?.behaviour
   ) {

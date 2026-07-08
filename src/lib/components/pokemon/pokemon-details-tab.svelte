@@ -48,12 +48,19 @@
     return 'No liquid glow';
   }
 
+  function formatNullableFlag(value: boolean | null): string {
+    if (value === null) return 'Unspecified';
+    return value ? 'Yes' : 'No';
+  }
+
   function hasGameplayVisuals(form: Form | null | undefined, pokemon: Pokemon | null | undefined) {
     return Boolean(
       form?.hitbox ||
       form?.lighting ||
       pokemon?.lighting ||
       pokemon?.riding ||
+      pokemon?.gameplay ||
+      form?.gameplay ||
       form?.aspectChoices.length ||
       form?.behaviour,
     );
@@ -235,6 +242,27 @@
               Riding profile
             </div>
             <div class="mt-1 font-semibold">Available</div>
+          </div>
+        {/if}
+
+        {#if pokemon?.gameplay}
+          <div class="border-b border-border/50 pb-2">
+            <div class="text-xs font-medium text-muted-foreground">Species Gameplay</div>
+            <div class="mt-1 font-semibold">
+              Dynamax blocked: {formatNullableFlag(pokemon.gameplay.dynamaxBlocked)}
+            </div>
+            <div class="mt-0.5 text-xs text-muted-foreground">
+              Battle only: {formatNullableFlag(pokemon.gameplay.battleOnly)}
+            </div>
+          </div>
+        {/if}
+
+        {#if form.gameplay}
+          <div class="border-b border-border/50 pb-2">
+            <div class="text-xs font-medium text-muted-foreground">Form Gameplay</div>
+            <div class="mt-1 font-semibold">
+              Dynamax blocked: {formatNullableFlag(form.gameplay.dynamaxBlocked)}
+            </div>
           </div>
         {/if}
 

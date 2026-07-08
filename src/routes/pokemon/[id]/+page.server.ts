@@ -23,6 +23,7 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
       'lighting',
       'riding',
       'behaviour',
+      'gameplay',
     ],
   });
 
