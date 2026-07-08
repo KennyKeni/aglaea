@@ -1,8 +1,13 @@
 import type { ServerClient } from '../client';
 import type { ApiResponse } from '$lib/api/types';
-import { validate } from '$lib/api/validate';
-import { MoveSchema, PaginatedSchema, NamedRefSchema } from '$lib/types/api';
+import { validate, validateTypeBox } from '$lib/api/validate';
 import { z } from 'zod';
+import {
+  MoveListResponseSchema,
+  MoveDetailResponseSchema,
+  type MoveListResponse,
+  type MoveDetailResponse,
+} from '@aglaea/contract';
 
 const FilterItemSchema = z
   .object({
@@ -31,7 +36,7 @@ export interface MoveDetailParams {
 
 type MoveInclude = 'flags' | 'boosts' | 'effects' | 'zData' | 'gmaxSpecies' | 'forms';
 
-function buildSearchQuery(params: MoveSearchParams): URLSearchParams {
+export function buildSearchQuery(params: MoveSearchParams): URLSearchParams {
   const q = new URLSearchParams();
   if (params.name) q.set('name', params.name);
   if (params.limit) q.set('limit', String(params.limit));
@@ -50,15 +55,15 @@ function buildDetailQuery(params: MoveDetailParams): URLSearchParams {
   return q;
 }
 
-export type Move = z.infer<typeof MoveSchema>;
-export type PaginatedMoves = z.infer<ReturnType<typeof PaginatedSchema<typeof MoveSchema>>>;
-export type FilterOption = z.infer<typeof NamedRefSchema>;
+export type Move = MoveDetailResponse;
+export type PaginatedMoves = MoveListResponse;
+export type FilterOption = z.infer<typeof FilterItemSchema>;
 
-export function createMoveEndpoint(client: ServerClient) {
+export function createMoveEndpoint(client: Pick<ServerClient, 'get'>) {
   return {
     search: async (params: MoveSearchParams = {}): Promise<ApiResponse<PaginatedMoves>> => {
       const result = await client.get('/moves', buildSearchQuery(params));
-      return validate(result, PaginatedSchema(MoveSchema));
+      return validateTypeBox(result, MoveListResponseSchema, 'move list');
     },
 
     getById: async (
@@ -66,7 +71,7 @@ export function createMoveEndpoint(client: ServerClient) {
       params: MoveDetailParams = {},
     ): Promise<ApiResponse<Move>> => {
       const result = await client.get(`/moves/${identifier}`, buildDetailQuery(params));
-      return validate(result, MoveSchema);
+      return validateTypeBox(result, MoveDetailResponseSchema, 'move detail');
     },
 
     getTypes: async (limit = 9999): Promise<ApiResponse<{ data: FilterOption[] }>> => {
@@ -79,7 +84,7 @@ export function createMoveEndpoint(client: ServerClient) {
         '/moves/categories',
         new URLSearchParams({ limit: String(limit) }),
       );
-      return validate(result, PaginatedSchema(FilterItemSchema));
+      return validate(result, FilterDataSchema);
     },
   };
 }

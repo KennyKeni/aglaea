@@ -1,8 +1,12 @@
 import type { ServerClient } from '../client';
 import type { ApiResponse } from '$lib/api/types';
-import { validate } from '$lib/api/validate';
-import { AbilitySchema, PaginatedSchema } from '$lib/types/api';
-import { z } from 'zod';
+import { validateTypeBox } from '$lib/api/validate';
+import {
+  AbilityListResponseSchema,
+  AbilityDetailResponseSchema,
+  type AbilityListResponse,
+  type AbilityDetailResponse,
+} from '@aglaea/contract';
 
 export interface AbilitySearchParams {
   name?: string;
@@ -17,7 +21,7 @@ export interface AbilityDetailParams {
 
 type AbilityInclude = 'flags' | 'forms';
 
-function buildSearchQuery(params: AbilitySearchParams): URLSearchParams {
+export function buildSearchQuery(params: AbilitySearchParams): URLSearchParams {
   const q = new URLSearchParams();
   if (params.name) q.set('name', params.name);
   if (params.limit) q.set('limit', String(params.limit));
@@ -34,14 +38,14 @@ function buildDetailQuery(params: AbilityDetailParams): URLSearchParams {
   return q;
 }
 
-export type Ability = z.infer<typeof AbilitySchema>;
-export type PaginatedAbilities = z.infer<ReturnType<typeof PaginatedSchema<typeof AbilitySchema>>>;
+export type Ability = AbilityDetailResponse;
+export type PaginatedAbilities = AbilityListResponse;
 
-export function createAbilityEndpoint(client: ServerClient) {
+export function createAbilityEndpoint(client: Pick<ServerClient, 'get'>) {
   return {
     search: async (params: AbilitySearchParams = {}): Promise<ApiResponse<PaginatedAbilities>> => {
       const result = await client.get('/abilities', buildSearchQuery(params));
-      return validate(result, PaginatedSchema(AbilitySchema));
+      return validateTypeBox(result, AbilityListResponseSchema, 'ability list');
     },
 
     getById: async (
@@ -49,7 +53,7 @@ export function createAbilityEndpoint(client: ServerClient) {
       params: AbilityDetailParams = {},
     ): Promise<ApiResponse<Ability>> => {
       const result = await client.get(`/abilities/${identifier}`, buildDetailQuery(params));
-      return validate(result, AbilitySchema);
+      return validateTypeBox(result, AbilityDetailResponseSchema, 'ability detail');
     },
   };
 }

@@ -1,8 +1,13 @@
 import type { ServerClient } from '../client';
 import type { ApiResponse } from '$lib/api/types';
-import { validate } from '$lib/api/validate';
-import { ItemSchema, PaginatedSchema, NamedRefSchema } from '$lib/types/api';
+import { validate, validateTypeBox } from '$lib/api/validate';
 import { z } from 'zod';
+import {
+  ItemListResponseSchema,
+  ItemDetailResponseSchema,
+  type ItemListResponse,
+  type ItemDetailResponse,
+} from '@aglaea/contract';
 
 const FilterItemSchema = z
   .object({
@@ -11,6 +16,13 @@ const FilterItemSchema = z
     name: z.string(),
   })
   .catchall(z.unknown());
+
+const FilterDataSchema = z.object({
+  data: z.array(FilterItemSchema),
+  total: z.number(),
+  limit: z.number(),
+  offset: z.number(),
+});
 
 export interface ItemSearchParams {
   name?: string;
@@ -25,7 +37,7 @@ export interface ItemDetailParams {
 
 type ItemInclude = 'boosts' | 'flags' | 'tags' | 'recipes';
 
-function buildSearchQuery(params: ItemSearchParams): URLSearchParams {
+export function buildSearchQuery(params: ItemSearchParams): URLSearchParams {
   const q = new URLSearchParams();
   if (params.name) q.set('name', params.name);
   if (params.limit) q.set('limit', String(params.limit));
@@ -42,15 +54,15 @@ function buildDetailQuery(params: ItemDetailParams): URLSearchParams {
   return q;
 }
 
-export type Item = z.infer<typeof ItemSchema>;
-export type PaginatedItems = z.infer<ReturnType<typeof PaginatedSchema<typeof ItemSchema>>>;
-export type FilterOption = z.infer<typeof NamedRefSchema>;
+export type Item = ItemDetailResponse;
+export type PaginatedItems = ItemListResponse;
+export type FilterOption = z.infer<typeof FilterItemSchema>;
 
-export function createItemEndpoint(client: ServerClient) {
+export function createItemEndpoint(client: Pick<ServerClient, 'get'>) {
   return {
     search: async (params: ItemSearchParams = {}): Promise<ApiResponse<PaginatedItems>> => {
       const result = await client.get('/items', buildSearchQuery(params));
-      return validate(result, PaginatedSchema(ItemSchema));
+      return validateTypeBox(result, ItemListResponseSchema, 'item list');
     },
 
     getById: async (
@@ -58,7 +70,7 @@ export function createItemEndpoint(client: ServerClient) {
       params: ItemDetailParams = {},
     ): Promise<ApiResponse<Item>> => {
       const result = await client.get(`/items/${identifier}`, buildDetailQuery(params));
-      return validate(result, ItemSchema);
+      return validateTypeBox(result, ItemDetailResponseSchema, 'item detail');
     },
 
     getTags: async (
@@ -67,7 +79,7 @@ export function createItemEndpoint(client: ServerClient) {
       ApiResponse<{ data: FilterOption[]; total: number; limit: number; offset: number }>
     > => {
       const result = await client.get('/items/tags', new URLSearchParams({ limit: String(limit) }));
-      return validate(result, PaginatedSchema(FilterItemSchema));
+      return validate(result, FilterDataSchema);
     },
   };
 }
