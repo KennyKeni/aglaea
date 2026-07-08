@@ -55,7 +55,7 @@ function setInclude(q: URLSearchParams, values: PokemonIncludeName[] | undefined
   if (values?.length) q.set('include', values.join(','));
 }
 
-function buildSearchQuery(params: PokemonSearchParams): URLSearchParams {
+export function buildSearchQuery(params: PokemonSearchParams): URLSearchParams {
   const q = new URLSearchParams();
   if (params.name) q.set('name', params.name);
   if (params.limit) q.set('limit', String(params.limit));

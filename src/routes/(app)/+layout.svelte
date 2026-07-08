@@ -1,12 +1,12 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { resolve } from '$app/paths';
   import { AppSidebar, AppHeader } from '$lib/components/layout';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import { SearchPalette } from '$lib/components/search-palette';
   import { allSearchSources } from '$lib/api/endpoints/search';
   import { createCommandPalette } from '$lib/state/command-palette.svelte';
   import { baseNavigation } from '$lib/config/navigation';
+  import { searchResultUrl } from '$lib/utils/search-result-url';
   import type { SearchResult } from '$lib/types/search';
 
   let { data, children } = $props();
@@ -17,21 +17,6 @@
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       palette.toggle();
-    }
-  }
-
-  function searchResultUrl(result: SearchResult): string {
-    switch (result.source) {
-      case 'pokemon':
-        return resolve('/pokemon/[id]', { id: String(result.id) });
-      case 'moves':
-        return resolve('/moves/[id]', { id: String(result.id) });
-      case 'abilities':
-        return resolve('/abilities/[id]', { id: String(result.id) });
-      case 'items':
-        return resolve('/items/[id]', { id: String(result.id) });
-      case 'types':
-        return `${resolve('/pokemon')}?types=${encodeURIComponent(result.slug)}`;
     }
   }
 

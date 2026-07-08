@@ -19,7 +19,7 @@
 
 <EntityGrid items={pokemon} {isLoading} {isRefreshing} {skeletonCount}>
   {#snippet card(mon)}
-    <PokemonCard pokemon={mon} href={pokemonUrl(mon.id)} />
+    <PokemonCard pokemon={mon} href={pokemonUrl(mon.slug)} />
   {/snippet}
   {#snippet skeleton()}
     <PokemonCard loading />
