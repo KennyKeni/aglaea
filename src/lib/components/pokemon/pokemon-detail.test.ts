@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { render } from 'svelte/server';
 import PokemonContent from './pokemon-content.svelte';
 import PokemonDetail from './pokemon-detail.svelte';
+import PokemonDetailsTab from './pokemon-details-tab.svelte';
 import type { Form, Pokemon } from '$lib/types/pokemon';
 import { buildPokemonDetailToc, resolvePokemonForm } from '$lib/utils/pokemon-detail';
 
@@ -46,6 +47,7 @@ function makeForm(overrides: Record<string, unknown> = {}): Form {
     aspectCombos: [],
     behaviour: null,
     gameplay: null,
+    riding: null,
     spawns: [],
     ...overrides,
   } as unknown as Form;
@@ -428,5 +430,128 @@ describe('Pokemon detail TOC', () => {
     expect(
       buildPokemonDetailToc(speciesGameplayPokemon, baseForm).map((item) => item.id),
     ).toContain('gameplay-visuals');
+  });
+
+  it('adds gameplay-visuals when the selected form has riding even if species has none', () => {
+    const form = makeForm({
+      id: 1,
+      riding: {
+        data: {
+          behaviours: {
+            LAND: { rideStyle: 'LAND' },
+          },
+        },
+      },
+    });
+    const pokemon = makeSpecies({
+      riding: null,
+      forms: [form],
+    });
+
+    const activeForm = resolvePokemonForm(pokemon.forms, form.id);
+    const tocIds = buildPokemonDetailToc(pokemon, activeForm).map((item) => item.id);
+
+    expect(tocIds).toContain('gameplay-visuals');
+  });
+});
+
+describe('PokemonDetailsTab riding', () => {
+  it('renders selected form riding first-class with useful detail', () => {
+    const form = makeForm({
+      id: 1,
+      riding: {
+        data: {
+          behaviours: {
+            LAND: {
+              key: 'cobblemon:land/horse',
+              rideStyle: 'LAND',
+              inheritedFromSpecies: false,
+              settingProfile: {
+                key: 'horse',
+                resource: 'cobblemon:ride_settings/horse',
+              },
+              stats: {
+                SPEED: '30-55',
+                STAMINA: '45-85',
+              },
+              rideSounds: [
+                { soundLocation: 'cobblemon:ride.loop.horse' },
+                { soundLocation: 'cobblemon:ride.step.grass' },
+              ],
+            },
+            LIQUID: {
+              key: 'cobblemon:liquid/swimmer',
+              rideStyle: 'LIQUID',
+              inheritedFromSpecies: false,
+              rideSounds: [],
+              stats: {},
+            },
+          },
+          seats: [{ locator: 'body' }],
+        },
+      },
+    });
+    const pokemon = makeSpecies({ riding: null, forms: [form] });
+
+    const html = render(PokemonDetailsTab, {
+      props: { form, pokemon, loading: false },
+    }).body;
+
+    expect(html).toContain('Form Riding profile');
+    expect(html).toContain('LAND, LIQUID');
+    expect(html).toContain('cobblemon:land/horse');
+    expect(html).toContain('cobblemon:liquid/swimmer');
+    expect(html).toContain('Seats 1');
+    expect(html).toMatch(/SPEED\s+30-55/);
+    expect(html).toMatch(/STAMINA\s+45-85/);
+    expect(html).toContain('horse');
+    expect(html).toContain('cobblemon:ride_settings/horse');
+    expect(html).toContain('2 ride sounds');
+    expect(html).toContain('Form-specific');
+  });
+
+  it('falls back to species riding when form riding is null', () => {
+    const form = makeForm({ id: 1, riding: null });
+    const pokemon = makeSpecies({
+      riding: {
+        data: {
+          behaviours: {
+            LIQUID: {
+              key: 'cobblemon:liquid/swimmer',
+              rideStyle: 'LIQUID',
+              inheritedFromSpecies: true,
+              rideSounds: [],
+              stats: {},
+            },
+          },
+          seats: [{ locator: 'body' }],
+        },
+      },
+      forms: [form],
+    });
+
+    const html = render(PokemonDetailsTab, {
+      props: { form, pokemon, loading: false },
+    }).body;
+
+    expect(html).toContain('Species Riding profile');
+    expect(html).toContain('LIQUID');
+    expect(html).toContain('Seats 1');
+    expect(html).toContain('Inherited from species');
+  });
+
+  it('renders Available gracefully when riding data shape is unknown', () => {
+    const form = makeForm({
+      id: 1,
+      riding: { data: 'something unstructured' },
+    });
+    const pokemon = makeSpecies({ riding: null, forms: [form] });
+
+    const html = render(PokemonDetailsTab, {
+      props: { form, pokemon, loading: false },
+    }).body;
+
+    expect(html).toContain('Form Riding profile');
+    expect(html).toContain('Available');
   });
 });

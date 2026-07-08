@@ -3,6 +3,7 @@
   import { Skeleton } from '$lib/components/ui/skeleton';
   import { Bike, Box, Brain, Droplets, MapPin, Sparkles, Sun } from '@lucide/svelte';
   import type { Form, Pokemon, Spawn } from '$lib/types/pokemon';
+  import { resolveRiding, summarizeRidingData } from '$lib/utils/pokemon-detail';
 
   let {
     form,
@@ -57,6 +58,7 @@
     return Boolean(
       form?.hitbox ||
       form?.lighting ||
+      form?.riding ||
       pokemon?.lighting ||
       pokemon?.riding ||
       pokemon?.gameplay ||
@@ -65,6 +67,9 @@
       form?.behaviour,
     );
   }
+
+  const resolvedRiding = $derived(resolveRiding(form, pokemon));
+  const ridingSummary = $derived(resolvedRiding ? summarizeRidingData(resolvedRiding.data) : null);
 
   // Resolve override values: form override takes precedence over species default
   const resolvedCatchRate = $derived(form?.overrides?.catchRate ?? pokemon?.catchRate ?? 0);
@@ -235,13 +240,56 @@
           </div>
         {/if}
 
-        {#if pokemon?.riding}
+        {#if resolvedRiding}
+          {@const isFormRiding = resolvedRiding.source === 'form'}
           <div class="border-b border-border/50 pb-2">
             <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
               <Bike class="h-3.5 w-3.5" />
-              Riding profile
+              {isFormRiding ? 'Form Riding profile' : 'Species Riding profile'}
             </div>
-            <div class="mt-1 font-semibold">Available</div>
+            {#if ridingSummary}
+              {#if ridingSummary.rideStyles?.length}
+                <div class="mt-1 font-semibold">{ridingSummary.rideStyles.join(', ')}</div>
+              {/if}
+              {#if ridingSummary.behaviourKeys?.length}
+                <div class="mt-0.5 text-xs text-muted-foreground">
+                  {ridingSummary.behaviourKeys.join(', ')}
+                </div>
+              {/if}
+              {#if ridingSummary.seatCount !== null}
+                <div class="mt-0.5 text-xs text-muted-foreground">
+                  Seats {ridingSummary.seatCount}
+                </div>
+              {/if}
+              {#if ridingSummary.stats}
+                {#each Object.entries(ridingSummary.stats) as [key, value] (`ride-stat-${key}`)}
+                  <div class="mt-0.5 text-xs text-muted-foreground">
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                    {value}
+                  </div>
+                {/each}
+              {/if}
+              {#if ridingSummary.settingProfiles?.length}
+                <div class="mt-0.5 text-xs text-muted-foreground">
+                  {ridingSummary.settingProfiles.join(', ')}
+                </div>
+              {/if}
+              {#if ridingSummary.rideSoundCount !== null}
+                <div class="mt-0.5 text-xs text-muted-foreground">
+                  {ridingSummary.rideSoundCount} ride sound{ridingSummary.rideSoundCount === 1
+                    ? ''
+                    : 's'}
+                </div>
+              {/if}
+              {#if ridingSummary.inheritance}
+                <div class="mt-0.5 text-xs text-muted-foreground">{ridingSummary.inheritance}</div>
+              {/if}
+              {#if !ridingSummary.rideStyles?.length && !ridingSummary.behaviourKeys?.length && ridingSummary.seatCount === null && !ridingSummary.stats && !ridingSummary.settingProfiles?.length && ridingSummary.rideSoundCount === null && !ridingSummary.inheritance}
+                <div class="mt-1 font-semibold">Available</div>
+              {/if}
+            {:else}
+              <div class="mt-1 font-semibold">Available</div>
+            {/if}
           </div>
         {/if}
 
