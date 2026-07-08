@@ -26,9 +26,27 @@
     return evs.length ? evs.join(', ') : 'None';
   }
 
+  function titleish(value: string): string {
+    if (!value) return value;
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  function formatRange(label: string, min: number | null, max: number | null): string | null {
+    if (min === null && max === null) return null;
+    if (min !== null && max !== null) return `${label} ${min}-${max}`;
+    if (min !== null) return `${label} ${min}+`;
+    return `${label} <=${max}`;
+  }
+
   function formatSpawnConditions(spawn: Spawn): string[] {
     const parts: string[] = [];
     for (const cond of spawn.conditions) {
+      if (cond.type) {
+        parts.push(titleish(cond.type));
+      }
+      if (cond.multiplier !== null && cond.multiplier !== undefined) {
+        parts.push(`x${cond.multiplier}`);
+      }
       if (cond.biomeTags?.length) {
         parts.push(...cond.biomeTags.map((t) => t.name.replace('Is ', '')));
       }
@@ -37,6 +55,29 @@
       }
       if (cond.timeRanges?.length) {
         parts.push(...cond.timeRanges.map((t) => t.name));
+      }
+      if (cond.moonPhases?.length) {
+        parts.push(...cond.moonPhases.map((m) => m.name));
+      }
+      if (cond.weather) {
+        if (cond.weather.isRaining === true) parts.push('Rain');
+        if (cond.weather.isRaining === false) parts.push('No rain');
+        if (cond.weather.isThundering === true) parts.push('Thunder');
+        if (cond.weather.isThundering === false) parts.push('No thunder');
+      }
+      if (cond.sky) {
+        if (cond.sky.canSeeSky === true) parts.push('Can see sky');
+        if (cond.sky.canSeeSky === false) parts.push('No sky view');
+        const skyLight = formatRange('Sky', cond.sky.minSkyLight, cond.sky.maxSkyLight);
+        if (skyLight) parts.push(skyLight);
+      }
+      if (cond.position) {
+        const yRange = formatRange('Y', cond.position.minY, cond.position.maxY);
+        if (yRange) parts.push(yRange);
+      }
+      if (cond.lure) {
+        const lureRange = formatRange('Lure', cond.lure.minLureLevel, cond.lure.maxLureLevel);
+        if (lureRange) parts.push(lureRange);
       }
     }
     return parts;
@@ -371,9 +412,12 @@
               </div>
               <span class="text-sm font-medium">Lv. {spawn.levelMin}–{spawn.levelMax}</span>
             </div>
+            {#if spawn.weight !== null && spawn.weight !== undefined}
+              <div class="mt-1 text-xs text-muted-foreground">Weight {spawn.weight}</div>
+            {/if}
             {#if conditions.length}
               <div class="mt-2 flex flex-wrap gap-1">
-                {#each conditions as cond (cond)}
+                {#each conditions as cond, index (`spawn-${spawn.id}-condition-${index}-${cond}`)}
                   <span class="rounded-full bg-background px-2 py-0.5 text-xs">{cond}</span>
                 {/each}
               </div>

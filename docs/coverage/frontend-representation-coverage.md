@@ -21,14 +21,14 @@ These groups are not yet in the retained route smoke matrix. They are tracked
 by Aglaea #21, Herta #47, and aglaea-contract #6, and will join the smoke once
 their contracts and routes are retained.
 
-| Source group             | Disposition                                            | Tracked by             |
-| ------------------------ | ------------------------------------------------------ | ---------------------- |
-| recipes                  | Rendered inline on item detail; no dedicated route yet | Aglaea #21             |
-| spawns                   | Rendered in Pokemon detail; no dedicated route yet     | Aglaea #21             |
-| visual assets            | Rendered via Pokemon form/species images               | Aglaea #21             |
-| localization/resource    | No Aglaea surface yet                                  | Aglaea #21 / Herta #47 |
-| biome/resource data      | No Aglaea surface yet                                  | Aglaea #21 / Herta #47 |
-| Minecraft/runtime groups | No Aglaea surface yet                                  | Aglaea #21 / Herta #47 |
+| Source group             | Disposition                                                                                                                                                                 | Tracked by             |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| recipes                  | Rendered inline on item detail; no dedicated route yet                                                                                                                      | Aglaea #21             |
+| spawns                   | Rendered in Pokemon detail with bucket, position, weight, levels, biome/time/moon/weather/sky/position/lure/multiplier condition facts; no dedicated spawn/preset route yet | Aglaea #21             |
+| visual assets            | Rendered via Pokemon form/species images                                                                                                                                    | Aglaea #21             |
+| localization/resource    | No Aglaea surface yet                                                                                                                                                       | Aglaea #21 / Herta #47 |
+| biome/resource data      | No Aglaea surface yet                                                                                                                                                       | Aglaea #21 / Herta #47 |
+| Minecraft/runtime groups | No Aglaea surface yet                                                                                                                                                       | Aglaea #21 / Herta #47 |
 
 ## No silent field drops
 
