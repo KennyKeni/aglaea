@@ -31,3 +31,6 @@ storybook-static
 
 # LLM
 .claude
+
+# Agent-owned local context, reports, and scratch files
+.local/
