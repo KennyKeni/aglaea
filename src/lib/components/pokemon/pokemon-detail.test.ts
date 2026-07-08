@@ -452,6 +452,7 @@ describe('Pokemon detail TOC', () => {
     const tocIds = buildPokemonDetailToc(pokemon, activeForm).map((item) => item.id);
 
     expect(tocIds).toContain('gameplay-visuals');
+    expect(tocIds).toContain('riding-details');
   });
 });
 
@@ -508,6 +509,109 @@ describe('PokemonDetailsTab riding', () => {
     expect(html).toContain('cobblemon:ride_settings/horse');
     expect(html).toContain('2 ride sounds');
     expect(html).toContain('Form-specific');
+  });
+
+  it('renders detailed riding behaviours, settings, sounds, seats, and pose offsets', () => {
+    const form = makeForm({
+      id: 1,
+      riding: {
+        data: {
+          behaviours: {
+            AIR: {
+              key: 'cobblemon:air/bird',
+              rideStyle: 'AIR',
+              compositeRole: 'primary',
+              transitionStrategy: 'smooth',
+              inheritedFromSpecies: false,
+              stats: {
+                SPEED: '30-65',
+                STAMINA: '45-75',
+              },
+              values: {
+                gravity: 0.08,
+                speed: { min: 0.2, max: 1.4, multiplier: 1.1 },
+              },
+              statDetails: {
+                SPEED: {
+                  displayName: 'Speed',
+                  description: 'Horizontal flight speed',
+                  rangeStart: 30,
+                  rangeEnd: 65,
+                },
+              },
+              settingProfile: {
+                id: 12,
+                key: 'bird',
+                resource: 'cobblemon:ride_settings/bird',
+                values: {
+                  canSprint: true,
+                  canJump: false,
+                  speedExpr: {
+                    kind: 'ride_stat',
+                    rideStyle: 'AIR',
+                    rideStat: 'SPEED',
+                    min: 0.1,
+                    max: 1.2,
+                    multiplier: 1,
+                  },
+                },
+              },
+              rideSounds: [
+                {
+                  soundLocation: 'cobblemon:ride.loop.wind.stereo',
+                  volumeExpressionKind: 'ride_velocity_squared',
+                  pitchExpressionKind: 'ride_velocity_pitch_curve',
+                  muffleEnabled: true,
+                  playForPassengers: true,
+                  playForNonPassengers: false,
+                  submerged: null,
+                },
+              ],
+            },
+          },
+          seats: [
+            {
+              locator: 'saddle',
+              offset: { x: 0, y: 1.25, z: -0.5 },
+              poseOffsets: [
+                {
+                  offset: { x: -0.01, y: -1.36, z: -0.29 },
+                  poseTypes: ['STAND', 'WALK'],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    const pokemon = makeSpecies({ riding: null, forms: [form] });
+
+    const html = render(PokemonDetailsTab, {
+      props: { form, pokemon, loading: false },
+    }).body;
+
+    expect(html).toContain('Riding Details');
+    expect(html).toContain('AIR');
+    expect(html).toContain('cobblemon:air/bird');
+    expect(html).toContain('Composite primary');
+    expect(html).toContain('Transition smooth');
+    expect(html).toContain('Speed 30-65');
+    expect(html).toContain('Horizontal flight speed');
+    expect(html).toContain('gravity 0.08');
+    expect(html).toContain('speed 0.2-1.4 x1.1');
+    expect(html).toContain('Profile #12 bird');
+    expect(html).toContain('cobblemon:ride_settings/bird');
+    expect(html).toContain('canSprint Yes');
+    expect(html).toContain('canJump No');
+    expect(html).toContain('speedExpr ride_stat AIR SPEED 0.1-1.2 x1');
+    expect(html).toContain('cobblemon:ride.loop.wind.stereo');
+    expect(html).toContain('volume ride_velocity_squared');
+    expect(html).toContain('pitch ride_velocity_pitch_curve');
+    expect(html).toContain('Muffled');
+    expect(html).toContain('Passengers only');
+    expect(html).toContain('Seat 1 saddle');
+    expect(html).toContain('Offset x 0 y 1.25 z -0.5');
+    expect(html).toContain('Pose STAND, WALK x -0.01 y -1.36 z -0.29');
   });
 
   it('falls back to species riding when form riding is null', () => {
