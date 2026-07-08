@@ -14,13 +14,13 @@ describe('@aglaea/contract npm dependency', () => {
     expect(spec).not.toMatch(/^(workspace|file|link):/);
   });
 
-  it('pins to at least the gameplay-capable contract (^0.7.0)', () => {
+  it('pins to at least the form-riding-capable contract (^0.8.0)', () => {
     const pkgPath = resolve(process.cwd(), 'package.json');
     const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as {
       dependencies?: Record<string, string>;
     };
     const spec = pkg.dependencies?.['@aglaea/contract'];
-    expect(spec).toMatch(/^\^?0\.7\.0/);
+    expect(spec).toMatch(/^\^?0\.8\.0/);
   });
 
   it('exposes a usable package import boundary', () => {

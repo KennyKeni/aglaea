@@ -66,6 +66,7 @@ function makeForm(overrides: Record<string, unknown> = {}) {
     aspectCombos: [],
     behaviour: null,
     gameplay: null,
+    riding: null,
     spawns: [],
     ...overrides,
   };

@@ -39,6 +39,8 @@ function makeForm(overrides: Record<string, unknown> = {}) {
     drops: null,
     aspectCombos: [],
     behaviour: null,
+    gameplay: null,
+    riding: null,
     spawns: [],
     ...overrides,
   };
@@ -62,6 +64,7 @@ function makeSpecies(overrides: Record<string, unknown> = {}): Pokemon {
     hitbox: null,
     lighting: null,
     riding: null,
+    gameplay: null,
     forms: [makeForm()],
     ...overrides,
   } as unknown as Pokemon;
