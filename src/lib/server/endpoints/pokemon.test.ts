@@ -50,6 +50,7 @@ function makeForm(overrides: Record<string, unknown> = {}) {
     ],
     moves: [],
     hitbox: null,
+    lighting: null,
     drops: {
       amount: 1,
       percentages: [],

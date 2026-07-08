@@ -16,8 +16,13 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders }) => {
       'spawns',
       'drops',
       'labels',
+      'aspects',
       'eggGroups',
       'experienceGroup',
+      'hitboxes',
+      'lighting',
+      'riding',
+      'behaviour',
     ],
   });
 

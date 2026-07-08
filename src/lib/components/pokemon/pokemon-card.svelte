@@ -16,6 +16,11 @@
   } = $props();
 
   let defaultForm = $derived(pokemon?.forms[0]);
+  const defaultFormImage = $derived(defaultForm?.image);
+  const cardImage = $derived(defaultFormImage ?? pokemon?.image);
+  const cardImageAlt = $derived(
+    pokemon ? (defaultFormImage ? `${pokemon.name} ${defaultForm?.name}` : pokemon.name) : '',
+  );
 </script>
 
 {#if loading}
@@ -51,10 +56,10 @@
         </div>
       </div>
       <div class="flex h-28 w-28 shrink-0 items-center justify-center rounded-lg bg-muted p-2">
-        {#if pokemon.image?.url}
+        {#if cardImage?.url}
           <img
-            src={pokemon.image.url}
-            alt={pokemon.name}
+            src={cardImage.url}
+            alt={cardImageAlt}
             class="max-h-full max-w-full object-contain"
           />
         {:else}

@@ -5,7 +5,7 @@
     "": {
       "name": "aglaea",
       "dependencies": {
-        "@aglaea/contract": "^0.4.0",
+        "@aglaea/contract": "^0.6.0",
         "@sinclair/typebox": "^0.34.49",
         "@tanstack/ai": "^0.32.0",
         "@tanstack/svelte-virtual": "^3.13.29",
@@ -67,7 +67,7 @@
 
     "@ag-ui/core": ["@ag-ui/core@0.0.52", "", { "dependencies": { "zod": "^3.22.4" } }, "sha512-Xo0bUaNV56EqylzcrAuhUkQX7et7+SZIrqZZtEByGwEq/I1EHny6ZMkWHLkKR7UNi0FJZwJyhKYmKJS3B2SEgA=="],
 
-    "@aglaea/contract": ["@aglaea/contract@0.4.0", "", { "dependencies": { "@sinclair/typebox": "^0.34.49" } }, "sha512-kPqmai16FbNPaBz5xqfLoQhM/ahxuxqJaT8YQEr8iTCtLtJvZYdCDcd4jiFM1ZnsqAT6RsUY5kev0Oeoi3+DXA=="],
+    "@aglaea/contract": ["@aglaea/contract@0.6.0", "", { "dependencies": { "@sinclair/typebox": "^0.34.49" } }, "sha512-aizFbKgOZ1SGBWpC3i+EFhJGI7KRqfhy8HKbuCK7BV+jPqZqiGAj/Fk+BVmLrAtPdWnpPz+4L2eP3/Oq9rRlDw=="],
 
     "@antfu/install-pkg": ["@antfu/install-pkg@1.1.0", "", { "dependencies": { "package-manager-detector": "^1.3.0", "tinyexec": "^1.0.1" } }, "sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ=="],
 

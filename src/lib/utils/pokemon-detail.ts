@@ -27,6 +27,16 @@ export function buildPokemonDetailToc(pokemon: Pokemon, activeForm: Form | null)
     { id: 'physical', text: 'Physical', level: 2 },
   ];
 
+  if (
+    activeForm?.hitbox ||
+    activeForm?.lighting ||
+    pokemon.lighting ||
+    pokemon.riding ||
+    activeForm?.aspectChoices.length ||
+    activeForm?.behaviour
+  ) {
+    items.push({ id: 'gameplay-visuals', text: 'Gameplay & Visuals', level: 2 });
+  }
   if (activeForm?.labels?.length) {
     items.push({ id: 'labels', text: 'Labels', level: 2 });
   }
