@@ -555,3 +555,59 @@ describe('PokemonDetailsTab riding', () => {
     expect(html).toContain('Available');
   });
 });
+
+describe('PokemonDetailsTab spawns', () => {
+  it('renders represented spawn condition facts from the contract payload', () => {
+    const form = makeForm({
+      id: 1,
+      spawns: [
+        {
+          id: 42,
+          bucket: { id: 3, name: 'Ultra Rare', slug: 'ultra-rare' },
+          positionType: { id: 2, name: 'Grounded', slug: 'grounded' },
+          weight: 6,
+          levelMin: 5,
+          levelMax: 16,
+          conditions: [
+            {
+              id: 7,
+              type: 'world',
+              multiplier: 0.25,
+              biomes: [{ id: 12, name: 'Lush Cave', slug: 'lush-cave' }],
+              biomeTags: [{ id: 9, name: 'Is Overworld', slug: 'is-overworld' }],
+              timeRanges: [{ id: 4, name: 'Night', slug: 'night' }],
+              moonPhases: [{ id: 6, name: 'Full Moon', slug: 'full-moon' }],
+              weather: { isRaining: true, isThundering: false },
+              sky: { canSeeSky: true, minSkyLight: 8, maxSkyLight: 15 },
+              position: { minY: -16, maxY: 64 },
+              lure: { minLureLevel: 1, maxLureLevel: 3 },
+            },
+          ],
+        },
+      ],
+    });
+    const pokemon = makeSpecies({ forms: [form] });
+
+    const html = render(PokemonDetailsTab, {
+      props: { form, pokemon, loading: false },
+    }).body;
+
+    expect(html).toContain('Spawn Locations');
+    expect(html).toContain('Ultra Rare');
+    expect(html).toContain('Grounded');
+    expect(html).toContain('Lv. 5–16');
+    expect(html).toContain('Weight 6');
+    expect(html).toContain('World');
+    expect(html).toContain('x0.25');
+    expect(html).toContain('Lush Cave');
+    expect(html).toContain('Overworld');
+    expect(html).toContain('Night');
+    expect(html).toContain('Full Moon');
+    expect(html).toContain('Rain');
+    expect(html).toContain('No thunder');
+    expect(html).toContain('Can see sky');
+    expect(html).toContain('Sky 8-15');
+    expect(html).toContain('Y -16-64');
+    expect(html).toContain('Lure 1-3');
+  });
+});
