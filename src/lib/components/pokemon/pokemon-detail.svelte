@@ -32,8 +32,8 @@
     <div class="self-stretch md:col-span-4">
       <div class="flex h-full flex-col rounded-lg bg-muted p-4">
         <div class="flex h-52 w-full flex-1 items-center justify-center md:h-auto">
-          {#if form.image?.url}
-            <img src={form.image.url} alt={form.name} class="h-full w-full object-contain" />
+          {#if pokemon.image?.url}
+            <img src={pokemon.image.url} alt={pokemon.name} class="h-full w-full object-contain" />
           {:else}
             <div class="flex flex-col items-center justify-center gap-1 text-muted-foreground/40">
               <ImageOff class="h-12 w-12" />
