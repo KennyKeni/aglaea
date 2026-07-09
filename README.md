@@ -1,38 +1,18 @@
-# sv
+# Aglaea
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+SvelteKit frontend for the Cobblemon wiki. Aglaea talks to the Herta API through
+SvelteKit server routes and uses `@aglaea/contract` for shared API shapes.
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Setup
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+bun install
+bun run dev
 ```
 
-## Building
+## Scripts
 
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- `bun run check` verifies Svelte and TypeScript.
+- `bun run lint` checks formatting and lint rules.
+- `bun run test` runs the Vitest suite.
+- `bun run build` creates a production build.
